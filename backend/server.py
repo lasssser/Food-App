@@ -400,6 +400,139 @@ async def get_me(current_user: dict = Depends(get_current_user)):
         created_at=current_user["created_at"]
     )
 
+# ==================== Cities & Location Routes ====================
+
+# Syrian cities with districts
+SYRIAN_CITIES = [
+    {
+        "id": "damascus",
+        "name": "دمشق",
+        "name_en": "Damascus",
+        "districts": [
+            {"id": "mazzeh", "name": "المزة", "name_en": "Mazzeh"},
+            {"id": "kafarsouseh", "name": "كفرسوسة", "name_en": "Kafarsouseh"},
+            {"id": "malki", "name": "المالكي", "name_en": "Malki"},
+            {"id": "abu_rummaneh", "name": "أبو رمانة", "name_en": "Abu Rummaneh"},
+            {"id": "sha3lan", "name": "الشعلان", "name_en": "Shaalan"},
+            {"id": "midan", "name": "الميدان", "name_en": "Midan"},
+            {"id": "bab_touma", "name": "باب توما", "name_en": "Bab Touma"},
+            {"id": "qassa3", "name": "القصاع", "name_en": "Qassa"},
+            {"id": "jaramana", "name": "جرمانا", "name_en": "Jaramana"},
+            {"id": "sahnaya", "name": "صحنايا", "name_en": "Sahnaya"},
+        ]
+    },
+    {
+        "id": "aleppo",
+        "name": "حلب",
+        "name_en": "Aleppo",
+        "districts": [
+            {"id": "aziziyeh", "name": "العزيزية", "name_en": "Aziziyeh"},
+            {"id": "shahba", "name": "شهباء", "name_en": "Shahba"},
+            {"id": "hamdaniyeh", "name": "الحمدانية", "name_en": "Hamdaniyeh"},
+            {"id": "sulaymaniyeh", "name": "السليمانية", "name_en": "Sulaymaniyeh"},
+            {"id": "midan_aleppo", "name": "الميدان", "name_en": "Midan"},
+            {"id": "jamiliyeh", "name": "الجميلية", "name_en": "Jamiliyeh"},
+        ]
+    },
+    {
+        "id": "homs",
+        "name": "حمص",
+        "name_en": "Homs",
+        "districts": [
+            {"id": "inshaat", "name": "الإنشاءات", "name_en": "Inshaat"},
+            {"id": "wa3r", "name": "الوعر", "name_en": "Waer"},
+            {"id": "zahra", "name": "الزهراء", "name_en": "Zahra"},
+            {"id": "akrama", "name": "عكرمة", "name_en": "Akrama"},
+            {"id": "ghouta", "name": "الغوطة", "name_en": "Ghouta"},
+        ]
+    },
+    {
+        "id": "latakia",
+        "name": "اللاذقية",
+        "name_en": "Latakia",
+        "districts": [
+            {"id": "kornish", "name": "الكورنيش", "name_en": "Corniche"},
+            {"id": "zira3a", "name": "الزراعة", "name_en": "Ziraa"},
+            {"id": "american", "name": "الأمريكان", "name_en": "American"},
+            {"id": "mashrou3", "name": "المشروع", "name_en": "Mashrou"},
+            {"id": "slibeh", "name": "الصليبة", "name_en": "Slibeh"},
+        ]
+    },
+    {
+        "id": "tartous",
+        "name": "طرطوس",
+        "name_en": "Tartous",
+        "districts": [
+            {"id": "kornish_tartous", "name": "الكورنيش", "name_en": "Corniche"},
+            {"id": "thawra", "name": "الثورة", "name_en": "Thawra"},
+            {"id": "dawwar", "name": "الدوار", "name_en": "Dawwar"},
+        ]
+    },
+]
+
+@api_router.get("/cities")
+async def get_cities():
+    """Get list of available cities with districts"""
+    return SYRIAN_CITIES
+
+@api_router.get("/cities/{city_id}")
+async def get_city(city_id: str):
+    """Get specific city details"""
+    for city in SYRIAN_CITIES:
+        if city["id"] == city_id:
+            return city
+    raise HTTPException(status_code=404, detail="المدينة غير موجودة")
+
+@api_router.put("/users/location")
+async def update_user_location(
+    location: UserLocationUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update user's current location (city/district)"""
+    # Validate city exists
+    city = None
+    for c in SYRIAN_CITIES:
+        if c["id"] == location.city_id:
+            city = c
+            break
+    
+    if not city:
+        raise HTTPException(status_code=400, detail="المدينة غير موجودة")
+    
+    # Validate district if provided
+    if location.district_id:
+        district_found = False
+        for d in city["districts"]:
+            if d["id"] == location.district_id:
+                district_found = True
+                break
+        if not district_found:
+            raise HTTPException(status_code=400, detail="المنطقة غير موجودة")
+    
+    # Update user location
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$set": {
+            "city_id": location.city_id,
+            "district_id": location.district_id,
+            "lat": location.lat,
+            "lng": location.lng,
+            "location_updated_at": datetime.utcnow()
+        }}
+    )
+    
+    return {"message": "تم تحديث الموقع بنجاح"}
+
+@api_router.get("/users/location")
+async def get_user_location(current_user: dict = Depends(get_current_user)):
+    """Get user's current location"""
+    return {
+        "city_id": current_user.get("city_id"),
+        "district_id": current_user.get("district_id"),
+        "lat": current_user.get("lat"),
+        "lng": current_user.get("lng")
+    }
+
 # ==================== Restaurant Routes ====================
 
 @api_router.get("/restaurants", response_model=List[Restaurant])
