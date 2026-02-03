@@ -391,9 +391,16 @@ export default function ProfileScreen() {
         </View>
 
         {/* Logout */}
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutText}>تسجيل الخروج</Text>
+        <TouchableOpacity 
+          style={styles.logoutButton} 
+          onPress={() => {
+            console.log('Logout pressed');
+            handleLogout();
+          }}
+          activeOpacity={0.7}
+        >
           <Ionicons name="log-out-outline" size={22} color={COLORS.error} />
+          <Text style={styles.logoutText}>تسجيل الخروج</Text>
         </TouchableOpacity>
 
         <Text style={styles.version}>يلا ناكل؟ v1.0.0</Text>
