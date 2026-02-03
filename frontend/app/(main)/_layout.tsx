@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet } from 'react-native';
 import { useCartStore } from '../../src/store/cartStore';
+import { notificationAPI } from '../../src/services/api';
 
 export default function MainLayout() {
   const itemCount = useCartStore((state) => state.getItemCount());
