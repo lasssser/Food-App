@@ -5,9 +5,11 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   TextInput,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -34,6 +36,9 @@ export default function CheckoutScreen() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showAddAddress, setShowAddAddress] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [newAddress, setNewAddress] = useState({ label: '', address_line: '', area: '' });
 
   const subtotal = getSubtotal();
@@ -60,7 +65,8 @@ export default function CheckoutScreen() {
 
   const handleAddAddress = async () => {
     if (!newAddress.label || !newAddress.address_line) {
-      Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
+      setErrorMessage('يرجى ملء جميع الحقول');
+      setShowErrorModal(true);
       return;
     }
 
@@ -71,18 +77,21 @@ export default function CheckoutScreen() {
       setShowAddAddress(false);
       setNewAddress({ label: '', address_line: '', area: '' });
     } catch (error) {
-      Alert.alert('خطأ', 'فشل إضافة العنوان');
+      setErrorMessage('فشل إضافة العنوان');
+      setShowErrorModal(true);
     }
   };
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
-      Alert.alert('خطأ', 'يرجى اختيار عنوان التوصيل');
+      setErrorMessage('يرجى اختيار عنوان التوصيل');
+      setShowErrorModal(true);
       return;
     }
 
     if (items.length === 0 || !restaurant) {
-      Alert.alert('خطأ', 'السلة فارغة');
+      setErrorMessage('السلة فارغة');
+      setShowErrorModal(true);
       return;
     }
 
@@ -99,26 +108,16 @@ export default function CheckoutScreen() {
         payment_method: paymentMethod,
       };
 
+      console.log('Sending order:', orderData);
       const order = await orderAPI.create(orderData);
+      console.log('Order created:', order);
 
-      if (paymentMethod === 'COD') {
-        clearCart();
-        Alert.alert(
-          'تم الطلب بنجاح! 🎉',
-          'سيتم توصيل طلبك قريباً',
-          [{ text: 'حسناً', onPress: () => router.replace('/(main)/orders') }]
-        );
-      } else {
-        // SHAMCASH payment
-        clearCart();
-        Alert.alert(
-          'أكمل الدفع عبر ShamCash',
-          'يرجى تحويل المبلغ إلى محفظتنا وإدخال رقم العملية',
-          [{ text: 'حسناً', onPress: () => router.replace('/(main)/orders') }]
-        );
-      }
+      clearCart();
+      setShowSuccessModal(true);
     } catch (error: any) {
-      Alert.alert('خطأ', error.response?.data?.detail || 'فشل إنشاء الطلب');
+      console.error('Order error:', error);
+      setErrorMessage(error.response?.data?.detail || 'فشل إنشاء الطلب');
+      setShowErrorModal(true);
     } finally {
       setSubmitting(false);
     }
@@ -136,7 +135,7 @@ export default function CheckoutScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
           <Ionicons name="arrow-forward" size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>إتمام الطلب</Text>
@@ -146,12 +145,12 @@ export default function CheckoutScreen() {
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 200 }}
+        contentContainerStyle={{ paddingBottom: 220 }}
       >
         {/* Address Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <TouchableOpacity onPress={() => setShowAddAddress(true)}>
+            <TouchableOpacity onPress={() => setShowAddAddress(true)} activeOpacity={0.7}>
               <Ionicons name="add-circle" size={24} color={COLORS.primary} />
             </TouchableOpacity>
             <Text style={styles.sectionTitle}>📍 عنوان التوصيل</Text>
@@ -161,6 +160,7 @@ export default function CheckoutScreen() {
             <TouchableOpacity 
               style={styles.addAddressCard}
               onPress={() => setShowAddAddress(true)}
+              activeOpacity={0.7}
             >
               <Ionicons name="add" size={32} color={COLORS.primary} />
               <Text style={styles.addAddressText}>أضف عنوان جديد</Text>
@@ -174,6 +174,7 @@ export default function CheckoutScreen() {
                   selectedAddress === address.id && styles.addressCardSelected,
                 ]}
                 onPress={() => setSelectedAddress(address.id)}
+                activeOpacity={0.7}
               >
                 <View style={styles.addressContent}>
                   <View style={styles.addressIcon}>
@@ -212,6 +213,7 @@ export default function CheckoutScreen() {
               paymentMethod === 'COD' && styles.paymentCardSelected,
             ]}
             onPress={() => setPaymentMethod('COD')}
+            activeOpacity={0.7}
           >
             <View style={styles.paymentContent}>
               <View style={[styles.paymentIcon, { backgroundColor: `${COLORS.success}15` }]}>
@@ -237,6 +239,7 @@ export default function CheckoutScreen() {
               paymentMethod === 'SHAMCASH' && styles.paymentCardSelected,
             ]}
             onPress={() => setPaymentMethod('SHAMCASH')}
+            activeOpacity={0.7}
           >
             <View style={styles.paymentContent}>
               <View style={[styles.paymentIcon, { backgroundColor: `${COLORS.info}15` }]}>
@@ -294,7 +297,7 @@ export default function CheckoutScreen() {
           style={[styles.orderButton, submitting && styles.orderButtonDisabled]}
           onPress={handlePlaceOrder}
           disabled={submitting}
-          activeOpacity={0.9}
+          activeOpacity={0.8}
         >
           <LinearGradient
             colors={[COLORS.primary, COLORS.primaryDark]}
@@ -313,11 +316,14 @@ export default function CheckoutScreen() {
       </View>
 
       {/* Add Address Modal */}
-      {showAddAddress && (
-        <View style={styles.modalOverlay}>
-          <View style={styles.modal}>
+      <Modal visible={showAddAddress} animationType="slide" transparent>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={() => setShowAddAddress(false)}>
+              <TouchableOpacity onPress={() => setShowAddAddress(false)} activeOpacity={0.7}>
                 <Ionicons name="close" size={24} color={COLORS.textPrimary} />
               </TouchableOpacity>
               <Text style={styles.modalTitle}>إضافة عنوان جديد</Text>
@@ -352,7 +358,7 @@ export default function CheckoutScreen() {
               textAlign="right"
             />
 
-            <TouchableOpacity style={styles.modalButton} onPress={handleAddAddress}>
+            <TouchableOpacity style={styles.modalButton} onPress={handleAddAddress} activeOpacity={0.7}>
               <LinearGradient
                 colors={[COLORS.primary, COLORS.primaryDark]}
                 style={styles.modalButtonGradient}
@@ -361,8 +367,55 @@ export default function CheckoutScreen() {
               </LinearGradient>
             </TouchableOpacity>
           </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal visible={showSuccessModal} animationType="fade" transparent>
+        <View style={styles.alertModalOverlay}>
+          <View style={styles.alertModal}>
+            <View style={[styles.alertIconContainer, { backgroundColor: `${COLORS.success}15` }]}>
+              <Ionicons name="checkmark-circle" size={50} color={COLORS.success} />
+            </View>
+            <Text style={styles.alertTitle}>تم الطلب بنجاح! 🎉</Text>
+            <Text style={styles.alertMessage}>
+              {paymentMethod === 'COD' 
+                ? 'سيتم توصيل طلبك قريباً' 
+                : 'يرجى تحويل المبلغ عبر ShamCash'}
+            </Text>
+            <TouchableOpacity 
+              style={styles.alertButton} 
+              onPress={() => {
+                setShowSuccessModal(false);
+                router.replace('/(main)/orders');
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.alertButtonText}>حسناً</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      )}
+      </Modal>
+
+      {/* Error Modal */}
+      <Modal visible={showErrorModal} animationType="fade" transparent>
+        <View style={styles.alertModalOverlay}>
+          <View style={styles.alertModal}>
+            <View style={[styles.alertIconContainer, { backgroundColor: `${COLORS.error}15` }]}>
+              <Ionicons name="close-circle" size={50} color={COLORS.error} />
+            </View>
+            <Text style={styles.alertTitle}>خطأ</Text>
+            <Text style={styles.alertMessage}>{errorMessage}</Text>
+            <TouchableOpacity 
+              style={[styles.alertButton, { backgroundColor: COLORS.error }]} 
+              onPress={() => setShowErrorModal(false)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.alertButtonText}>حسناً</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -631,17 +684,15 @@ const styles = StyleSheet.create({
 
   // Modal
   modalOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: SPACING.lg,
+    justifyContent: 'flex-end',
   },
-  modal: {
+  modalContent: {
     backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.xl,
+    borderTopLeftRadius: RADIUS.xl,
+    borderTopRightRadius: RADIUS.xl,
     padding: SPACING.xl,
-    width: '100%',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -676,6 +727,53 @@ const styles = StyleSheet.create({
   modalButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: COLORS.textWhite,
+  },
+
+  // Alert Modal
+  alertModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.xl,
+  },
+  alertModal: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.xl,
+    width: '100%',
+    alignItems: 'center',
+  },
+  alertIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+  },
+  alertTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
+  },
+  alertMessage: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginBottom: SPACING.xl,
+  },
+  alertButton: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.xxl,
+    borderRadius: RADIUS.md,
+  },
+  alertButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
     color: COLORS.textWhite,
   },
 });
