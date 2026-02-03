@@ -1,45 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   Alert,
   ActivityIndicator,
-  Modal,
-  KeyboardAvoidingView,
-  Platform,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useCartStore } from '../../src/store/cartStore';
 import { addressAPI, orderAPI, paymentAPI } from '../../src/services/api';
-import { Address } from '../../src/types';
+import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+
+interface Address {
+  id: string;
+  label: string;
+  address_line: string;
+  area?: string;
+}
 
 export default function CheckoutScreen() {
   const router = useRouter();
-  const { items, restaurant, getSubtotal, getTotal, clearCart } = useCartStore();
+  const { items, getTotal, getRestaurantId, clearCart } = useCartStore();
   
   const [addresses, setAddresses] = useState<Address[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'COD' | 'SHAMCASH'>('COD');
-  const [notes, setNotes] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [loadingAddresses, setLoadingAddresses] = useState(true);
-  
-  // Address Modal
-  const [showAddressModal, setShowAddressModal] = useState(false);
-  const [newAddressLabel, setNewAddressLabel] = useState('');
-  const [newAddressLine, setNewAddressLine] = useState('');
-  const [newAddressArea, setNewAddressArea] = useState('');
-  
-  // ShamCash Modal
-  const [showShamCashModal, setShowShamCashModal] = useState(false);
-  const [shamCashRef, setShamCashRef] = useState('');
-  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [showAddAddress, setShowAddAddress] = useState(false);
+  const [newAddress, setNewAddress] = useState({ label: '', address_line: '', area: '' });
+
+  const subtotal = getTotal();
+  const deliveryFee = 5000;
+  const total = subtotal + deliveryFee;
 
   useEffect(() => {
     fetchAddresses();
@@ -50,33 +49,27 @@ export default function CheckoutScreen() {
       const data = await addressAPI.getAll();
       setAddresses(data);
       if (data.length > 0) {
-        setSelectedAddress(data[0]);
+        setSelectedAddress(data[0].id);
       }
     } catch (error) {
       console.error('Error fetching addresses:', error);
     } finally {
-      setLoadingAddresses(false);
+      setLoading(false);
     }
   };
 
   const handleAddAddress = async () => {
-    if (!newAddressLabel || !newAddressLine) {
-      Alert.alert('خطأ', 'يرجى ملء جميع الحقول المطلوبة');
+    if (!newAddress.label || !newAddress.address_line) {
+      Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
       return;
     }
 
     try {
-      const newAddress = await addressAPI.create({
-        label: newAddressLabel,
-        address_line: newAddressLine,
-        area: newAddressArea,
-      });
-      setAddresses([...addresses, newAddress]);
-      setSelectedAddress(newAddress);
-      setShowAddressModal(false);
-      setNewAddressLabel('');
-      setNewAddressLine('');
-      setNewAddressArea('');
+      const address = await addressAPI.create(newAddress);
+      setAddresses([...addresses, address]);
+      setSelectedAddress(address.id);
+      setShowAddAddress(false);
+      setNewAddress({ label: '', address_line: '', area: '' });
     } catch (error) {
       Alert.alert('خطأ', 'فشل إضافة العنوان');
     }
@@ -88,93 +81,54 @@ export default function CheckoutScreen() {
       return;
     }
 
-    if (!restaurant) {
-      Alert.alert('خطأ', 'لا يوجد مطعم محدد');
+    if (items.length === 0) {
+      Alert.alert('خطأ', 'السلة فارغة');
       return;
     }
 
-    setLoading(true);
+    setSubmitting(true);
+
     try {
       const orderData = {
-        restaurant_id: restaurant.id,
+        restaurant_id: getRestaurantId()!,
         items: items.map((item) => ({
-          menu_item_id: item.menuItem.id,
+          menu_item_id: item.id,
           quantity: item.quantity,
         })),
-        address_id: selectedAddress.id,
+        address_id: selectedAddress,
         payment_method: paymentMethod,
-        notes: notes || undefined,
       };
 
       const order = await orderAPI.create(orderData);
 
-      if (paymentMethod === 'SHAMCASH') {
-        setPendingOrderId(order.id);
-        setShowShamCashModal(true);
-      } else {
-        // COD - Order placed successfully
+      if (paymentMethod === 'COD') {
         clearCart();
-        Alert.alert('تم الطلب', 'تم إرسال طلبك بنجاح!', [
-          {
-            text: 'تتبع الطلب',
-            onPress: () => router.replace('/(main)/orders'),
-          },
-        ]);
+        Alert.alert(
+          'تم الطلب بنجاح! 🎉',
+          'سيتم توصيل طلبك قريباً',
+          [{ text: 'حسناً', onPress: () => router.replace('/(main)/orders') }]
+        );
+      } else {
+        // SHAMCASH payment
+        clearCart();
+        Alert.alert(
+          'أكمل الدفع عبر ShamCash',
+          'يرجى تحويل المبلغ إلى محفظتنا وإدخال رقم العملية',
+          [{ text: 'حسناً', onPress: () => router.replace('/(main)/orders') }]
+        );
       }
     } catch (error: any) {
-      Alert.alert('خطأ', error.response?.data?.detail || 'فشل إرسال الطلب');
+      Alert.alert('خطأ', error.response?.data?.detail || 'فشل إنشاء الطلب');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  const handleShamCashVerify = async () => {
-    if (!shamCashRef.trim()) {
-      Alert.alert('خطأ', 'يرجى إدخال رقم العملية');
-      return;
-    }
-
-    if (!pendingOrderId) return;
-
-    setLoading(true);
-    try {
-      await paymentAPI.verifyPayment({
-        order_id: pendingOrderId,
-        reference: shamCashRef,
-      });
-
-      clearCart();
-      setShowShamCashModal(false);
-      Alert.alert('تم الطلب', 'تم إرسال طلبك وطلب التحقق من الدفع!', [
-        {
-          text: 'تتبع الطلب',
-          onPress: () => router.replace('/(main)/orders'),
-        },
-      ]);
-    } catch (error: any) {
-      Alert.alert('خطأ', error.response?.data?.detail || 'فشل إرسال طلب التحقق');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const subtotal = getSubtotal();
-  const deliveryFee = restaurant?.delivery_fee || 0;
-  const total = getTotal();
-
-  if (items.length === 0) {
+  if (loading) {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>السلة فارغة</Text>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <Text style={styles.backButtonText}>العودة</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </View>
     );
   }
 
@@ -182,35 +136,34 @@ export default function CheckoutScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <View style={{ width: 40 }} />
-        <Text style={styles.headerTitle}>إتمام الطلب</Text>
         <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-forward" size={24} color="#333" />
+          <Ionicons name="arrow-forward" size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>إتمام الطلب</Text>
+        <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView style={styles.content}>
-        {/* Delivery Address */}
+      <ScrollView 
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 200 }}
+      >
+        {/* Address Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <TouchableOpacity onPress={() => setShowAddressModal(true)}>
-              <Text style={styles.addButton}>إضافة جديد</Text>
+            <TouchableOpacity onPress={() => setShowAddAddress(true)}>
+              <Ionicons name="add-circle" size={24} color={COLORS.primary} />
             </TouchableOpacity>
-            <View style={styles.sectionTitleRow}>
-              <Text style={styles.sectionTitle}>عنوان التوصيل</Text>
-              <Ionicons name="location" size={20} color="#FF6B35" />
-            </View>
+            <Text style={styles.sectionTitle}>📍 عنوان التوصيل</Text>
           </View>
 
-          {loadingAddresses ? (
-            <ActivityIndicator size="small" color="#FF6B35" />
-          ) : addresses.length === 0 ? (
-            <TouchableOpacity
-              style={styles.addAddressButton}
-              onPress={() => setShowAddressModal(true)}
+          {addresses.length === 0 ? (
+            <TouchableOpacity 
+              style={styles.addAddressCard}
+              onPress={() => setShowAddAddress(true)}
             >
-              <Ionicons name="add-circle" size={24} color="#FF6B35" />
-              <Text style={styles.addAddressText}>أضف عنوان التوصيل</Text>
+              <Ionicons name="add" size={32} color={COLORS.primary} />
+              <Text style={styles.addAddressText}>أضف عنوان جديد</Text>
             </TouchableOpacity>
           ) : (
             addresses.map((address) => (
@@ -218,154 +171,154 @@ export default function CheckoutScreen() {
                 key={address.id}
                 style={[
                   styles.addressCard,
-                  selectedAddress?.id === address.id && styles.addressCardSelected,
+                  selectedAddress === address.id && styles.addressCardSelected,
                 ]}
-                onPress={() => setSelectedAddress(address)}
+                onPress={() => setSelectedAddress(address.id)}
               >
-                <View style={styles.radioButton}>
-                  {selectedAddress?.id === address.id && (
+                <View style={styles.addressContent}>
+                  <View style={styles.addressIcon}>
+                    <Ionicons 
+                      name={address.label === 'المنزل' ? 'home' : address.label === 'العمل' ? 'briefcase' : 'location'} 
+                      size={20} 
+                      color={selectedAddress === address.id ? COLORS.primary : COLORS.textSecondary} 
+                    />
+                  </View>
+                  <View style={styles.addressInfo}>
+                    <Text style={styles.addressLabel}>{address.label}</Text>
+                    <Text style={styles.addressLine}>{address.address_line}</Text>
+                  </View>
+                </View>
+                <View style={[
+                  styles.radioButton,
+                  selectedAddress === address.id && styles.radioButtonSelected,
+                ]}>
+                  {selectedAddress === address.id && (
                     <View style={styles.radioButtonInner} />
                   )}
-                </View>
-                <View style={styles.addressInfo}>
-                  <Text style={styles.addressLabel}>{address.label}</Text>
-                  <Text style={styles.addressLine}>{address.address_line}</Text>
                 </View>
               </TouchableOpacity>
             ))
           )}
         </View>
 
-        {/* Payment Method */}
+        {/* Payment Section */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleRow}>
-              <Text style={styles.sectionTitle}>طريقة الدفع</Text>
-              <Ionicons name="card" size={20} color="#FF6B35" />
-            </View>
-          </View>
+          <Text style={styles.sectionTitle}>💳 طريقة الدفع</Text>
 
+          {/* COD */}
           <TouchableOpacity
             style={[
-              styles.paymentOption,
-              paymentMethod === 'COD' && styles.paymentOptionSelected,
+              styles.paymentCard,
+              paymentMethod === 'COD' && styles.paymentCardSelected,
             ]}
             onPress={() => setPaymentMethod('COD')}
           >
-            <View style={styles.radioButton}>
+            <View style={styles.paymentContent}>
+              <View style={[styles.paymentIcon, { backgroundColor: `${COLORS.success}15` }]}>
+                <Ionicons name="cash" size={24} color={COLORS.success} />
+              </View>
+              <View style={styles.paymentInfo}>
+                <Text style={styles.paymentTitle}>الدفع عند الاستلام</Text>
+                <Text style={styles.paymentDesc}>ادفع نقداً للسائق</Text>
+              </View>
+            </View>
+            <View style={[
+              styles.radioButton,
+              paymentMethod === 'COD' && styles.radioButtonSelected,
+            ]}>
               {paymentMethod === 'COD' && <View style={styles.radioButtonInner} />}
             </View>
-            <View style={styles.paymentInfo}>
-              <Text style={styles.paymentLabel}>الدفع عند الاستلام</Text>
-              <Text style={styles.paymentDesc}>ادفع نقداً عند وصول طلبك</Text>
-            </View>
-            <Ionicons name="cash" size={28} color="#4CAF50" />
           </TouchableOpacity>
 
+          {/* ShamCash */}
           <TouchableOpacity
             style={[
-              styles.paymentOption,
-              paymentMethod === 'SHAMCASH' && styles.paymentOptionSelected,
+              styles.paymentCard,
+              paymentMethod === 'SHAMCASH' && styles.paymentCardSelected,
             ]}
             onPress={() => setPaymentMethod('SHAMCASH')}
           >
-            <View style={styles.radioButton}>
+            <View style={styles.paymentContent}>
+              <View style={[styles.paymentIcon, { backgroundColor: `${COLORS.info}15` }]}>
+                <Ionicons name="wallet" size={24} color={COLORS.info} />
+              </View>
+              <View style={styles.paymentInfo}>
+                <Text style={styles.paymentTitle}>ShamCash</Text>
+                <Text style={styles.paymentDesc}>محفظة إلكترونية</Text>
+              </View>
+            </View>
+            <View style={[
+              styles.radioButton,
+              paymentMethod === 'SHAMCASH' && styles.radioButtonSelected,
+            ]}>
               {paymentMethod === 'SHAMCASH' && <View style={styles.radioButtonInner} />}
             </View>
-            <View style={styles.paymentInfo}>
-              <Text style={styles.paymentLabel}>ShamCash</Text>
-              <Text style={styles.paymentDesc}>الدفع عبر محفظة ShamCash</Text>
-            </View>
-            <Ionicons name="wallet" size={28} color="#2196F3" />
           </TouchableOpacity>
-        </View>
-
-        {/* Notes */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleRow}>
-              <Text style={styles.sectionTitle}>ملاحظات</Text>
-              <Ionicons name="document-text" size={20} color="#FF6B35" />
-            </View>
-          </View>
-          <TextInput
-            style={styles.notesInput}
-            placeholder="أضف ملاحظات للطلب (اختياري)"
-            placeholderTextColor="#999"
-            value={notes}
-            onChangeText={setNotes}
-            multiline
-            numberOfLines={3}
-            textAlign="right"
-          />
         </View>
 
         {/* Order Summary */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleRow}>
-              <Text style={styles.sectionTitle}>ملخص الطلب</Text>
-              <Ionicons name="receipt" size={20} color="#FF6B35" />
-            </View>
-          </View>
-
+          <Text style={styles.sectionTitle}>📝 ملخص الطلب</Text>
+          
           <View style={styles.summaryCard}>
-            <Text style={styles.restaurantName}>{restaurant?.name}</Text>
             {items.map((item) => (
-              <View key={item.menuItem.id} style={styles.summaryItem}>
-                <Text style={styles.summaryItemPrice}>
-                  {(item.menuItem.price * item.quantity).toLocaleString()} ل.س
-                </Text>
+              <View key={item.id} style={styles.summaryItem}>
                 <Text style={styles.summaryItemName}>
-                  {item.quantity}x {item.menuItem.name}
+                  {item.name} × {item.quantity}
+                </Text>
+                <Text style={styles.summaryItemPrice}>
+                  {(item.price * item.quantity).toLocaleString()} ل.س
                 </Text>
               </View>
             ))}
-            <View style={styles.summaryDivider} />
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryValue}>{subtotal.toLocaleString()} ل.س</Text>
-              <Text style={styles.summaryLabel}>المجموع</Text>
-            </View>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryValue}>{deliveryFee.toLocaleString()} ل.س</Text>
-              <Text style={styles.summaryLabel}>رسوم التوصيل</Text>
-            </View>
-            <View style={styles.summaryDivider} />
-            <View style={styles.summaryRow}>
-              <Text style={styles.totalValue}>{total.toLocaleString()} ل.س</Text>
-              <Text style={styles.totalLabel}>الإجمالي</Text>
-            </View>
           </View>
         </View>
       </ScrollView>
 
-      {/* Place Order Button */}
-      <View style={styles.footer}>
+      {/* Bottom Summary */}
+      <View style={styles.bottomCard}>
+        <View style={styles.totalRow}>
+          <Text style={styles.totalLabel}>المجموع</Text>
+          <Text style={styles.totalSubValue}>{subtotal.toLocaleString()} ل.س</Text>
+        </View>
+        <View style={styles.totalRow}>
+          <Text style={styles.totalLabel}>التوصيل</Text>
+          <Text style={styles.totalSubValue}>{deliveryFee.toLocaleString()} ل.س</Text>
+        </View>
+        <View style={[styles.totalRow, styles.totalRowFinal]}>
+          <Text style={styles.totalFinalLabel}>الإجمالي</Text>
+          <Text style={styles.totalFinalValue}>{total.toLocaleString()} ل.س</Text>
+        </View>
+
         <TouchableOpacity
-          style={[styles.placeOrderButton, loading && styles.placeOrderButtonDisabled]}
+          style={[styles.orderButton, submitting && styles.orderButtonDisabled]}
           onPress={handlePlaceOrder}
-          disabled={loading || !selectedAddress}
+          disabled={submitting}
+          activeOpacity={0.9}
         >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.placeOrderText}>
-              تأكيد الطلب - {total.toLocaleString()} ل.س
-            </Text>
-          )}
+          <LinearGradient
+            colors={[COLORS.primary, COLORS.primaryDark]}
+            style={styles.orderButtonGradient}
+          >
+            {submitting ? (
+              <ActivityIndicator color={COLORS.textWhite} />
+            ) : (
+              <>
+                <Text style={styles.orderButtonText}>تأكيد الطلب 🔥</Text>
+                <Ionicons name="checkmark-circle" size={24} color={COLORS.textWhite} />
+              </>
+            )}
+          </LinearGradient>
         </TouchableOpacity>
       </View>
 
       {/* Add Address Modal */}
-      <Modal visible={showAddressModal} animationType="slide" transparent>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.modalOverlay}
-        >
-          <View style={styles.modalContent}>
+      {showAddAddress && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modal}>
             <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={() => setShowAddressModal(false)}>
-                <Ionicons name="close" size={24} color="#333" />
+              <TouchableOpacity onPress={() => setShowAddAddress(false)}>
+                <Ionicons name="close" size={24} color={COLORS.textPrimary} />
               </TouchableOpacity>
               <Text style={styles.modalTitle}>إضافة عنوان جديد</Text>
               <View style={{ width: 24 }} />
@@ -373,19 +326,19 @@ export default function CheckoutScreen() {
 
             <TextInput
               style={styles.modalInput}
-              placeholder="اسم العنوان (مثل: المنزل)"
-              placeholderTextColor="#999"
-              value={newAddressLabel}
-              onChangeText={setNewAddressLabel}
+              placeholder="اسم العنوان (مثال: المنزل)"
+              placeholderTextColor={COLORS.textLight}
+              value={newAddress.label}
+              onChangeText={(text) => setNewAddress({ ...newAddress, label: text })}
               textAlign="right"
             />
 
             <TextInput
               style={styles.modalInput}
               placeholder="العنوان بالتفصيل"
-              placeholderTextColor="#999"
-              value={newAddressLine}
-              onChangeText={setNewAddressLine}
+              placeholderTextColor={COLORS.textLight}
+              value={newAddress.address_line}
+              onChangeText={(text) => setNewAddress({ ...newAddress, address_line: text })}
               textAlign="right"
               multiline
             />
@@ -393,75 +346,23 @@ export default function CheckoutScreen() {
             <TextInput
               style={styles.modalInput}
               placeholder="المنطقة (اختياري)"
-              placeholderTextColor="#999"
-              value={newAddressArea}
-              onChangeText={setNewAddressArea}
+              placeholderTextColor={COLORS.textLight}
+              value={newAddress.area}
+              onChangeText={(text) => setNewAddress({ ...newAddress, area: text })}
               textAlign="right"
             />
 
             <TouchableOpacity style={styles.modalButton} onPress={handleAddAddress}>
-              <Text style={styles.modalButtonText}>حفظ العنوان</Text>
+              <LinearGradient
+                colors={[COLORS.primary, COLORS.primaryDark]}
+                style={styles.modalButtonGradient}
+              >
+                <Text style={styles.modalButtonText}>حفظ العنوان</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
-      </Modal>
-
-      {/* ShamCash Modal */}
-      <Modal visible={showShamCashModal} animationType="slide" transparent>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.modalOverlay}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <View style={{ width: 24 }} />
-              <Text style={styles.modalTitle}>الدفع عبر ShamCash</Text>
-              <View style={{ width: 24 }} />
-            </View>
-
-            <View style={styles.shamCashInfo}>
-              <Text style={styles.shamCashTitle}>خطوات الدفع:</Text>
-              <Text style={styles.shamCashStep}>1. افتح تطبيق ShamCash</Text>
-              <Text style={styles.shamCashStep}>2. اختر "تحويل"</Text>
-              <Text style={styles.shamCashStep}>3. حوّل {total.toLocaleString()} ل.س</Text>
-              <Text style={styles.shamCashStep}>4. أدخل رقم العملية أدناه</Text>
-            </View>
-
-            <TextInput
-              style={styles.modalInput}
-              placeholder="رقم العملية / المرجع"
-              placeholderTextColor="#999"
-              value={shamCashRef}
-              onChangeText={setShamCashRef}
-              textAlign="right"
-              keyboardType="numeric"
-            />
-
-            <TouchableOpacity
-              style={[styles.modalButton, loading && styles.modalButtonDisabled]}
-              onPress={handleShamCashVerify}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.modalButtonText}>تأكيد الدفع</Text>
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => {
-                setShowShamCashModal(false);
-                setPendingOrderId(null);
-                setShamCashRef('');
-              }}
-            >
-              <Text style={styles.cancelButtonText}>إلغاء</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -469,311 +370,312 @@ export default function CheckoutScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: COLORS.background,
   },
-  emptyContainer: {
+  loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: COLORS.background,
   },
-  emptyText: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 16,
-  },
-  backButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    backgroundColor: '#FF6B35',
-    borderRadius: 8,
-  },
-  backButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
+
+  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: COLORS.divider,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textPrimary,
   },
-  content: {
+
+  // Scroll View
+  scrollView: {
     flex: 1,
   },
+
+  // Section
   section: {
-    backgroundColor: '#fff',
-    marginTop: 12,
-    padding: 16,
+    padding: SPACING.lg,
   },
   sectionHeader: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionTitleRow: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 8,
+    marginBottom: SPACING.md,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textPrimary,
+    textAlign: 'right',
+    marginBottom: SPACING.md,
   },
-  addButton: {
-    fontSize: 14,
-    color: '#FF6B35',
-  },
-  addAddressButton: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: '#FF6B35',
-    borderRadius: 12,
-    gap: 8,
-  },
-  addAddressText: {
-    fontSize: 14,
-    color: '#FF6B35',
-  },
+
+  // Address Card
   addressCard: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 12,
-    marginBottom: 8,
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.md,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    ...SHADOWS.small,
   },
   addressCardSelected: {
-    borderColor: '#FF6B35',
-    backgroundColor: '#FFF5F2',
+    borderColor: COLORS.primary,
+    backgroundColor: `${COLORS.primary}08`,
   },
-  radioButton: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#FF6B35',
+  addressContent: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    flex: 1,
+  },
+  addressIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 12,
-  },
-  radioButtonInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#FF6B35',
   },
   addressInfo: {
     flex: 1,
+    marginRight: SPACING.md,
     alignItems: 'flex-end',
   },
   addressLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
   },
   addressLine: {
-    fontSize: 13,
-    color: '#666',
-    marginTop: 4,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginTop: 2,
   },
-  paymentOption: {
+  addAddressCard: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xxl,
+    borderWidth: 2,
+    borderColor: COLORS.border,
+    borderStyle: 'dashed',
+  },
+  addAddressText: {
+    fontSize: 14,
+    color: COLORS.primary,
+    fontWeight: '600',
+    marginTop: SPACING.sm,
+  },
+
+  // Radio Button
+  radioButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: COLORS.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioButtonSelected: {
+    borderColor: COLORS.primary,
+  },
+  radioButtonInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: COLORS.primary,
+  },
+
+  // Payment Card
+  paymentCard: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 12,
-    marginBottom: 8,
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.md,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    ...SHADOWS.small,
   },
-  paymentOptionSelected: {
-    borderColor: '#FF6B35',
-    backgroundColor: '#FFF5F2',
+  paymentCardSelected: {
+    borderColor: COLORS.primary,
+    backgroundColor: `${COLORS.primary}08`,
+  },
+  paymentContent: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    flex: 1,
+  },
+  paymentIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   paymentInfo: {
     flex: 1,
-    marginRight: 12,
+    marginRight: SPACING.md,
     alignItems: 'flex-end',
   },
-  paymentLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
-  },
-  paymentDesc: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 2,
-  },
-  notesInput: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 14,
-    color: '#333',
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  summaryCard: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 12,
-    padding: 16,
-  },
-  restaurantName: {
+  paymentTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'right',
-    marginBottom: 12,
+    color: COLORS.textPrimary,
+  },
+  paymentDesc: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+
+  // Summary Card
+  summaryCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    ...SHADOWS.small,
   },
   summaryItem: {
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: SPACING.sm,
   },
   summaryItemName: {
     fontSize: 14,
-    color: '#666',
+    color: COLORS.textPrimary,
   },
   summaryItemPrice: {
     fontSize: 14,
-    color: '#333',
+    color: COLORS.textSecondary,
   },
-  summaryDivider: {
-    height: 1,
-    backgroundColor: '#e0e0e0',
-    marginVertical: 12,
+
+  // Bottom Card
+  bottomCard: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: COLORS.surface,
+    borderTopLeftRadius: RADIUS.xl,
+    borderTopRightRadius: RADIUS.xl,
+    padding: SPACING.xl,
+    ...SHADOWS.large,
   },
-  summaryRow: {
+  totalRow: {
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    marginBottom: SPACING.sm,
   },
-  summaryLabel: {
-    fontSize: 14,
-    color: '#666',
-  },
-  summaryValue: {
-    fontSize: 14,
-    color: '#333',
+  totalRowFinal: {
+    marginTop: SPACING.sm,
+    paddingTop: SPACING.md,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.divider,
   },
   totalLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
-  totalValue: {
+  totalSubValue: {
+    fontSize: 14,
+    color: COLORS.textPrimary,
+  },
+  totalFinalLabel: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF6B35',
+    color: COLORS.textPrimary,
   },
-  footer: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+  totalFinalValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.primary,
   },
-  placeOrderButton: {
-    backgroundColor: '#FF6B35',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
+  orderButton: {
+    marginTop: SPACING.lg,
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
   },
-  placeOrderButtonDisabled: {
+  orderButtonDisabled: {
     opacity: 0.7,
   },
-  placeOrderText: {
-    color: '#fff',
+  orderButtonGradient: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.lg,
+    gap: SPACING.sm,
+  },
+  orderButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: COLORS.textWhite,
   },
+
+  // Modal
   modalOverlay: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.lg,
   },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    maxHeight: '80%',
+  modal: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.xl,
+    width: '100%',
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: SPACING.xl,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textPrimary,
   },
   modalInput: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 12,
-    padding: 14,
-    fontSize: 15,
-    color: '#333',
-    marginBottom: 12,
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.md,
+    padding: SPACING.lg,
+    fontSize: 16,
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   modalButton: {
-    backgroundColor: '#FF6B35',
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 8,
+    marginTop: SPACING.md,
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
   },
-  modalButtonDisabled: {
-    opacity: 0.7,
+  modalButtonGradient: {
+    paddingVertical: SPACING.lg,
+    alignItems: 'center',
   },
   modalButtonText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  shamCashInfo: {
-    backgroundColor: '#E3F2FD',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  shamCashTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1976D2',
-    textAlign: 'right',
-    marginBottom: 8,
-  },
-  shamCashStep: {
-    fontSize: 14,
-    color: '#333',
-    textAlign: 'right',
-    marginBottom: 4,
-  },
-  cancelButton: {
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  cancelButtonText: {
-    color: '#666',
-    fontSize: 16,
+    color: COLORS.textWhite,
   },
 });
