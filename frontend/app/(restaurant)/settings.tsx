@@ -232,6 +232,37 @@ export default function RestaurantSettings() {
           </View>
         </View>
       </Modal>
+
+      {/* Logout Confirmation Modal */}
+      <Modal visible={showLogoutModal} animationType="fade" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.confirmModal}>
+            <View style={styles.confirmIconContainer}>
+              <Ionicons name="log-out-outline" size={40} color={COLORS.error} />
+            </View>
+            <Text style={styles.confirmTitle}>تسجيل الخروج</Text>
+            <Text style={styles.confirmMessage}>هل تريد تسجيل الخروج من حسابك؟</Text>
+            
+            <View style={styles.confirmButtons}>
+              <TouchableOpacity 
+                style={styles.cancelButton} 
+                onPress={() => setShowLogoutModal(false)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cancelButtonText}>إلغاء</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.confirmButton} 
+                onPress={handleLogout}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.confirmButtonText}>خروج</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
