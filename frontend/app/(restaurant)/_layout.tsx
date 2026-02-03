@@ -52,6 +52,15 @@ export default function RestaurantLayout() {
         }}
       />
       <Tabs.Screen
+        name="drivers"
+        options={{
+          title: 'السائقين',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="bicycle" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'الإعدادات',
