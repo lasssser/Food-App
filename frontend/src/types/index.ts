@@ -36,10 +36,35 @@ export interface MenuItem {
   is_available: boolean;
 }
 
+// Add-on Types
+export interface AddOnOption {
+  id: string;
+  name: string;
+  price: number;
+}
+
+export interface AddOnGroup {
+  id: string;
+  menu_item_id: string;
+  restaurant_id: string;
+  name: string;
+  is_required: boolean;
+  max_selections: number;
+  options: AddOnOption[];
+}
+
+export interface SelectedAddOn {
+  group_name: string;
+  option_name: string;
+  price: number;
+}
+
 export interface CartItem {
   menuItem: MenuItem;
   quantity: number;
   notes?: string;
+  selectedAddOns?: SelectedAddOn[];
+  itemKey?: string; // Unique key for items with different add-ons
 }
 
 export interface Address {
