@@ -1030,7 +1030,7 @@ async def seed_database():
             "review_count": 120,
             "is_open": True,
             "delivery_fee": 5000,
-            "min_order": 15000,
+            "min_order": 5000,
             "delivery_time": "30-45 دقيقة",
             "created_at": datetime.utcnow()
         },
