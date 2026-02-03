@@ -66,7 +66,7 @@ export default function RestaurantScreen() {
     ? menuItems.slice(0, 6)
     : menuItems.filter((item) => item.category === selectedCategory);
 
-  const fetchAddOns = async (menuItemId: string) => {
+  const fetchAddOns = async (menuItemId: string): Promise<AddOnGroup[]> => {
     try {
       setLoadingAddOns(true);
       const response = await fetch(`/api/restaurants/${id}/menu/${menuItemId}/addons`);
@@ -75,7 +75,7 @@ export default function RestaurantScreen() {
       
       // Initialize selections for required groups
       const initialSelections: { [groupId: string]: string[] } = {};
-      data.forEach((group: AddOnGroup) => {
+      (data || []).forEach((group: AddOnGroup) => {
         if (group.is_required && group.options.length > 0) {
           initialSelections[group.id] = [group.options[0].id];
         } else {
@@ -83,9 +83,11 @@ export default function RestaurantScreen() {
         }
       });
       setSelectedAddOns(initialSelections);
+      return data || [];
     } catch (error) {
       console.error('Error fetching add-ons:', error);
       setAddOnGroups([]);
+      return [];
     } finally {
       setLoadingAddOns(false);
     }
@@ -95,10 +97,10 @@ export default function RestaurantScreen() {
     if (!restaurant) return;
     
     setSelectedMenuItem(menuItem);
-    await fetchAddOns(menuItem.id);
+    const fetchedAddOns = await fetchAddOns(menuItem.id);
     
     // If no add-ons, add directly to cart
-    if (addOnGroups.length === 0) {
+    if (fetchedAddOns.length === 0) {
       addToCartDirectly(menuItem);
     } else {
       setShowAddOnModal(true);
