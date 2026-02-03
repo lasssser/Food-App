@@ -129,11 +129,45 @@ class MenuItemUpdate(BaseModel):
     category: Optional[str] = None
     is_available: Optional[bool] = None
 
-# Order Models
+# Add-on Models (الإضافات)
+class AddOnCreate(BaseModel):
+    name: str
+    price: float = 0
+    is_required: bool = False  # هل الإضافة إجبارية
+    max_selections: int = 1  # الحد الأقصى للاختيارات
+
+class AddOnGroupCreate(BaseModel):
+    name: str  # مثل: "الصلصات" أو "المشروبات"
+    is_required: bool = False
+    max_selections: int = 1
+    options: List[AddOnCreate]
+
+class AddOnOption(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    price: float = 0
+
+class AddOnGroup(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    menu_item_id: str
+    restaurant_id: str
+    name: str
+    is_required: bool = False
+    max_selections: int = 1
+    options: List[AddOnOption] = []
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Order Add-on Selection
+class OrderAddOnSelection(BaseModel):
+    group_name: str
+    option_name: str
+    price: float
+
 class OrderItemCreate(BaseModel):
     menu_item_id: str
     quantity: int
     notes: Optional[str] = None
+    addons: Optional[List[OrderAddOnSelection]] = []  # الإضافات المختارة
 
 class OrderCreate(BaseModel):
     restaurant_id: str
