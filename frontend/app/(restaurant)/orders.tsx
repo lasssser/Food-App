@@ -7,31 +7,53 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-  Alert,
+  Modal,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { restaurantPanelAPI } from '../../src/services/api';
 import { Order } from '../../src/types';
+import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
-const STATUS_ACTIONS: Record<string, { next: string; label: string; color: string }> = {
-  pending: { next: 'accepted', label: 'قبول', color: '#4CAF50' },
-  accepted: { next: 'preparing', label: 'بدء التحضير', color: '#2196F3' },
-  preparing: { next: 'ready', label: 'جاهز للتوصيل', color: '#FF9800' },
+interface RestaurantDriver {
+  id: string;
+  name: string;
+  phone: string;
+}
+
+const STATUS_ACTIONS: Record<string, { next: string; label: string; icon: string }> = {
+  pending: { next: 'accepted', label: 'قبول الطلب', icon: 'checkmark-circle' },
+  accepted: { next: 'preparing', label: 'بدء التحضير', icon: 'flame' },
+  preparing: { next: 'ready', label: 'جاهز للتوصيل', icon: 'bicycle' },
 };
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending: { label: 'جديد', color: '#FFA726' },
-  accepted: { label: 'مقبول', color: '#42A5F5' },
-  preparing: { label: 'جاري التحضير', color: '#AB47BC' },
-  ready: { label: 'جاهز', color: '#26A69A' },
+const STATUS_LABELS: Record<string, { label: string; color: string; icon: string }> = {
+  pending: { label: 'جديد', color: '#FFA726', icon: 'time' },
+  accepted: { label: 'مقبول', color: '#42A5F5', icon: 'checkmark' },
+  preparing: { label: 'جاري التحضير', color: '#AB47BC', icon: 'flame' },
+  ready: { label: 'جاهز للاستلام', color: '#26A69A', icon: 'bag-check' },
+  driver_assigned: { label: 'تم تعيين سائق', color: '#5C6BC0', icon: 'bicycle' },
+  picked_up: { label: 'استلمها السائق', color: '#7E57C2', icon: 'navigate' },
+  out_for_delivery: { label: 'في الطريق', color: '#26A69A', icon: 'car' },
+  delivered: { label: 'تم التسليم', color: '#66BB6A', icon: 'checkmark-done' },
+  cancelled: { label: 'ملغي', color: '#EF5350', icon: 'close' },
 };
 
 export default function RestaurantOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [drivers, setDrivers] = useState<RestaurantDriver[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Modal states
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
+  const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
+  const [assigning, setAssigning] = useState(false);
 
   const fetchOrders = async () => {
     try {
@@ -45,10 +67,19 @@ export default function RestaurantOrders() {
     }
   };
 
+  const fetchDrivers = async () => {
+    try {
+      const data = await restaurantPanelAPI.getDrivers();
+      setDrivers(data);
+    } catch (error) {
+      console.error('Error fetching drivers:', error);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       fetchOrders();
-      // Auto-refresh every 30 seconds
+      fetchDrivers();
       const interval = setInterval(fetchOrders, 30000);
       return () => clearInterval(interval);
     }, [])
@@ -57,6 +88,7 @@ export default function RestaurantOrders() {
   const onRefresh = () => {
     setRefreshing(true);
     fetchOrders();
+    fetchDrivers();
   };
 
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
@@ -64,43 +96,117 @@ export default function RestaurantOrders() {
       await restaurantPanelAPI.updateOrderStatus(orderId, newStatus);
       fetchOrders();
     } catch (error: any) {
-      Alert.alert('خطأ', error.response?.data?.detail || 'فشل تحديث الحالة');
+      console.error('Error updating status:', error);
     }
   };
 
-  const handleCancelOrder = (orderId: string) => {
-    Alert.alert('تأكيد الإلغاء', 'هل تريد إلغاء هذا الطلب؟', [
-      { text: 'لا', style: 'cancel' },
-      {
-        text: 'إلغاء',
-        style: 'destructive',
-        onPress: () => handleUpdateStatus(orderId, 'cancelled'),
-      },
-    ]);
+  const openAssignModal = (order: Order) => {
+    setSelectedOrder(order);
+    setShowAssignModal(true);
+  };
+
+  const handleAssignDriver = async (driverId: string) => {
+    if (!selectedOrder) return;
+    
+    setAssigning(true);
+    try {
+      await restaurantPanelAPI.assignDriver(selectedOrder.id, {
+        driver_type: 'restaurant_driver',
+        driver_id: driverId,
+      });
+      setShowAssignModal(false);
+      setSelectedOrder(null);
+      fetchOrders();
+    } catch (error: any) {
+      console.error('Error assigning driver:', error);
+    } finally {
+      setAssigning(false);
+    }
+  };
+
+  const handleRequestPlatformDrivers = async () => {
+    if (!selectedOrder) return;
+    
+    setAssigning(true);
+    try {
+      await restaurantPanelAPI.assignDriver(selectedOrder.id, {
+        driver_type: 'platform_driver',
+      });
+      setShowAssignModal(false);
+      setSelectedOrder(null);
+      fetchOrders();
+    } catch (error: any) {
+      console.error('Error requesting drivers:', error);
+    } finally {
+      setAssigning(false);
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    if (!orderToCancel) return;
+    try {
+      await restaurantPanelAPI.updateOrderStatus(orderToCancel, 'cancelled');
+      fetchOrders();
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+    } finally {
+      setConfirmCancelVisible(false);
+      setOrderToCancel(null);
+    }
+  };
+
+  const callNumber = (phone: string) => {
+    Linking.openURL(`tel:${phone}`);
   };
 
   const renderOrder = ({ item: order }: { item: Order }) => {
-    const status = STATUS_LABELS[order.order_status] || { label: order.order_status, color: '#999' };
+    const status = STATUS_LABELS[order.order_status] || { label: order.order_status, color: '#999', icon: 'help' };
     const action = STATUS_ACTIONS[order.order_status];
+    const showAssignButton = order.order_status === 'ready' && !order.driver_id;
+    const hasDriver = order.driver_id && order.driver_name;
 
     return (
       <View style={styles.orderCard}>
         {/* Header */}
         <View style={styles.orderHeader}>
           <View style={[styles.statusBadge, { backgroundColor: status.color }]}>
+            <Ionicons name={status.icon as any} size={14} color={COLORS.textWhite} />
             <Text style={styles.statusText}>{status.label}</Text>
           </View>
-          <Text style={styles.orderId}>طلب #{order.id.slice(0, 8)}</Text>
+          <Text style={styles.orderId}>#{order.id.slice(0, 8)}</Text>
         </View>
 
-        {/* Customer Info */}
-        <View style={styles.customerInfo}>
-          <View style={styles.addressRow}>
-            <Ionicons name="location" size={16} color="#666" />
-            <Text style={styles.addressText}>
-              {order.address.label} - {order.address.address_line}
-            </Text>
+        {/* Driver Info */}
+        {hasDriver && (
+          <View style={styles.driverSection}>
+            <View style={styles.driverInfo}>
+              <View style={styles.driverAvatar}>
+                <Ionicons name="bicycle" size={18} color={COLORS.primary} />
+              </View>
+              <View style={styles.driverDetails}>
+                <Text style={styles.driverName}>{order.driver_name}</Text>
+                <Text style={styles.driverType}>
+                  {order.driver_type === 'restaurant_driver' ? 'سائق المطعم' : 'سائق المنصة'}
+                </Text>
+              </View>
+            </View>
+            {order.driver_phone && (
+              <TouchableOpacity 
+                style={styles.callDriverButton}
+                onPress={() => callNumber(order.driver_phone!)}
+              >
+                <Ionicons name="call" size={18} color={COLORS.success} />
+              </TouchableOpacity>
+            )}
           </View>
+        )}
+
+        {/* Customer Address */}
+        <View style={styles.addressSection}>
+          <Ionicons name="location" size={16} color={COLORS.textSecondary} />
+          <Text style={styles.addressText}>
+            {order.address?.label} - {order.address?.address_line}
+          </Text>
         </View>
 
         {/* Items */}
@@ -113,49 +219,48 @@ export default function RestaurantOrders() {
           ))}
         </View>
 
-        {/* Notes */}
-        {order.notes && (
-          <View style={styles.notesSection}>
-            <Text style={styles.notesLabel}>ملاحظات:</Text>
-            <Text style={styles.notesText}>{order.notes}</Text>
-          </View>
-        )}
-
         {/* Total */}
-        <View style={styles.totalSection}>
+        <View style={styles.totalRow}>
           <Text style={styles.totalValue}>{order.total.toLocaleString()} ل.س</Text>
           <Text style={styles.totalLabel}>الإجمالي</Text>
         </View>
 
-        {/* Payment Info */}
-        <View style={styles.paymentRow}>
-          <Text style={styles.paymentMethod}>
-            {order.payment_method === 'COD' ? 'كاش' : 'ShamCash'}
-          </Text>
-          <Ionicons
-            name={order.payment_method === 'COD' ? 'cash' : 'wallet'}
-            size={18}
-            color="#666"
-          />
-        </View>
-
         {/* Actions */}
-        <View style={styles.actions}>
+        <View style={styles.actionsRow}>
           {action && (
             <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: action.color }]}
+              style={styles.actionButton}
               onPress={() => handleUpdateStatus(order.id, action.next)}
             >
-              <Text style={styles.actionButtonText}>{action.label}</Text>
+              <LinearGradient
+                colors={[COLORS.primary, COLORS.primaryDark]}
+                style={styles.actionButtonGradient}
+              >
+                <Ionicons name={action.icon as any} size={18} color={COLORS.textWhite} />
+                <Text style={styles.actionButtonText}>{action.label}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          )}
+          
+          {showAssignButton && (
+            <TouchableOpacity
+              style={styles.assignButton}
+              onPress={() => openAssignModal(order)}
+            >
+              <Ionicons name="bicycle" size={18} color={COLORS.info} />
+              <Text style={styles.assignButtonText}>تعيين سائق</Text>
             </TouchableOpacity>
           )}
           
           {['pending', 'accepted'].includes(order.order_status) && (
             <TouchableOpacity
               style={styles.cancelButton}
-              onPress={() => handleCancelOrder(order.id)}
+              onPress={() => {
+                setOrderToCancel(order.id);
+                setConfirmCancelVisible(true);
+              }}
             >
-              <Ionicons name="close" size={20} color="#EF5350" />
+              <Ionicons name="close" size={20} color={COLORS.error} />
             </TouchableOpacity>
           )}
         </View>
@@ -167,7 +272,7 @@ export default function RestaurantOrders() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B35" />
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       </SafeAreaView>
     );
@@ -175,25 +280,121 @@ export default function RestaurantOrders() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
+      {/* Header */}
+      <LinearGradient colors={[COLORS.primary, COLORS.primaryDark]} style={styles.header}>
         <Text style={styles.headerTitle}>الطلبات الحالية</Text>
-      </View>
+        <Text style={styles.headerSubtitle}>{orders.length} طلبات نشطة</Text>
+      </LinearGradient>
 
-      <FlatList
-        data={orders}
-        keyExtractor={(item) => item.id}
-        renderItem={renderOrder}
-        contentContainerStyle={styles.listContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF6B35']} />
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons name="receipt-outline" size={60} color="#ccc" />
-            <Text style={styles.emptyText}>لا توجد طلبات حالياً</Text>
+      {/* Orders List */}
+      {orders.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Ionicons name="receipt-outline" size={60} color={COLORS.textLight} />
+          <Text style={styles.emptyText}>لا توجد طلبات حالياً</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={orders}
+          keyExtractor={(item) => item.id}
+          renderItem={renderOrder}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
+          }
+        />
+      )}
+
+      {/* Assign Driver Modal */}
+      <Modal visible={showAssignModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setShowAssignModal(false)}>
+                <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>تعيين سائق</Text>
+              <View style={{ width: 24 }} />
+            </View>
+
+            <View style={styles.modalBody}>
+              {/* Restaurant Drivers */}
+              <Text style={styles.sectionTitle}>سائقي المطعم</Text>
+              {drivers.length === 0 ? (
+                <Text style={styles.noDriversText}>لم تضف سائقين بعد</Text>
+              ) : (
+                drivers.map((driver) => (
+                  <TouchableOpacity
+                    key={driver.id}
+                    style={styles.driverOption}
+                    onPress={() => handleAssignDriver(driver.id)}
+                    disabled={assigning}
+                  >
+                    <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+                    <View style={styles.driverOptionInfo}>
+                      <Text style={styles.driverOptionName}>{driver.name}</Text>
+                      <Text style={styles.driverOptionPhone}>{driver.phone}</Text>
+                    </View>
+                    <View style={styles.driverOptionAvatar}>
+                      <Ionicons name="person" size={20} color={COLORS.primary} />
+                    </View>
+                  </TouchableOpacity>
+                ))
+              )}
+
+              {/* Divider */}
+              <View style={styles.divider}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>أو</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              {/* Platform Drivers */}
+              <TouchableOpacity
+                style={styles.platformButton}
+                onPress={handleRequestPlatformDrivers}
+                disabled={assigning}
+              >
+                {assigning ? (
+                  <ActivityIndicator color={COLORS.textWhite} />
+                ) : (
+                  <>
+                    <Ionicons name="globe-outline" size={22} color={COLORS.textWhite} />
+                    <Text style={styles.platformButtonText}>اطلب سائق من المنصة</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+              <Text style={styles.platformHint}>
+                سيتم إشعار السائقين القريبين وأول من يقبل يأخذ الطلب
+              </Text>
+            </View>
           </View>
-        }
-      />
+        </View>
+      </Modal>
+
+      {/* Cancel Confirmation Modal */}
+      <Modal visible={confirmCancelVisible} animationType="fade" transparent>
+        <View style={styles.confirmOverlay}>
+          <View style={styles.confirmContent}>
+            <Ionicons name="warning-outline" size={50} color={COLORS.warning} />
+            <Text style={styles.confirmTitle}>تأكيد الإلغاء</Text>
+            <Text style={styles.confirmMessage}>هل تريد إلغاء هذا الطلب؟</Text>
+            <View style={styles.confirmButtons}>
+              <TouchableOpacity
+                style={[styles.confirmButton, styles.keepButton]}
+                onPress={() => setConfirmCancelVisible(false)}
+              >
+                <Text style={styles.keepButtonText}>لا، إبقاء</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.confirmButton, styles.cancelOrderButton]}
+                onPress={handleCancelOrder}
+              >
+                <Text style={styles.cancelOrderButtonText}>نعم، إلغاء</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -201,7 +402,7 @@ export default function RestaurantOrders() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: COLORS.background,
   },
   loadingContainer: {
     flex: 1,
@@ -209,160 +410,360 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.xl,
+    paddingTop: SPACING.xxl,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
+    color: COLORS.textWhite,
+    textAlign: 'right',
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'right',
+    marginTop: 4,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    color: COLORS.textLight,
+    marginTop: SPACING.lg,
   },
   listContent: {
-    padding: 16,
+    padding: SPACING.lg,
+    paddingBottom: SPACING.xxxl,
   },
   orderCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
+    marginBottom: SPACING.md,
+    ...SHADOWS.small,
   },
   orderHeader: {
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: SPACING.md,
   },
   orderId: {
     fontSize: 14,
-    color: '#666',
-  },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusText: {
-    fontSize: 12,
-    color: '#fff',
+    color: COLORS.textSecondary,
     fontWeight: '600',
   },
-  customerInfo: {
-    marginBottom: 12,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 4,
+    borderRadius: RADIUS.sm,
   },
-  addressRow: {
+  statusText: {
+    color: COLORS.textWhite,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  driverSection: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'space-between',
+    backgroundColor: `${COLORS.success}10`,
+    padding: SPACING.sm,
+    borderRadius: RADIUS.md,
+    marginBottom: SPACING.md,
+  },
+  driverInfo: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  driverAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  driverDetails: {
+    alignItems: 'flex-end',
+  },
+  driverName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  driverType: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
+  },
+  callDriverButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: `${COLORS.success}20`,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addressSection: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: SPACING.sm,
+    marginBottom: SPACING.md,
   },
   addressText: {
-    fontSize: 14,
-    color: '#333',
     flex: 1,
+    fontSize: 13,
+    color: COLORS.textSecondary,
     textAlign: 'right',
   },
   itemsSection: {
-    marginBottom: 12,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.divider,
+    paddingTop: SPACING.sm,
+    marginBottom: SPACING.sm,
   },
   itemRow: {
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    paddingVertical: 4,
   },
   itemName: {
     fontSize: 14,
-    color: '#333',
+    color: COLORS.textPrimary,
   },
   itemPrice: {
     fontSize: 14,
-    color: '#666',
+    color: COLORS.textSecondary,
   },
-  notesSection: {
-    backgroundColor: '#FFF9C4',
-    padding: 8,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  notesLabel: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'right',
-  },
-  notesText: {
-    fontSize: 14,
-    color: '#333',
-    textAlign: 'right',
-  },
-  totalSection: {
+  totalRow: {
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
-    paddingTop: 12,
+    alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    marginBottom: 12,
+    borderTopColor: COLORS.divider,
+    paddingTop: SPACING.sm,
+    marginBottom: SPACING.md,
   },
   totalLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
   totalValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF6B35',
+    color: COLORS.primary,
   },
-  paymentRow: {
+  actionsRow: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
-  },
-  paymentMethod: {
-    fontSize: 14,
-    color: '#666',
-  },
-  actions: {
-    flexDirection: 'row-reverse',
-    gap: 8,
+    gap: SPACING.sm,
   },
   actionButton: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
+  },
+  actionButtonGradient: {
+    flexDirection: 'row-reverse',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    paddingVertical: SPACING.md,
   },
   actionButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: COLORS.textWhite,
     fontWeight: 'bold',
+    fontSize: 14,
+  },
+  assignButton: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: SPACING.xs,
+    backgroundColor: `${COLORS.info}15`,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.info,
+  },
+  assignButtonText: {
+    color: COLORS.info,
+    fontWeight: '600',
+    fontSize: 13,
   },
   cancelButton: {
+    padding: SPACING.sm,
+  },
+
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: COLORS.overlay,
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: COLORS.surface,
+    borderTopLeftRadius: RADIUS.xl,
+    borderTopRightRadius: RADIUS.xl,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: SPACING.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.divider,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  modalBody: {
+    padding: SPACING.lg,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    textAlign: 'right',
+    marginBottom: SPACING.md,
+  },
+  noDriversText: {
+    fontSize: 14,
+    color: COLORS.textLight,
+    textAlign: 'center',
+    paddingVertical: SPACING.lg,
+  },
+  driverOption: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    backgroundColor: COLORS.background,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+    marginBottom: SPACING.sm,
+  },
+  driverOptionAvatar: {
     width: 44,
     height: 44,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#EF5350',
+    borderRadius: 22,
+    backgroundColor: `${COLORS.primary}15`,
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: SPACING.md,
   },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingTop: 60,
+  driverOptionInfo: {
+    flex: 1,
+    alignItems: 'flex-end',
   },
-  emptyText: {
+  driverOptionName: {
     fontSize: 16,
-    color: '#999',
-    marginTop: 12,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  driverOptionPhone: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: SPACING.lg,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: COLORS.divider,
+  },
+  dividerText: {
+    paddingHorizontal: SPACING.md,
+    color: COLORS.textSecondary,
+    fontSize: 14,
+  },
+  platformButton: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    backgroundColor: COLORS.info,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+  },
+  platformButtonText: {
+    color: COLORS.textWhite,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  platformHint: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginTop: SPACING.sm,
+  },
+
+  // Confirm Modal
+  confirmOverlay: {
+    flex: 1,
+    backgroundColor: COLORS.overlay,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.xl,
+  },
+  confirmContent: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xl,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 320,
+  },
+  confirmTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    marginTop: SPACING.md,
+  },
+  confirmMessage: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginTop: SPACING.sm,
+  },
+  confirmButtons: {
+    flexDirection: 'row',
+    gap: SPACING.md,
+    marginTop: SPACING.xl,
+  },
+  confirmButton: {
+    flex: 1,
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.md,
+    alignItems: 'center',
+  },
+  keepButton: {
+    backgroundColor: COLORS.background,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  keepButtonText: {
+    color: COLORS.textPrimary,
+    fontWeight: '600',
+  },
+  cancelOrderButton: {
+    backgroundColor: COLORS.error,
+  },
+  cancelOrderButtonText: {
+    color: COLORS.textWhite,
+    fontWeight: '600',
   },
 });
