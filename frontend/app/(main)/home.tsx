@@ -11,13 +11,15 @@ import {
   ActivityIndicator,
   Dimensions,
   Animated,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { restaurantAPI } from '../../src/services/api';
+import { restaurantAPI, locationAPI } from '../../src/services/api';
 import { useAuthStore } from '../../src/store/authStore';
+import { useLocationStore, City, District } from '../../src/store/locationStore';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 const { width } = Dimensions.get('window');
@@ -30,6 +32,7 @@ interface Restaurant {
   image?: string;
   address: string;
   area: string;
+  city_id?: string;
   cuisine_type: string;
   rating: number;
   review_count: number;
@@ -51,17 +54,39 @@ const CATEGORIES = [
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
+  const { selectedCity, selectedDistrict, cities, setCities, setLocation, isLocationSet } = useLocationStore();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [selectedCityLocal, setSelectedCityLocal] = useState<City | null>(null);
+
+  // Fetch cities on mount
+  useEffect(() => {
+    const loadCities = async () => {
+      if (cities.length === 0) {
+        try {
+          const data = await locationAPI.getCities();
+          setCities(data);
+        } catch (error) {
+          console.error('Error loading cities:', error);
+        }
+      }
+    };
+    loadCities();
+  }, []);
 
   const fetchRestaurants = async () => {
     try {
       const filters: any = {};
       if (selectedCategory !== 'all') {
         filters.cuisine = selectedCategory;
+      }
+      // Filter by city if location is set
+      if (selectedCity) {
+        filters.city_id = selectedCity.id;
       }
       const data = await restaurantAPI.getAll(filters);
       setRestaurants(data);
@@ -76,7 +101,7 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchRestaurants();
-    }, [selectedCategory])
+    }, [selectedCategory, selectedCity])
   );
 
   const onRefresh = () => {
