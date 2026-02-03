@@ -305,8 +305,20 @@ export default function HomeScreen() {
           ) : (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyIcon}>🍽️</Text>
-              <Text style={styles.emptyText}>لا توجد مطاعم متاحة</Text>
-              <Text style={styles.emptySubtext}>جرب تغيير الفلتر أو البحث</Text>
+              <Text style={styles.emptyText}>
+                {selectedCity ? 'لا توجد مطاعم متاحة في هذه المدينة' : 'اختر موقعك أولاً'}
+              </Text>
+              <Text style={styles.emptySubtext}>
+                {selectedCity ? 'جرب تغيير الفلتر أو البحث' : 'اضغط على "التوصيل إلى" لاختيار مدينتك'}
+              </Text>
+              {!selectedCity && (
+                <TouchableOpacity 
+                  style={styles.selectLocationButton}
+                  onPress={() => setShowLocationModal(true)}
+                >
+                  <Text style={styles.selectLocationButtonText}>اختر موقعك</Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         </View>
@@ -314,6 +326,52 @@ export default function HomeScreen() {
         {/* Bottom Spacing */}
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* Location Selection Modal */}
+      <Modal
+        visible={showLocationModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowLocationModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setShowLocationModal(false)}>
+                <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>اختر المدينة</Text>
+              <View style={{ width: 24 }} />
+            </View>
+
+            <ScrollView style={styles.citiesList}>
+              {cities.map((city) => (
+                <TouchableOpacity
+                  key={city.id}
+                  style={[
+                    styles.cityItem,
+                    selectedCity?.id === city.id && styles.cityItemSelected,
+                  ]}
+                  onPress={() => {
+                    setLocation(city);
+                    setShowLocationModal(false);
+                  }}
+                >
+                  <Text style={[
+                    styles.cityName,
+                    selectedCity?.id === city.id && styles.cityNameSelected,
+                  ]}>
+                    {city.name}
+                  </Text>
+                  {selectedCity?.id === city.id && (
+                    <Ionicons name="checkmark" size={20} color={COLORS.primary} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
