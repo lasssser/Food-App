@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet } from 'react-native';
+import { COLORS } from '../../src/constants/theme';
 
 export default function DriverLayout() {
   return (
@@ -9,8 +10,8 @@ export default function DriverLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: '#FF6B35',
-        tabBarInactiveTintColor: '#999',
+        tabBarActiveTintColor: COLORS.primary,
+        tabBarInactiveTintColor: COLORS.textLight,
         tabBarLabelStyle: styles.tabBarLabel,
       }}
     >
@@ -56,15 +57,15 @@ export default function DriverLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.surface,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    height: 60,
+    borderTopColor: COLORS.divider,
+    height: 65,
     paddingBottom: 8,
     paddingTop: 8,
   },
   tabBarLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
   },
 });
