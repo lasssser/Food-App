@@ -537,11 +537,14 @@ async def get_user_location(current_user: dict = Depends(get_current_user)):
 
 @api_router.get("/restaurants", response_model=List[Restaurant])
 async def get_restaurants(
+    city_id: Optional[str] = None,
     area: Optional[str] = None,
     cuisine: Optional[str] = None,
     is_open: Optional[bool] = None
 ):
     query = {}
+    if city_id:
+        query["city_id"] = city_id
     if area:
         query["area"] = area
     if cuisine:
