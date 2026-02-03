@@ -39,7 +39,7 @@ export default function RestaurantSettings() {
   const [showAboutModal, setShowAboutModal] = useState(false);
 
   const handleLogout = () => {
-    Alert.alert('تسجيل الخروج', 'هل تريد تسجيل الخروج؟', [
+    showAlert('تسجيل الخروج', 'هل تريد تسجيل الخروج؟', [
       { text: 'إلغاء', style: 'cancel' },
       {
         text: 'خروج',
@@ -53,15 +53,19 @@ export default function RestaurantSettings() {
   };
 
   const handleContactSupport = () => {
-    Alert.alert(
-      'تواصل معنا',
-      'اختر طريقة التواصل',
-      [
-        { text: 'إلغاء', style: 'cancel' },
-        { text: '📞 اتصال', onPress: () => Linking.openURL('tel:+963999999999') },
-        { text: '💬 واتساب', onPress: () => Linking.openURL('https://wa.me/963999999999') },
-      ]
-    );
+    if (Platform.OS === 'web') {
+      window.open('https://wa.me/963999999999', '_blank');
+    } else {
+      Alert.alert(
+        'تواصل معنا',
+        'اختر طريقة التواصل',
+        [
+          { text: 'إلغاء', style: 'cancel' },
+          { text: '📞 اتصال', onPress: () => Linking.openURL('tel:+963999999999') },
+          { text: '💬 واتساب', onPress: () => Linking.openURL('https://wa.me/963999999999') },
+        ]
+      );
+    }
   };
 
   return (
