@@ -408,11 +408,13 @@ const styles = StyleSheet.create({
   categoriesTabs: {
     borderBottomWidth: 1,
     borderBottomColor: COLORS.divider,
+    maxHeight: 60,
   },
   categoriesContent: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     flexDirection: 'row',
+    alignItems: 'center',
   },
   categoryTab: {
     paddingHorizontal: 16,
@@ -422,6 +424,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   categoryTabActive: {
     backgroundColor: COLORS.primary,
