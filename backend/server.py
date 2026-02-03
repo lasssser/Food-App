@@ -1634,6 +1634,7 @@ async def seed_database():
             "delivery_fee": 5000,
             "min_order": 5000,
             "delivery_time": "30-45 دقيقة",
+            "city_id": "damascus",
             "created_at": datetime.utcnow()
         },
         {
@@ -1651,6 +1652,7 @@ async def seed_database():
             "delivery_fee": 3000,
             "min_order": 20000,
             "delivery_time": "25-35 دقيقة",
+            "city_id": "damascus",
             "created_at": datetime.utcnow()
         },
         {
@@ -1668,6 +1670,7 @@ async def seed_database():
             "delivery_fee": 4000,
             "min_order": 12000,
             "delivery_time": "20-30 دقيقة",
+            "city_id": "damascus",
             "created_at": datetime.utcnow()
         },
         {
@@ -1685,6 +1688,7 @@ async def seed_database():
             "delivery_fee": 6000,
             "min_order": 25000,
             "delivery_time": "40-55 دقيقة",
+            "city_id": "damascus",
             "created_at": datetime.utcnow()
         },
         {
@@ -1702,6 +1706,45 @@ async def seed_database():
             "delivery_fee": 2000,
             "min_order": 8000,
             "delivery_time": "15-25 دقيقة",
+            "city_id": "damascus",
+            "created_at": datetime.utcnow()
+        },
+        # Aleppo Restaurant
+        {
+            "id": "rest-6",
+            "name": "كباب حلب",
+            "name_en": "Aleppo Kebab",
+            "description": "أشهى الكباب الحلبي الأصيل",
+            "image": "https://images.pexels.com/photos/8697540/pexels-photo-8697540.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "address": "العزيزية، حلب",
+            "area": "حلب",
+            "cuisine_type": "مشاوي",
+            "rating": 4.8,
+            "review_count": 250,
+            "is_open": True,
+            "delivery_fee": 4000,
+            "min_order": 15000,
+            "delivery_time": "30-40 دقيقة",
+            "city_id": "aleppo",
+            "created_at": datetime.utcnow()
+        },
+        # Homs Restaurant
+        {
+            "id": "rest-7",
+            "name": "حمص الخير",
+            "name_en": "Homs Al Khair",
+            "description": "مأكولات حمصية تقليدية",
+            "image": "https://images.pexels.com/photos/5639411/pexels-photo-5639411.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "address": "الإنشاءات، حمص",
+            "area": "حمص",
+            "cuisine_type": "شامي",
+            "rating": 4.4,
+            "review_count": 80,
+            "is_open": True,
+            "delivery_fee": 3000,
+            "min_order": 10000,
+            "delivery_time": "25-35 دقيقة",
+            "city_id": "homs",
             "created_at": datetime.utcnow()
         }
     ]
