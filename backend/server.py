@@ -1191,11 +1191,12 @@ async def mark_all_notifications_read(current_user: dict = Depends(get_current_u
 
 @api_router.post("/seed")
 async def seed_database():
-    """Seed database with demo data including images"""
+    """Seed database with demo data including images and add-ons"""
     
     # Clear existing data
     await db.restaurants.delete_many({})
     await db.menu_items.delete_many({})
+    await db.addon_groups.delete_many({})
     
     # Demo Restaurants with images
     restaurants = [
