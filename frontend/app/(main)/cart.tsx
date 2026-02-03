@@ -323,6 +323,14 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     marginBottom: 4,
   },
+  addOnsContainer: {
+    marginBottom: 4,
+  },
+  addOnText: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    textAlign: 'right',
+  },
   itemPrice: {
     fontSize: 15,
     fontWeight: 'bold',
