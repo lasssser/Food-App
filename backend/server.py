@@ -1498,6 +1498,82 @@ async def seed_database():
                 {"id": "addon-opt-32", "name": "فتوش", "price": 4500}
             ],
             "created_at": datetime.utcnow()
+        },
+        
+        # More add-ons for Al Sham Restaurant (شاورما دجاج)
+        {
+            "id": "addon-group-10",
+            "menu_item_id": "item-2",  # شاورما دجاج
+            "restaurant_id": "rest-1",
+            "name": "الصلصات",
+            "is_required": False,
+            "max_selections": 2,
+            "options": [
+                {"id": "addon-opt-33", "name": "طحينة", "price": 0},
+                {"id": "addon-opt-34", "name": "ثومية", "price": 0},
+                {"id": "addon-opt-35", "name": "حار", "price": 0},
+                {"id": "addon-opt-36", "name": "كاتشب", "price": 0}
+            ],
+            "created_at": datetime.utcnow()
+        },
+        {
+            "id": "addon-group-11",
+            "menu_item_id": "item-2",  # شاورما دجاج
+            "restaurant_id": "rest-1",
+            "name": "الإضافات",
+            "is_required": False,
+            "max_selections": 3,
+            "options": [
+                {"id": "addon-opt-37", "name": "جبنة", "price": 2000},
+                {"id": "addon-opt-38", "name": "فطر", "price": 1500},
+                {"id": "addon-opt-39", "name": "بطاطا", "price": 1500}
+            ],
+            "created_at": datetime.utcnow()
+        },
+        
+        # Fatte Hummus add-ons
+        {
+            "id": "addon-group-12",
+            "menu_item_id": "item-3",  # فتة حمص
+            "restaurant_id": "rest-1",
+            "name": "الإضافات",
+            "is_required": False,
+            "max_selections": 2,
+            "options": [
+                {"id": "addon-opt-40", "name": "لحمة مفرومة", "price": 5000},
+                {"id": "addon-opt-41", "name": "صنوبر", "price": 3000},
+                {"id": "addon-opt-42", "name": "خبز إضافي", "price": 1000}
+            ],
+            "created_at": datetime.utcnow()
+        },
+        
+        # Fatayer add-ons (rest-5)
+        {
+            "id": "addon-group-13",
+            "menu_item_id": "item-22",  # فطيرة لحمة
+            "restaurant_id": "rest-5",
+            "name": "الحجم",
+            "is_required": True,
+            "max_selections": 1,
+            "options": [
+                {"id": "addon-opt-43", "name": "عادي", "price": 0},
+                {"id": "addon-opt-44", "name": "كبير", "price": 3000}
+            ],
+            "created_at": datetime.utcnow()
+        },
+        {
+            "id": "addon-group-14",
+            "menu_item_id": "item-21",  # فطيرة جبنة
+            "restaurant_id": "rest-5",
+            "name": "إضافات",
+            "is_required": False,
+            "max_selections": 2,
+            "options": [
+                {"id": "addon-opt-45", "name": "زعتر", "price": 500},
+                {"id": "addon-opt-46", "name": "سماق", "price": 500},
+                {"id": "addon-opt-47", "name": "جبنة إضافية", "price": 2000}
+            ],
+            "created_at": datetime.utcnow()
         }
     ]
     
