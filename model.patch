@@ -1,14 +1,19 @@
-diff --git a/frontend/app/(main)/checkout.tsx b/frontend/app/(main)/checkout.tsx
-index 4144c62..6381027 100644
---- a/frontend/app/(main)/checkout.tsx
-+++ b/frontend/app/(main)/checkout.tsx
-@@ -114,8 +114,7 @@ export default function CheckoutScreen() {
-       } else {
-         // COD - Order placed successfully
-         clearCart();
--        Alert.alert('
--تم الطلب', 'تم إرسال طلبك بنجاح!', [
-+        Alert.alert('تم الطلب', 'تم إرسال طلبك بنجاح!', [
-           {
-             text: 'تتبع الطلب',
-             onPress: () => router.replace('/(main)/orders'),
+diff --git a/model.patch b/model.patch
+index ef2b74a..e69de29 100644
+--- a/model.patch
++++ b/model.patch
+@@ -1,14 +0,0 @@
+-diff --git a/frontend/app/(main)/checkout.tsx b/frontend/app/(main)/checkout.tsx
+-index 4144c62..6381027 100644
+---- a/frontend/app/(main)/checkout.tsx
+-+++ b/frontend/app/(main)/checkout.tsx
+-@@ -114,8 +114,7 @@ export default function CheckoutScreen() {
+-       } else {
+-         // COD - Order placed successfully
+-         clearCart();
+--        Alert.alert('
+--تم الطلب', 'تم إرسال طلبك بنجاح!', [
+-+        Alert.alert('تم الطلب', 'تم إرسال طلبك بنجاح!', [
+-           {
+-             text: 'تتبع الطلب',
+-             onPress: () => router.replace('/(main)/orders'),
