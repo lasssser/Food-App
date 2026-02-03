@@ -96,6 +96,10 @@ export const restaurantAPI = {
     const response = await api.get(`/restaurants/${restaurantId}/menu${params}`);
     return response.data;
   },
+  getMenuItemAddOns: async (restaurantId: string, menuItemId: string) => {
+    const response = await api.get(`/restaurants/${restaurantId}/menu/${menuItemId}/addons`);
+    return response.data;
+  },
 };
 
 export const addressAPI = {
