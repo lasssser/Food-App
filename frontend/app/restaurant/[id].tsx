@@ -69,8 +69,7 @@ export default function RestaurantScreen() {
   const fetchAddOns = async (menuItemId: string): Promise<AddOnGroup[]> => {
     try {
       setLoadingAddOns(true);
-      const response = await fetch(`/api/restaurants/${id}/menu/${menuItemId}/addons`);
-      const data = await response.json();
+      const data = await restaurantAPI.getMenuItemAddOns(id!, menuItemId);
       setAddOnGroups(data || []);
       
       // Initialize selections for required groups
