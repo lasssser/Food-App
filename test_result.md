@@ -282,7 +282,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All MVP and Phase 2 features implemented and tested"
+    - "Add-ons feature completed"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -292,3 +292,5 @@ agent_communication:
     message: "MVP completed with all core features: Auth, Restaurants, Menu, Cart, Checkout (COD + ShamCash), Orders, Profile"
   - agent: "main"
     message: "Phase 2 completed: Restaurant Panel, Driver Interface, Notifications System, Images for restaurants/menu items. All features tested via screenshots and working correctly."
+  - agent: "main"
+    message: "Add-ons feature completed: Backend APIs for managing add-on groups and options, Frontend Modal for selecting add-ons when adding items to cart, Cart displays selected add-ons with prices, Price calculation includes add-on costs. Demo data includes 9 add-on groups for various menu items (sauces, sizes, extras, drinks)."
