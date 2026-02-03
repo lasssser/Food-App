@@ -90,6 +90,7 @@ class Restaurant(BaseModel):
     image: Optional[str] = None
     address: str
     area: str
+    city_id: str = "damascus"  # المدينة
     cuisine_type: str
     rating: float = 4.0
     review_count: int = 0
