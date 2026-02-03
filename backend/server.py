@@ -828,13 +828,32 @@ async def create_order(order_data: OrderCreate, current_user: dict = Depends(get
         if not menu_item:
             raise HTTPException(status_code=404, detail=f"الصنف غير موجود: {item.menu_item_id}")
         
-        item_subtotal = menu_item["price"] * item.quantity
+        # Calculate base item price
+        item_base_price = menu_item["price"]
+        
+        # Calculate addons price
+        addons_price = 0
+        selected_addons = []
+        
+        if item.addons:
+            for addon_selection in item.addons:
+                addons_price += addon_selection.price
+                selected_addons.append(OrderAddOnSelection(
+                    group_name=addon_selection.group_name,
+                    option_name=addon_selection.option_name,
+                    price=addon_selection.price
+                ))
+        
+        # Total price per item = (base price + addons) * quantity
+        item_subtotal = (item_base_price + addons_price) * item.quantity
+        
         order_items.append(OrderItem(
             menu_item_id=item.menu_item_id,
             name=menu_item["name"],
-            price=menu_item["price"],
+            price=item_base_price,
             quantity=item.quantity,
             notes=item.notes,
+            addons=selected_addons,
             subtotal=item_subtotal
         ))
         subtotal += item_subtotal
