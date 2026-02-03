@@ -974,19 +974,92 @@ async def update_driver_location(location: DriverLocation, current_user: dict = 
 
 @api_router.get("/driver/available-orders")
 async def get_available_orders_for_driver(current_user: dict = Depends(get_current_user)):
-    """Get orders ready for pickup"""
+    """Get orders ready for pickup in driver's city"""
     if current_user.get("role") != "driver":
         raise HTTPException(status_code=403, detail="غير مصرح")
     
     if not current_user.get("is_online"):
         return []
     
+    # Filter by driver's city
+    driver_city = current_user.get("city_id", "damascus")
+    
+    # Get restaurants in driver's city
+    restaurants_in_city = await db.restaurants.find({"city_id": driver_city}).to_list(100)
+    restaurant_ids = [r["id"] for r in restaurants_in_city]
+    
     orders = await db.orders.find({
         "order_status": "ready",
-        "driver_id": None
+        "delivery_mode": "platform_driver",  # Only platform delivery orders
+        "driver_id": None,
+        "restaurant_id": {"$in": restaurant_ids}
     }).sort("created_at", 1).to_list(20)
     
-    return [Order(**order) for order in orders]
+    # Enrich orders with restaurant info
+    result = []
+    for order in orders:
+        restaurant = next((r for r in restaurants_in_city if r["id"] == order["restaurant_id"]), None)
+        order_data = Order(**order).dict()
+        order_data["restaurant_address"] = restaurant.get("address") if restaurant else ""
+        result.append(order_data)
+    
+    return result
+
+@api_router.post("/driver/accept-order/{order_id}")
+async def driver_accept_order(order_id: str, current_user: dict = Depends(get_current_user)):
+    """Driver accepts an order with lock mechanism"""
+    if current_user.get("role") != "driver":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    if not current_user.get("is_online"):
+        raise HTTPException(status_code=400, detail="يجب أن تكون متصلاً لقبول الطلبات")
+    
+    # Try to atomically lock the order
+    result = await db.orders.update_one(
+        {
+            "id": order_id,
+            "order_status": "ready",
+            "delivery_mode": "platform_driver",
+            "driver_id": None  # Only if no driver assigned yet
+        },
+        {"$set": {
+            "driver_id": current_user["id"],
+            "driver_name": current_user["name"],
+            "driver_phone": current_user.get("phone"),
+            "driver_type": "platform_driver",
+            "order_status": "driver_assigned",
+            "updated_at": datetime.utcnow()
+        }}
+    )
+    
+    if result.modified_count == 0:
+        # Order was already taken by another driver
+        raise HTTPException(status_code=409, detail="تم استلام هذا الطلب من سائق آخر")
+    
+    # Get order details
+    order = await db.orders.find_one({"id": order_id})
+    
+    # Notify restaurant
+    restaurant = await db.restaurants.find_one({"id": order["restaurant_id"]})
+    if restaurant and restaurant.get("owner_id"):
+        await create_notification(
+            restaurant["owner_id"],
+            "سائق استلم الطلب",
+            f"السائق {current_user['name']} قبل الطلب #{order_id[:8]}",
+            "driver_assigned",
+            {"order_id": order_id, "driver_name": current_user["name"], "driver_phone": current_user.get("phone")}
+        )
+    
+    # Notify customer
+    await create_notification(
+        order["user_id"],
+        "سائق في الطريق",
+        f"السائق {current_user['name']} سيستلم طلبك قريباً",
+        "order_update",
+        {"order_id": order_id}
+    )
+    
+    return {"message": "تم قبول الطلب بنجاح", "order": Order(**order).dict()}
 
 @api_router.get("/driver/my-orders")
 async def get_driver_orders(current_user: dict = Depends(get_current_user)):
