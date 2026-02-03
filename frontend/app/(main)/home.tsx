@@ -661,9 +661,75 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     marginBottom: SPACING.sm,
+    textAlign: 'center',
   },
   emptySubtext: {
     fontSize: 14,
     color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  selectLocationButton: {
+    marginTop: SPACING.lg,
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.md,
+  },
+  selectLocationButtonText: {
+    color: COLORS.textWhite,
+    fontWeight: '600',
+    fontSize: 16,
+  },
+
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: COLORS.overlay,
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: COLORS.surface,
+    borderTopLeftRadius: RADIUS.xl,
+    borderTopRightRadius: RADIUS.xl,
+    maxHeight: '70%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: SPACING.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.divider,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  citiesList: {
+    padding: SPACING.lg,
+  },
+  cityItem: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADIUS.md,
+    marginBottom: SPACING.sm,
+    backgroundColor: COLORS.background,
+  },
+  cityItemSelected: {
+    backgroundColor: `${COLORS.primary}15`,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+  },
+  cityName: {
+    fontSize: 17,
+    color: COLORS.textPrimary,
+  },
+  cityNameSelected: {
+    fontWeight: '600',
+    color: COLORS.primary,
   },
 });
