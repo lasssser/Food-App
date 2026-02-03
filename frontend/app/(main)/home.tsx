@@ -399,10 +399,33 @@ const styles = StyleSheet.create({
   // Header
   header: {
     paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.lg,
+    paddingTop: SPACING.md,
     paddingBottom: SPACING.xxl,
     borderBottomLeftRadius: RADIUS.xl,
     borderBottomRightRadius: RADIUS.xl,
+  },
+  locationBar: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    marginBottom: SPACING.md,
+    gap: SPACING.sm,
+  },
+  locationInfo: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  locationLabel: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.7)',
+  },
+  locationText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.textWhite,
   },
   headerContent: {
     flexDirection: 'row-reverse',
