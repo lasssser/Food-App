@@ -1,339 +1,581 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Image,
   ActivityIndicator,
-  SectionList,
+  Dimensions,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Restaurant, MenuItem } from '../../src/types';
+import { LinearGradient } from 'expo-linear-gradient';
 import { restaurantAPI } from '../../src/services/api';
-import { MenuItemCard } from '../../src/components/MenuItemCard';
-import { CartButton } from '../../src/components/CartButton';
 import { useCartStore } from '../../src/store/cartStore';
+import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+
+const { width, height } = Dimensions.get('window');
+const HERO_HEIGHT = height * 0.35;
+
+interface Restaurant {
+  id: string;
+  name: string;
+  description: string;
+  image?: string;
+  address: string;
+  cuisine_type: string;
+  rating: number;
+  review_count: number;
+  delivery_fee: number;
+  delivery_time: string;
+  is_open: boolean;
+}
+
+interface MenuItem {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  image?: string;
+  category: string;
+  is_available: boolean;
+}
 
 export default function RestaurantScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
+  const { addItem, items } = useCartStore();
+  
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const router = useRouter();
-  const { items, addItem, removeItem, updateQuantity } = useCartStore();
+  const [selectedCategory, setSelectedCategory] = useState<string>('الأكثر طلباً');
+  const [addedItems, setAddedItems] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!id) return;
-      try {
-        const [restaurantData, menuData] = await Promise.all([
-          restaurantAPI.getById(id),
-          restaurantAPI.getMenu(id),
-        ]);
-        setRestaurant(restaurantData);
-        setMenuItems(menuData);
-      } catch (error) {
-        console.error('Error fetching restaurant:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [id]);
+  const scrollY = new Animated.Value(0);
 
-  const categories = useMemo(() => {
-    const cats = [...new Set(menuItems.map((item) => item.category))];
-    return cats;
-  }, [menuItems]);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const [restaurantData, menuData] = await Promise.all([
+            restaurantAPI.getById(id!),
+            restaurantAPI.getMenu(id!),
+          ]);
+          setRestaurant(restaurantData);
+          setMenuItems(menuData);
+        } catch (error) {
+          console.error('Error fetching restaurant:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchData();
+    }, [id])
+  );
 
-  const sections = useMemo(() => {
-    const filteredItems = selectedCategory
-      ? menuItems.filter((item) => item.category === selectedCategory)
-      : menuItems;
+  const categories = ['الأكثر طلباً', ...new Set(menuItems.map((item) => item.category))];
 
-    const grouped = filteredItems.reduce((acc, item) => {
-      if (!acc[item.category]) {
-        acc[item.category] = [];
-      }
-      acc[item.category].push(item);
-      return acc;
-    }, {} as Record<string, MenuItem[]>);
+  const filteredItems = selectedCategory === 'الأكثر طلباً'
+    ? menuItems.slice(0, 6)
+    : menuItems.filter((item) => item.category === selectedCategory);
 
-    return Object.entries(grouped).map(([title, data]) => ({
-      title,
-      data,
-    }));
-  }, [menuItems, selectedCategory]);
+  const handleAddToCart = (item: MenuItem) => {
+    if (!restaurant) return;
+    
+    addItem({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      image: item.image,
+      restaurantId: restaurant.id,
+      restaurantName: restaurant.name,
+    });
+
+    // Show animation feedback
+    setAddedItems(prev => new Set(prev).add(item.id));
+    setTimeout(() => {
+      setAddedItems(prev => {
+        const next = new Set(prev);
+        next.delete(item.id);
+        return next;
+      });
+    }, 500);
+  };
 
   const getItemQuantity = (itemId: string) => {
-    const cartItem = items.find((item) => item.menuItem.id === itemId);
+    const cartItem = items.find(i => i.id === itemId);
     return cartItem?.quantity || 0;
-  };
-
-  const handleAddItem = (menuItem: MenuItem) => {
-    if (restaurant) {
-      addItem(menuItem, restaurant);
-    }
-  };
-
-  const handleRemoveItem = (menuItemId: string) => {
-    const quantity = getItemQuantity(menuItemId);
-    if (quantity > 1) {
-      updateQuantity(menuItemId, quantity - 1);
-    } else {
-      removeItem(menuItemId);
-    }
   };
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B35" />
-        </View>
-      </SafeAreaView>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+        <Text style={styles.loadingText}>جاري تحميل المنيو...</Text>
+      </View>
     );
   }
 
   if (!restaurant) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>المطعم غير موجود</Text>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.backLink}>العودة</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorIcon}>😕</Text>
+        <Text style={styles.errorText}>المطعم غير موجود</Text>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Text style={styles.backButtonText}>رجوع</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-forward" size={24} color="#333" />
-        </TouchableOpacity>
+    <View style={styles.container}>
+      {/* Hero Image */}
+      <View style={styles.heroContainer}>
+        <Image
+          source={{ uri: restaurant.image || 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=600' }}
+          style={styles.heroImage}
+        />
+        <LinearGradient
+          colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)']}
+          style={styles.heroOverlay}
+        />
         
-        <View style={styles.restaurantInfo}>
-          <Text style={styles.restaurantName}>{restaurant.name}</Text>
-          <View style={styles.ratingRow}>
-            <Text style={styles.ratingText}>{restaurant.rating.toFixed(1)}</Text>
-            <Ionicons name="star" size={16} color="#FFD700" />
-            <Text style={styles.reviewCount}>({restaurant.review_count} تقييم)</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <View style={styles.infoItem}>
-              <Ionicons name="time-outline" size={14} color="#666" />
-              <Text style={styles.infoText}>{restaurant.delivery_time}</Text>
+        {/* Back Button */}
+        <SafeAreaView style={styles.headerButtons}>
+          <TouchableOpacity 
+            style={styles.headerButton} 
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-forward" size={24} color={COLORS.textWhite} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerButton}>
+            <Ionicons name="heart-outline" size={24} color={COLORS.textWhite} />
+          </TouchableOpacity>
+        </SafeAreaView>
+
+        {/* Restaurant Info on Hero */}
+        <View style={styles.heroInfo}>
+          <Text style={styles.heroName}>{restaurant.name}</Text>
+          <Text style={styles.heroCuisine}>{restaurant.cuisine_type}</Text>
+          
+          <View style={styles.heroStats}>
+            <View style={styles.heroStat}>
+              <Ionicons name="star" size={18} color={COLORS.accent} />
+              <Text style={styles.heroStatText}>{restaurant.rating.toFixed(1)}</Text>
+              <Text style={styles.heroStatLabel}>({restaurant.review_count}+ تقييم)</Text>
             </View>
-            <View style={styles.infoItem}>
-              <Ionicons name="bicycle-outline" size={14} color="#666" />
-              <Text style={styles.infoText}>توصيل: {restaurant.delivery_fee.toLocaleString()} ل.س</Text>
+            <View style={styles.heroDivider} />
+            <View style={styles.heroStat}>
+              <Ionicons name="time-outline" size={18} color={COLORS.textWhite} />
+              <Text style={styles.heroStatText}>{restaurant.delivery_time}</Text>
+            </View>
+            <View style={styles.heroDivider} />
+            <View style={styles.heroStat}>
+              <Ionicons name="bicycle-outline" size={18} color={COLORS.textWhite} />
+              <Text style={styles.heroStatText}>{restaurant.delivery_fee.toLocaleString()} ل.س</Text>
             </View>
           </View>
-          <Text style={styles.minOrder}>
-            الحد الأدنى للطلب: {restaurant.min_order.toLocaleString()} ل.س
-          </Text>
         </View>
       </View>
 
-      {/* Categories */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoriesContainer}
-        style={styles.categoriesScroll}
-      >
-        <TouchableOpacity
-          style={[
-            styles.categoryChip,
-            selectedCategory === null && styles.categoryChipActive,
-          ]}
-          onPress={() => setSelectedCategory(null)}
+      {/* Menu Content */}
+      <View style={styles.menuContainer}>
+        {/* Category Tabs */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoriesTabs}
+          contentContainerStyle={styles.categoriesContent}
         >
-          <Text
-            style={[
-              styles.categoryChipText,
-              selectedCategory === null && styles.categoryChipTextActive,
-            ]}
-          >
-            الكل
-          </Text>
-        </TouchableOpacity>
-        {categories.map((cat) => (
-          <TouchableOpacity
-            key={cat}
-            style={[
-              styles.categoryChip,
-              selectedCategory === cat && styles.categoryChipActive,
-            ]}
-            onPress={() => setSelectedCategory(cat)}
-          >
-            <Text
+          {categories.map((category) => (
+            <TouchableOpacity
+              key={category}
               style={[
-                styles.categoryChipText,
-                selectedCategory === cat && styles.categoryChipTextActive,
+                styles.categoryTab,
+                selectedCategory === category && styles.categoryTabActive,
               ]}
+              onPress={() => setSelectedCategory(category)}
             >
-              {cat}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+              <Text
+                style={[
+                  styles.categoryTabText,
+                  selectedCategory === category && styles.categoryTabTextActive,
+                ]}
+              >
+                {category}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
-      {/* Menu Items */}
-      <SectionList
-        sections={sections}
-        keyExtractor={(item) => item.id}
-        renderSectionHeader={({ section }) => (
-          <Text style={styles.sectionHeader}>{section.title}</Text>
-        )}
-        renderItem={({ item }) => (
-          <MenuItemCard
-            item={item}
-            quantity={getItemQuantity(item.id)}
-            onAdd={() => handleAddItem(item)}
-            onRemove={() => handleRemoveItem(item.id)}
-          />
-        )}
-        contentContainerStyle={styles.menuContent}
-        stickySectionHeadersEnabled
-      />
+        {/* Menu Items */}
+        <ScrollView
+          style={styles.menuList}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 120 }}
+        >
+          {filteredItems.map((item) => (
+            <View key={item.id} style={styles.menuItem}>
+              <View style={styles.menuItemContent}>
+                <View style={styles.menuItemInfo}>
+                  <Text style={styles.menuItemName}>{item.name}</Text>
+                  {item.description && (
+                    <Text style={styles.menuItemDesc} numberOfLines={2}>
+                      {item.description}
+                    </Text>
+                  )}
+                  <Text style={styles.menuItemPrice}>
+                    {item.price.toLocaleString()} ل.س
+                  </Text>
+                </View>
+                
+                <View style={styles.menuItemImageContainer}>
+                  {item.image && (
+                    <Image source={{ uri: item.image }} style={styles.menuItemImage} />
+                  )}
+                  
+                  {/* Add Button */}
+                  <TouchableOpacity
+                    style={[
+                      styles.addButton,
+                      addedItems.has(item.id) && styles.addButtonActive,
+                      !item.is_available && styles.addButtonDisabled,
+                    ]}
+                    onPress={() => handleAddToCart(item)}
+                    disabled={!item.is_available}
+                    activeOpacity={0.8}
+                  >
+                    {getItemQuantity(item.id) > 0 ? (
+                      <View style={styles.quantityBadge}>
+                        <Text style={styles.quantityText}>{getItemQuantity(item.id)}</Text>
+                      </View>
+                    ) : (
+                      <Ionicons 
+                        name={addedItems.has(item.id) ? "checkmark" : "add"} 
+                        size={24} 
+                        color={COLORS.textWhite} 
+                      />
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
+      </View>
 
-      {/* Cart Button */}
-      <CartButton onPress={() => router.push('/(main)/cart')} />
-    </SafeAreaView>
+      {/* Floating Cart Button */}
+      {items.length > 0 && (
+        <TouchableOpacity
+          style={styles.floatingCart}
+          onPress={() => router.push('/(main)/cart')}
+          activeOpacity={0.9}
+        >
+          <LinearGradient
+            colors={[COLORS.primary, COLORS.primaryDark]}
+            style={styles.floatingCartGradient}
+          >
+            <View style={styles.floatingCartContent}>
+              <View style={styles.cartBadge}>
+                <Text style={styles.cartBadgeText}>
+                  {items.reduce((sum, item) => sum + item.quantity, 0)}
+                </Text>
+              </View>
+              <Text style={styles.floatingCartText}>عرض السلة</Text>
+              <Text style={styles.floatingCartPrice}>
+                {items.reduce((sum, item) => sum + item.price * item.quantity, 0).toLocaleString()} ل.س
+              </Text>
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: COLORS.background,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: COLORS.textSecondary,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: COLORS.background,
+  },
+  errorIcon: {
+    fontSize: 60,
+    marginBottom: SPACING.lg,
   },
   errorText: {
     fontSize: 18,
-    color: '#666',
-    marginBottom: 12,
-  },
-  backLink: {
-    fontSize: 16,
-    color: '#FF6B35',
-  },
-  header: {
-    flexDirection: 'row-reverse',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    backgroundColor: '#fff',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.lg,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: SPACING.xxl,
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.md,
+  },
+  backButtonText: {
+    color: COLORS.textWhite,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
+  // Hero
+  heroContainer: {
+    height: HERO_HEIGHT,
+    position: 'relative',
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  heroOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  headerButtons: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: SPACING.lg,
+  },
+  headerButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  restaurantInfo: {
+  heroInfo: {
+    position: 'absolute',
+    bottom: SPACING.xl,
+    left: SPACING.lg,
+    right: SPACING.lg,
+  },
+  heroName: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: COLORS.textWhite,
+    textAlign: 'right',
+    marginBottom: 4,
+  },
+  heroCuisine: {
+    fontSize: 16,
+    color: 'rgba(255,255,255,0.9)',
+    textAlign: 'right',
+    marginBottom: SPACING.md,
+  },
+  heroStats: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+  },
+  heroStat: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 4,
+  },
+  heroStatText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: COLORS.textWhite,
+  },
+  heroStatLabel: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.7)',
+  },
+  heroDivider: {
+    width: 1,
+    height: 16,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    marginHorizontal: SPACING.md,
+  },
+
+  // Menu Container
+  menuContainer: {
     flex: 1,
-    marginRight: 12,
+    backgroundColor: COLORS.background,
+    borderTopLeftRadius: RADIUS.xl,
+    borderTopRightRadius: RADIUS.xl,
+    marginTop: -RADIUS.xl,
+  },
+
+  // Category Tabs
+  categoriesTabs: {
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.divider,
+  },
+  categoriesContent: {
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+  },
+  categoryTab: {
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    marginRight: SPACING.sm,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surface,
+  },
+  categoryTabActive: {
+    backgroundColor: COLORS.primary,
+  },
+  categoryTabText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+  },
+  categoryTabTextActive: {
+    color: COLORS.textWhite,
+  },
+
+  // Menu List
+  menuList: {
+    flex: 1,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.lg,
+  },
+  menuItem: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    marginBottom: SPACING.md,
+    ...SHADOWS.small,
+  },
+  menuItemContent: {
+    flexDirection: 'row-reverse',
+    padding: SPACING.md,
+  },
+  menuItemInfo: {
+    flex: 1,
+    paddingLeft: SPACING.md,
     alignItems: 'flex-end',
   },
-  restaurantName: {
-    fontSize: 22,
+  menuItemName: {
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textPrimary,
     textAlign: 'right',
+    marginBottom: 4,
   },
-  ratingRow: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 4,
-  },
-  ratingText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-  },
-  reviewCount: {
+  menuItemDesc: {
     fontSize: 13,
-    color: '#999',
+    color: COLORS.textSecondary,
+    textAlign: 'right',
+    marginBottom: SPACING.sm,
   },
-  infoRow: {
-    flexDirection: 'row-reverse',
-    gap: 16,
-    marginTop: 8,
+  menuItemPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.primary,
   },
-  infoItem: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 4,
+  menuItemImageContainer: {
+    position: 'relative',
   },
-  infoText: {
-    fontSize: 13,
-    color: '#666',
+  menuItemImage: {
+    width: 90,
+    height: 90,
+    borderRadius: RADIUS.md,
+    resizeMode: 'cover',
   },
-  minOrder: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 6,
-  },
-  categoriesScroll: {
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  categoriesContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
-    flexDirection: 'row-reverse',
-  },
-  categoryChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#f5f5f5',
+  addButton: {
+    position: 'absolute',
+    bottom: -10,
+    right: -10,
+    width: 40,
+    height: 40,
     borderRadius: 20,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.medium,
   },
-  categoryChipActive: {
-    backgroundColor: '#FF6B35',
+  addButtonActive: {
+    backgroundColor: COLORS.success,
+    transform: [{ scale: 1.1 }],
   },
-  categoryChipText: {
+  addButtonDisabled: {
+    backgroundColor: COLORS.textLight,
+  },
+  quantityBadge: {
+    backgroundColor: COLORS.accent,
+    borderRadius: 10,
+    minWidth: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  quantityText: {
+    color: COLORS.secondary,
     fontSize: 14,
-    color: '#666',
+    fontWeight: 'bold',
   },
-  categoryChipTextActive: {
-    color: '#fff',
-    fontWeight: '600',
+
+  // Floating Cart
+  floatingCart: {
+    position: 'absolute',
+    bottom: SPACING.xl,
+    left: SPACING.lg,
+    right: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
+    ...SHADOWS.large,
   },
-  menuContent: {
-    paddingBottom: 100,
+  floatingCartGradient: {
+    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.xl,
   },
-  sectionHeader: {
+  floatingCartContent: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  cartBadge: {
+    backgroundColor: COLORS.textWhite,
+    borderRadius: RADIUS.full,
+    width: 28,
+    height: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cartBadgeText: {
+    color: COLORS.primary,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  floatingCartText: {
+    flex: 1,
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
-    backgroundColor: '#fff',
-    padding: 16,
-    paddingBottom: 8,
-    textAlign: 'right',
+    color: COLORS.textWhite,
+    textAlign: 'center',
+  },
+  floatingCartPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.textWhite,
   },
 });
