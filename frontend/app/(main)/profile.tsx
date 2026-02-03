@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   TextInput,
   Modal,
   KeyboardAvoidingView,
@@ -28,6 +27,9 @@ export default function ProfileScreen() {
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
   const [newAddressLabel, setNewAddressLabel] = useState('');
   const [newAddressLine, setNewAddressLine] = useState('');
   const [newAddressArea, setNewAddressArea] = useState('');
@@ -49,7 +51,6 @@ export default function ProfileScreen() {
 
   const handleAddAddress = async () => {
     if (!newAddressLabel || !newAddressLine) {
-      Alert.alert('خطأ', 'يرجى ملء جميع الحقول المطلوبة');
       return;
     }
 
@@ -64,77 +65,43 @@ export default function ProfileScreen() {
       setNewAddressLabel('');
       setNewAddressLine('');
       setNewAddressArea('');
-      Alert.alert('تم', 'تمت إضافة العنوان بنجاح ✅');
     } catch (error) {
-      Alert.alert('خطأ', 'فشل إضافة العنوان');
+      console.error('Error adding address:', error);
     }
   };
 
-  const handleDeleteAddress = async (addressId: string) => {
-    Alert.alert('تأكيد الحذف', 'هل تريد حذف هذا العنوان؟', [
-      { text: 'إلغاء', style: 'cancel' },
-      {
-        text: 'حذف',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await addressAPI.delete(addressId);
-            setAddresses(addresses.filter((a) => a.id !== addressId));
-            Alert.alert('تم', 'تم حذف العنوان ✅');
-          } catch (error) {
-            Alert.alert('خطأ', 'فشل حذف العنوان');
-          }
-        },
-      },
-    ]);
+  const handleDeleteAddress = async () => {
+    if (!addressToDelete) return;
+    
+    try {
+      await addressAPI.delete(addressToDelete);
+      setAddresses(addresses.filter((a) => a.id !== addressToDelete));
+      setShowDeleteModal(false);
+      setAddressToDelete(null);
+    } catch (error) {
+      console.error('Error deleting address:', error);
+    }
   };
 
-  const handleLogout = () => {
-    Alert.alert('تسجيل الخروج', 'هل تريد تسجيل الخروج؟', [
-      { text: 'إلغاء', style: 'cancel' },
-      {
-        text: 'خروج',
-        style: 'destructive',
-        onPress: async () => {
-          if (isGuest) {
-            setGuestMode(false);
-          } else {
-            await logout();
-          }
-          router.replace('/(auth)/login');
-        },
-      },
-    ]);
+  const handleLogout = async () => {
+    if (isGuest) {
+      setGuestMode(false);
+    } else {
+      await logout();
+    }
+    router.replace('/(auth)/login');
   };
 
   const handleNotifications = () => {
     router.push('/(main)/notifications');
   };
 
-  const handleHelp = () => {
-    setShowHelpModal(true);
-  };
-
-  const handleAbout = () => {
-    setShowAboutModal(true);
-  };
-
   const handleContactSupport = () => {
-    Alert.alert(
-      'تواصل معنا',
-      'اختر طريقة التواصل',
-      [
-        { text: 'إلغاء', style: 'cancel' },
-        { 
-          text: '📞 اتصال', 
-          onPress: () => Linking.openURL('tel:+963999999999') 
-        },
-        { 
-          text: '💬 واتساب', 
-          onPress: () => Linking.openURL('https://wa.me/963999999999') 
-        },
-      ]
-    );
+    if (Platform.OS === 'web') {
+      window.open('https://wa.me/963999999999', '_blank');
+    } else {
+      Linking.openURL('https://wa.me/963999999999');
+    }
   };
 
   // Guest View
@@ -158,6 +125,7 @@ export default function ProfileScreen() {
               setGuestMode(false);
               router.replace('/(auth)/login');
             }}
+            activeOpacity={0.7}
           >
             <LinearGradient
               colors={[COLORS.primary, COLORS.primaryDark]}
@@ -174,6 +142,7 @@ export default function ProfileScreen() {
               setGuestMode(false);
               router.push('/(auth)/register');
             }}
+            activeOpacity={0.7}
           >
             <Text style={styles.registerButtonText}>إنشاء حساب جديد</Text>
           </TouchableOpacity>
@@ -181,7 +150,7 @@ export default function ProfileScreen() {
 
         {/* Menu Items for Guest */}
         <View style={styles.menuSection}>
-          <TouchableOpacity style={styles.menuItem} onPress={handleHelp}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => setShowHelpModal(true)} activeOpacity={0.7}>
             <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
             <View style={styles.menuItemContent}>
               <Text style={styles.menuItemText}>المساعدة والدعم</Text>
@@ -189,7 +158,7 @@ export default function ProfileScreen() {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={handleAbout}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => setShowAboutModal(true)} activeOpacity={0.7}>
             <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
             <View style={styles.menuItemContent}>
               <Text style={styles.menuItemText}>عن التطبيق</Text>
@@ -205,7 +174,7 @@ export default function ProfileScreen() {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
-                <TouchableOpacity onPress={() => setShowHelpModal(false)}>
+                <TouchableOpacity onPress={() => setShowHelpModal(false)} activeOpacity={0.7}>
                   <Ionicons name="close" size={24} color={COLORS.textPrimary} />
                 </TouchableOpacity>
                 <Text style={styles.modalTitle}>المساعدة والدعم</Text>
@@ -213,33 +182,13 @@ export default function ProfileScreen() {
               </View>
 
               <View style={styles.helpContent}>
-                <TouchableOpacity style={styles.helpItem} onPress={handleContactSupport}>
+                <TouchableOpacity style={styles.helpItem} onPress={handleContactSupport} activeOpacity={0.7}>
                   <View style={[styles.helpIcon, { backgroundColor: `${COLORS.success}15` }]}>
-                    <Ionicons name="call" size={24} color={COLORS.success} />
+                    <Ionicons name="logo-whatsapp" size={24} color={COLORS.success} />
                   </View>
                   <View style={styles.helpInfo}>
                     <Text style={styles.helpTitle}>تواصل معنا</Text>
-                    <Text style={styles.helpDesc}>اتصل أو راسلنا عبر واتساب</Text>
-                  </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.helpItem}>
-                  <View style={[styles.helpIcon, { backgroundColor: `${COLORS.info}15` }]}>
-                    <Ionicons name="chatbubbles" size={24} color={COLORS.info} />
-                  </View>
-                  <View style={styles.helpInfo}>
-                    <Text style={styles.helpTitle}>الأسئلة الشائعة</Text>
-                    <Text style={styles.helpDesc}>إجابات على أكثر الأسئلة شيوعاً</Text>
-                  </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.helpItem}>
-                  <View style={[styles.helpIcon, { backgroundColor: `${COLORS.warning}15` }]}>
-                    <Ionicons name="document-text" size={24} color={COLORS.warning} />
-                  </View>
-                  <View style={styles.helpInfo}>
-                    <Text style={styles.helpTitle}>الشروط والأحكام</Text>
-                    <Text style={styles.helpDesc}>اقرأ شروط استخدام التطبيق</Text>
+                    <Text style={styles.helpDesc}>راسلنا عبر واتساب</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -252,7 +201,7 @@ export default function ProfileScreen() {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
-                <TouchableOpacity onPress={() => setShowAboutModal(false)}>
+                <TouchableOpacity onPress={() => setShowAboutModal(false)} activeOpacity={0.7}>
                   <Ionicons name="close" size={24} color={COLORS.textPrimary} />
                 </TouchableOpacity>
                 <Text style={styles.modalTitle}>عن التطبيق</Text>
@@ -266,26 +215,9 @@ export default function ProfileScreen() {
                 <Text style={styles.aboutName}>يلا ناكل؟</Text>
                 <Text style={styles.aboutVersion}>الإصدار 1.0.0</Text>
                 <Text style={styles.aboutDesc}>
-                  تطبيق توصيل الطعام الأسرع والأسهل في سوريا!
-                  اطلب من أكثر من 200 مطعم واستمتع بتوصيل سريع لباب بيتك.
+                  تطبيق توصيل الطعام الأسرع والأسهل!
                 </Text>
-
-                <View style={styles.aboutFeatures}>
-                  <View style={styles.aboutFeature}>
-                    <Ionicons name="restaurant" size={20} color={COLORS.primary} />
-                    <Text style={styles.aboutFeatureText}>+200 مطعم</Text>
-                  </View>
-                  <View style={styles.aboutFeature}>
-                    <Ionicons name="bicycle" size={20} color={COLORS.primary} />
-                    <Text style={styles.aboutFeatureText}>توصيل سريع</Text>
-                  </View>
-                  <View style={styles.aboutFeature}>
-                    <Ionicons name="card" size={20} color={COLORS.primary} />
-                    <Text style={styles.aboutFeatureText}>دفع آمن</Text>
-                  </View>
-                </View>
-
-                <Text style={styles.aboutCopyright}>© 2025 يلا ناكل؟ - جميع الحقوق محفوظة</Text>
+                <Text style={styles.aboutCopyright}>© 2025 يلا ناكل؟</Text>
               </View>
             </View>
           </View>
@@ -304,7 +236,7 @@ export default function ProfileScreen() {
         {/* User Info */}
         <View style={styles.profileCard}>
           <View style={styles.avatarContainer}>
-            <Text style={styles.avatarEmoji}>👤</Text>
+            <Ionicons name="person" size={35} color={COLORS.primary} />
           </View>
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{user?.name}</Text>
@@ -315,7 +247,7 @@ export default function ProfileScreen() {
         {/* Addresses Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <TouchableOpacity onPress={() => setShowAddressModal(true)}>
+            <TouchableOpacity onPress={() => setShowAddressModal(true)} activeOpacity={0.7}>
               <Ionicons name="add-circle" size={24} color={COLORS.primary} />
             </TouchableOpacity>
             <View style={styles.sectionTitleRow}>
@@ -330,6 +262,7 @@ export default function ProfileScreen() {
               <TouchableOpacity
                 style={styles.addAddressButton}
                 onPress={() => setShowAddressModal(true)}
+                activeOpacity={0.7}
               >
                 <Ionicons name="add" size={20} color={COLORS.primary} />
                 <Text style={styles.addAddressText}>إضافة عنوان</Text>
@@ -341,11 +274,10 @@ export default function ProfileScreen() {
                 <TouchableOpacity
                   style={styles.deleteButton}
                   onPress={() => {
-                    console.log('Delete pressed for:', address.id);
-                    handleDeleteAddress(address.id);
+                    setAddressToDelete(address.id);
+                    setShowDeleteModal(true);
                   }}
-                  hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
-                  activeOpacity={0.6}
+                  activeOpacity={0.7}
                 >
                   <View style={styles.deleteIconContainer}>
                     <Ionicons name="trash" size={20} color={COLORS.error} />
@@ -365,7 +297,7 @@ export default function ProfileScreen() {
 
         {/* Menu Items */}
         <View style={styles.menuSection}>
-          <TouchableOpacity style={styles.menuItem} onPress={handleNotifications}>
+          <TouchableOpacity style={styles.menuItem} onPress={handleNotifications} activeOpacity={0.7}>
             <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
             <View style={styles.menuItemContent}>
               <Text style={styles.menuItemText}>الإشعارات</Text>
@@ -373,7 +305,7 @@ export default function ProfileScreen() {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={handleHelp}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => setShowHelpModal(true)} activeOpacity={0.7}>
             <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
             <View style={styles.menuItemContent}>
               <Text style={styles.menuItemText}>المساعدة والدعم</Text>
@@ -381,7 +313,7 @@ export default function ProfileScreen() {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={handleAbout}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => setShowAboutModal(true)} activeOpacity={0.7}>
             <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
             <View style={styles.menuItemContent}>
               <Text style={styles.menuItemText}>عن التطبيق</Text>
@@ -393,10 +325,7 @@ export default function ProfileScreen() {
         {/* Logout */}
         <TouchableOpacity 
           style={styles.logoutButton} 
-          onPress={() => {
-            console.log('Logout pressed');
-            handleLogout();
-          }}
+          onPress={() => setShowLogoutModal(true)}
           activeOpacity={0.7}
         >
           <Ionicons name="log-out-outline" size={22} color={COLORS.error} />
@@ -414,7 +343,7 @@ export default function ProfileScreen() {
         >
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={() => setShowAddressModal(false)}>
+              <TouchableOpacity onPress={() => setShowAddressModal(false)} activeOpacity={0.7}>
                 <Ionicons name="close" size={24} color={COLORS.textPrimary} />
               </TouchableOpacity>
               <Text style={styles.modalTitle}>إضافة عنوان جديد</Text>
@@ -449,16 +378,81 @@ export default function ProfileScreen() {
               textAlign="right"
             />
 
-            <TouchableOpacity style={styles.modalButton} onPress={handleAddAddress}>
+            <TouchableOpacity style={styles.saveButton} onPress={handleAddAddress} activeOpacity={0.7}>
               <LinearGradient
                 colors={[COLORS.primary, COLORS.primaryDark]}
-                style={styles.modalButtonGradient}
+                style={styles.saveButtonGradient}
               >
-                <Text style={styles.modalButtonText}>حفظ العنوان</Text>
+                <Text style={styles.saveButtonText}>حفظ العنوان</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal visible={showDeleteModal} animationType="fade" transparent>
+        <View style={styles.confirmModalOverlay}>
+          <View style={styles.confirmModal}>
+            <View style={styles.confirmIconContainer}>
+              <Ionicons name="trash" size={40} color={COLORS.error} />
+            </View>
+            <Text style={styles.confirmTitle}>حذف العنوان</Text>
+            <Text style={styles.confirmMessage}>هل تريد حذف هذا العنوان؟</Text>
+            
+            <View style={styles.confirmButtons}>
+              <TouchableOpacity 
+                style={styles.cancelButton} 
+                onPress={() => {
+                  setShowDeleteModal(false);
+                  setAddressToDelete(null);
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cancelButtonText}>إلغاء</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.deleteConfirmButton} 
+                onPress={handleDeleteAddress}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.deleteConfirmButtonText}>حذف</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Logout Confirmation Modal */}
+      <Modal visible={showLogoutModal} animationType="fade" transparent>
+        <View style={styles.confirmModalOverlay}>
+          <View style={styles.confirmModal}>
+            <View style={styles.confirmIconContainer}>
+              <Ionicons name="log-out-outline" size={40} color={COLORS.error} />
+            </View>
+            <Text style={styles.confirmTitle}>تسجيل الخروج</Text>
+            <Text style={styles.confirmMessage}>هل تريد تسجيل الخروج من حسابك؟</Text>
+            
+            <View style={styles.confirmButtons}>
+              <TouchableOpacity 
+                style={styles.cancelButton} 
+                onPress={() => setShowLogoutModal(false)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cancelButtonText}>إلغاء</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.deleteConfirmButton} 
+                onPress={handleLogout}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.deleteConfirmButtonText}>خروج</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
       </Modal>
 
       {/* Help Modal */}
@@ -466,7 +460,7 @@ export default function ProfileScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={() => setShowHelpModal(false)}>
+              <TouchableOpacity onPress={() => setShowHelpModal(false)} activeOpacity={0.7}>
                 <Ionicons name="close" size={24} color={COLORS.textPrimary} />
               </TouchableOpacity>
               <Text style={styles.modalTitle}>المساعدة والدعم</Text>
@@ -474,33 +468,13 @@ export default function ProfileScreen() {
             </View>
 
             <View style={styles.helpContent}>
-              <TouchableOpacity style={styles.helpItem} onPress={handleContactSupport}>
+              <TouchableOpacity style={styles.helpItem} onPress={handleContactSupport} activeOpacity={0.7}>
                 <View style={[styles.helpIcon, { backgroundColor: `${COLORS.success}15` }]}>
-                  <Ionicons name="call" size={24} color={COLORS.success} />
+                  <Ionicons name="logo-whatsapp" size={24} color={COLORS.success} />
                 </View>
                 <View style={styles.helpInfo}>
                   <Text style={styles.helpTitle}>تواصل معنا</Text>
-                  <Text style={styles.helpDesc}>اتصل أو راسلنا عبر واتساب</Text>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.helpItem}>
-                <View style={[styles.helpIcon, { backgroundColor: `${COLORS.info}15` }]}>
-                  <Ionicons name="chatbubbles" size={24} color={COLORS.info} />
-                </View>
-                <View style={styles.helpInfo}>
-                  <Text style={styles.helpTitle}>الأسئلة الشائعة</Text>
-                  <Text style={styles.helpDesc}>إجابات على أكثر الأسئلة شيوعاً</Text>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.helpItem}>
-                <View style={[styles.helpIcon, { backgroundColor: `${COLORS.warning}15` }]}>
-                  <Ionicons name="document-text" size={24} color={COLORS.warning} />
-                </View>
-                <View style={styles.helpInfo}>
-                  <Text style={styles.helpTitle}>الشروط والأحكام</Text>
-                  <Text style={styles.helpDesc}>اقرأ شروط استخدام التطبيق</Text>
+                  <Text style={styles.helpDesc}>راسلنا عبر واتساب</Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -513,7 +487,7 @@ export default function ProfileScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={() => setShowAboutModal(false)}>
+              <TouchableOpacity onPress={() => setShowAboutModal(false)} activeOpacity={0.7}>
                 <Ionicons name="close" size={24} color={COLORS.textPrimary} />
               </TouchableOpacity>
               <Text style={styles.modalTitle}>عن التطبيق</Text>
@@ -527,26 +501,9 @@ export default function ProfileScreen() {
               <Text style={styles.aboutName}>يلا ناكل؟</Text>
               <Text style={styles.aboutVersion}>الإصدار 1.0.0</Text>
               <Text style={styles.aboutDesc}>
-                تطبيق توصيل الطعام الأسرع والأسهل في سوريا!
-                اطلب من أكثر من 200 مطعم واستمتع بتوصيل سريع لباب بيتك.
+                تطبيق توصيل الطعام الأسرع والأسهل!
               </Text>
-
-              <View style={styles.aboutFeatures}>
-                <View style={styles.aboutFeature}>
-                  <Ionicons name="restaurant" size={20} color={COLORS.primary} />
-                  <Text style={styles.aboutFeatureText}>+200 مطعم</Text>
-                </View>
-                <View style={styles.aboutFeature}>
-                  <Ionicons name="bicycle" size={20} color={COLORS.primary} />
-                  <Text style={styles.aboutFeatureText}>توصيل سريع</Text>
-                </View>
-                <View style={styles.aboutFeature}>
-                  <Ionicons name="card" size={20} color={COLORS.primary} />
-                  <Text style={styles.aboutFeatureText}>دفع آمن</Text>
-                </View>
-              </View>
-
-              <Text style={styles.aboutCopyright}>© 2025 يلا ناكل؟ - جميع الحقوق محفوظة</Text>
+              <Text style={styles.aboutCopyright}>© 2025 يلا ناكل؟</Text>
             </View>
           </View>
         </View>
@@ -650,9 +607,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  avatarEmoji: {
-    fontSize: 35,
-  },
   userInfo: {
     flex: 1,
     marginRight: SPACING.lg,
@@ -749,12 +703,12 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   deleteButton: {
-    padding: SPACING.sm,
+    marginLeft: SPACING.md,
   },
   deleteIconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: `${COLORS.error}15`,
     justifyContent: 'center',
     alignItems: 'center',
@@ -796,6 +750,8 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
     gap: SPACING.sm,
     marginBottom: SPACING.md,
+    marginHorizontal: SPACING.lg,
+    borderRadius: RADIUS.lg,
     ...SHADOWS.small,
   },
   logoutText: {
@@ -807,7 +763,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textLight,
     textAlign: 'center',
-    paddingBottom: 30,
+    paddingBottom: 100,
   },
 
   // Modal
@@ -843,19 +799,85 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
-  modalButton: {
+  saveButton: {
     borderRadius: RADIUS.md,
     overflow: 'hidden',
     marginTop: SPACING.sm,
   },
-  modalButtonGradient: {
+  saveButtonGradient: {
     paddingVertical: SPACING.lg,
     alignItems: 'center',
   },
-  modalButtonText: {
+  saveButtonText: {
     color: COLORS.textWhite,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+
+  // Confirm Modal
+  confirmModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.xl,
+  },
+  confirmModal: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.xl,
+    width: '100%',
+    alignItems: 'center',
+  },
+  confirmIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: `${COLORS.error}15`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+  },
+  confirmTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
+  },
+  confirmMessage: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginBottom: SPACING.xl,
+  },
+  confirmButtons: {
+    flexDirection: 'row',
+    gap: SPACING.md,
+    width: '100%',
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  deleteConfirmButton: {
+    flex: 1,
+    backgroundColor: COLORS.error,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    alignItems: 'center',
+  },
+  deleteConfirmButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textWhite,
   },
 
   // Help Content
@@ -926,20 +948,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: SPACING.xl,
-  },
-  aboutFeatures: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginBottom: SPACING.xl,
-  },
-  aboutFeature: {
-    alignItems: 'center',
-    gap: SPACING.xs,
-  },
-  aboutFeatureText: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
   },
   aboutCopyright: {
     fontSize: 12,
