@@ -1,182 +1,274 @@
 diff --git a/backend/server.py b/backend/server.py
-index ddb983a..b36d4f7 100644
+index b36d4f7..138c034 100644
 --- a/backend/server.py
 +++ b/backend/server.py
-@@ -1359,7 +1359,152 @@ async def seed_database():
-         }
-         await db.users.insert_one(driver)
-     
--    return {"message": "تم إضافة البيانات التجريبية بنجاح", "restaurants": len(restaurants), "menu_items": len(menu_items)}
-+    # Demo Add-on Groups (الإضافات)
-+    addon_groups = [
-+        # Shawarma add-ons for Al Sham Restaurant
+@@ -1498,6 +1498,82 @@ async def seed_database():
+                 {"id": "addon-opt-32", "name": "فتوش", "price": 4500}
+             ],
+             "created_at": datetime.utcnow()
++        },
++        
++        # More add-ons for Al Sham Restaurant (شاورما دجاج)
 +        {
-+            "id": "addon-group-1",
-+            "menu_item_id": "item-1",  # شاورما لحمة
++            "id": "addon-group-10",
++            "menu_item_id": "item-2",  # شاورما دجاج
 +            "restaurant_id": "rest-1",
 +            "name": "الصلصات",
 +            "is_required": False,
 +            "max_selections": 2,
 +            "options": [
-+                {"id": "addon-opt-1", "name": "طحينة", "price": 0},
-+                {"id": "addon-opt-2", "name": "ثومية", "price": 0},
-+                {"id": "addon-opt-3", "name": "حار", "price": 0},
-+                {"id": "addon-opt-4", "name": "مخلل", "price": 500}
++                {"id": "addon-opt-33", "name": "طحينة", "price": 0},
++                {"id": "addon-opt-34", "name": "ثومية", "price": 0},
++                {"id": "addon-opt-35", "name": "حار", "price": 0},
++                {"id": "addon-opt-36", "name": "كاتشب", "price": 0}
 +            ],
 +            "created_at": datetime.utcnow()
 +        },
 +        {
-+            "id": "addon-group-2",
-+            "menu_item_id": "item-1",  # شاورما لحمة
++            "id": "addon-group-11",
++            "menu_item_id": "item-2",  # شاورما دجاج
 +            "restaurant_id": "rest-1",
 +            "name": "الإضافات",
 +            "is_required": False,
 +            "max_selections": 3,
 +            "options": [
-+                {"id": "addon-opt-5", "name": "جبنة", "price": 2000},
-+                {"id": "addon-opt-6", "name": "خضار إضافية", "price": 1000},
-+                {"id": "addon-opt-7", "name": "بطاطا", "price": 1500}
++                {"id": "addon-opt-37", "name": "جبنة", "price": 2000},
++                {"id": "addon-opt-38", "name": "فطر", "price": 1500},
++                {"id": "addon-opt-39", "name": "بطاطا", "price": 1500}
 +            ],
 +            "created_at": datetime.utcnow()
 +        },
 +        
-+        # Pizza add-ons for Pizza Napoli
++        # Fatte Hummus add-ons
 +        {
-+            "id": "addon-group-3",
-+            "menu_item_id": "item-7",  # بيتزا مارغريتا
-+            "restaurant_id": "rest-2",
++            "id": "addon-group-12",
++            "menu_item_id": "item-3",  # فتة حمص
++            "restaurant_id": "rest-1",
++            "name": "الإضافات",
++            "is_required": False,
++            "max_selections": 2,
++            "options": [
++                {"id": "addon-opt-40", "name": "لحمة مفرومة", "price": 5000},
++                {"id": "addon-opt-41", "name": "صنوبر", "price": 3000},
++                {"id": "addon-opt-42", "name": "خبز إضافي", "price": 1000}
++            ],
++            "created_at": datetime.utcnow()
++        },
++        
++        # Fatayer add-ons (rest-5)
++        {
++            "id": "addon-group-13",
++            "menu_item_id": "item-22",  # فطيرة لحمة
++            "restaurant_id": "rest-5",
 +            "name": "الحجم",
 +            "is_required": True,
 +            "max_selections": 1,
 +            "options": [
-+                {"id": "addon-opt-8", "name": "صغير", "price": 0},
-+                {"id": "addon-opt-9", "name": "وسط", "price": 5000},
-+                {"id": "addon-opt-10", "name": "كبير", "price": 8000}
++                {"id": "addon-opt-43", "name": "عادي", "price": 0},
++                {"id": "addon-opt-44", "name": "كبير", "price": 3000}
 +            ],
 +            "created_at": datetime.utcnow()
 +        },
 +        {
-+            "id": "addon-group-4",
-+            "menu_item_id": "item-7",  # بيتزا مارغريتا
-+            "restaurant_id": "rest-2",
-+            "name": "إضافات البيتزا",
-+            "is_required": False,
-+            "max_selections": 4,
-+            "options": [
-+                {"id": "addon-opt-11", "name": "جبنة إضافية", "price": 3000},
-+                {"id": "addon-opt-12", "name": "فطر", "price": 2000},
-+                {"id": "addon-opt-13", "name": "زيتون", "price": 1500},
-+                {"id": "addon-opt-14", "name": "فلفل حلو", "price": 1500},
-+                {"id": "addon-opt-15", "name": "بصل", "price": 1000}
-+            ],
-+            "created_at": datetime.utcnow()
-+        },
-+        
-+        # Burger add-ons for Burger House
-+        {
-+            "id": "addon-group-5",
-+            "menu_item_id": "item-12",  # كلاسيك برجر
-+            "restaurant_id": "rest-3",
-+            "name": "الجبنة",
-+            "is_required": False,
-+            "max_selections": 1,
-+            "options": [
-+                {"id": "addon-opt-16", "name": "شيدر", "price": 2000},
-+                {"id": "addon-opt-17", "name": "سويسري", "price": 2500},
-+                {"id": "addon-opt-18", "name": "موزاريلا", "price": 2000}
-+            ],
-+            "created_at": datetime.utcnow()
-+        },
-+        {
-+            "id": "addon-group-6",
-+            "menu_item_id": "item-12",  # كلاسيك برجر
-+            "restaurant_id": "rest-3",
-+            "name": "الإضافات",
-+            "is_required": False,
-+            "max_selections": 5,
-+            "options": [
-+                {"id": "addon-opt-19", "name": "بيكون", "price": 3000},
-+                {"id": "addon-opt-20", "name": "أفوكادو", "price": 2500},
-+                {"id": "addon-opt-21", "name": "فطر مشوي", "price": 2000},
-+                {"id": "addon-opt-22", "name": "بصل مقلي", "price": 1500},
-+                {"id": "addon-opt-23", "name": "مخلل", "price": 500}
-+            ],
-+            "created_at": datetime.utcnow()
-+        },
-+        {
-+            "id": "addon-group-7",
-+            "menu_item_id": "item-12",  # كلاسيك برجر
-+            "restaurant_id": "rest-3",
-+            "name": "المشروبات",
-+            "is_required": False,
-+            "max_selections": 1,
-+            "options": [
-+                {"id": "addon-opt-24", "name": "كولا", "price": 2000},
-+                {"id": "addon-opt-25", "name": "فانتا", "price": 2000},
-+                {"id": "addon-opt-26", "name": "ماء", "price": 1000}
-+            ],
-+            "created_at": datetime.utcnow()
-+        },
-+        
-+        # Grills add-ons for Gulf Grills
-+        {
-+            "id": "addon-group-8",
-+            "menu_item_id": "item-17",  # مشكل مشاوي
-+            "restaurant_id": "rest-4",
-+            "name": "الأرز",
-+            "is_required": True,
-+            "max_selections": 1,
-+            "options": [
-+                {"id": "addon-opt-27", "name": "أرز أبيض", "price": 0},
-+                {"id": "addon-opt-28", "name": "أرز بالزعفران", "price": 3000},
-+                {"id": "addon-opt-29", "name": "أرز بالخضار", "price": 2000}
-+            ],
-+            "created_at": datetime.utcnow()
-+        },
-+        {
-+            "id": "addon-group-9",
-+            "menu_item_id": "item-17",  # مشكل مشاوي
-+            "restaurant_id": "rest-4",
-+            "name": "السلطات",
++            "id": "addon-group-14",
++            "menu_item_id": "item-21",  # فطيرة جبنة
++            "restaurant_id": "rest-5",
++            "name": "إضافات",
 +            "is_required": False,
 +            "max_selections": 2,
 +            "options": [
-+                {"id": "addon-opt-30", "name": "سلطة خضراء", "price": 3000},
-+                {"id": "addon-opt-31", "name": "تبولة", "price": 4000},
-+                {"id": "addon-opt-32", "name": "فتوش", "price": 4500}
++                {"id": "addon-opt-45", "name": "زعتر", "price": 500},
++                {"id": "addon-opt-46", "name": "سماق", "price": 500},
++                {"id": "addon-opt-47", "name": "جبنة إضافية", "price": 2000}
 +            ],
 +            "created_at": datetime.utcnow()
-+        }
-+    ]
-+    
-+    # Insert add-on groups
-+    await db.addon_groups.insert_many(addon_groups)
-+    
-+    return {"message": "تم إضافة البيانات التجريبية بنجاح", "restaurants": len(restaurants), "menu_items": len(menu_items), "addon_groups": len(addon_groups)}
- 
- # ==================== Health Check ====================
- 
+         }
+     ]
+     
 diff --git a/model.patch b/model.patch
-index c71dc4c..2edfff6 100644
+index 25df65a..e69de29 100644
 --- a/model.patch
 +++ b/model.patch
-@@ -1,19 +0,0 @@
+@@ -1,182 +0,0 @@
+-diff --git a/backend/server.py b/backend/server.py
+-index ddb983a..b36d4f7 100644
+---- a/backend/server.py
+-+++ b/backend/server.py
+-@@ -1359,7 +1359,152 @@ async def seed_database():
+-         }
+-         await db.users.insert_one(driver)
+-     
+--    return {"message": "تم إضافة البيانات التجريبية بنجاح", "restaurants": len(restaurants), "menu_items": len(menu_items)}
+-+    # Demo Add-on Groups (الإضافات)
+-+    addon_groups = [
+-+        # Shawarma add-ons for Al Sham Restaurant
+-+        {
+-+            "id": "addon-group-1",
+-+            "menu_item_id": "item-1",  # شاورما لحمة
+-+            "restaurant_id": "rest-1",
+-+            "name": "الصلصات",
+-+            "is_required": False,
+-+            "max_selections": 2,
+-+            "options": [
+-+                {"id": "addon-opt-1", "name": "طحينة", "price": 0},
+-+                {"id": "addon-opt-2", "name": "ثومية", "price": 0},
+-+                {"id": "addon-opt-3", "name": "حار", "price": 0},
+-+                {"id": "addon-opt-4", "name": "مخلل", "price": 500}
+-+            ],
+-+            "created_at": datetime.utcnow()
+-+        },
+-+        {
+-+            "id": "addon-group-2",
+-+            "menu_item_id": "item-1",  # شاورما لحمة
+-+            "restaurant_id": "rest-1",
+-+            "name": "الإضافات",
+-+            "is_required": False,
+-+            "max_selections": 3,
+-+            "options": [
+-+                {"id": "addon-opt-5", "name": "جبنة", "price": 2000},
+-+                {"id": "addon-opt-6", "name": "خضار إضافية", "price": 1000},
+-+                {"id": "addon-opt-7", "name": "بطاطا", "price": 1500}
+-+            ],
+-+            "created_at": datetime.utcnow()
+-+        },
+-+        
+-+        # Pizza add-ons for Pizza Napoli
+-+        {
+-+            "id": "addon-group-3",
+-+            "menu_item_id": "item-7",  # بيتزا مارغريتا
+-+            "restaurant_id": "rest-2",
+-+            "name": "الحجم",
+-+            "is_required": True,
+-+            "max_selections": 1,
+-+            "options": [
+-+                {"id": "addon-opt-8", "name": "صغير", "price": 0},
+-+                {"id": "addon-opt-9", "name": "وسط", "price": 5000},
+-+                {"id": "addon-opt-10", "name": "كبير", "price": 8000}
+-+            ],
+-+            "created_at": datetime.utcnow()
+-+        },
+-+        {
+-+            "id": "addon-group-4",
+-+            "menu_item_id": "item-7",  # بيتزا مارغريتا
+-+            "restaurant_id": "rest-2",
+-+            "name": "إضافات البيتزا",
+-+            "is_required": False,
+-+            "max_selections": 4,
+-+            "options": [
+-+                {"id": "addon-opt-11", "name": "جبنة إضافية", "price": 3000},
+-+                {"id": "addon-opt-12", "name": "فطر", "price": 2000},
+-+                {"id": "addon-opt-13", "name": "زيتون", "price": 1500},
+-+                {"id": "addon-opt-14", "name": "فلفل حلو", "price": 1500},
+-+                {"id": "addon-opt-15", "name": "بصل", "price": 1000}
+-+            ],
+-+            "created_at": datetime.utcnow()
+-+        },
+-+        
+-+        # Burger add-ons for Burger House
+-+        {
+-+            "id": "addon-group-5",
+-+            "menu_item_id": "item-12",  # كلاسيك برجر
+-+            "restaurant_id": "rest-3",
+-+            "name": "الجبنة",
+-+            "is_required": False,
+-+            "max_selections": 1,
+-+            "options": [
+-+                {"id": "addon-opt-16", "name": "شيدر", "price": 2000},
+-+                {"id": "addon-opt-17", "name": "سويسري", "price": 2500},
+-+                {"id": "addon-opt-18", "name": "موزاريلا", "price": 2000}
+-+            ],
+-+            "created_at": datetime.utcnow()
+-+        },
+-+        {
+-+            "id": "addon-group-6",
+-+            "menu_item_id": "item-12",  # كلاسيك برجر
+-+            "restaurant_id": "rest-3",
+-+            "name": "الإضافات",
+-+            "is_required": False,
+-+            "max_selections": 5,
+-+            "options": [
+-+                {"id": "addon-opt-19", "name": "بيكون", "price": 3000},
+-+                {"id": "addon-opt-20", "name": "أفوكادو", "price": 2500},
+-+                {"id": "addon-opt-21", "name": "فطر مشوي", "price": 2000},
+-+                {"id": "addon-opt-22", "name": "بصل مقلي", "price": 1500},
+-+                {"id": "addon-opt-23", "name": "مخلل", "price": 500}
+-+            ],
+-+            "created_at": datetime.utcnow()
+-+        },
+-+        {
+-+            "id": "addon-group-7",
+-+            "menu_item_id": "item-12",  # كلاسيك برجر
+-+            "restaurant_id": "rest-3",
+-+            "name": "المشروبات",
+-+            "is_required": False,
+-+            "max_selections": 1,
+-+            "options": [
+-+                {"id": "addon-opt-24", "name": "كولا", "price": 2000},
+-+                {"id": "addon-opt-25", "name": "فانتا", "price": 2000},
+-+                {"id": "addon-opt-26", "name": "ماء", "price": 1000}
+-+            ],
+-+            "created_at": datetime.utcnow()
+-+        },
+-+        
+-+        # Grills add-ons for Gulf Grills
+-+        {
+-+            "id": "addon-group-8",
+-+            "menu_item_id": "item-17",  # مشكل مشاوي
+-+            "restaurant_id": "rest-4",
+-+            "name": "الأرز",
+-+            "is_required": True,
+-+            "max_selections": 1,
+-+            "options": [
+-+                {"id": "addon-opt-27", "name": "أرز أبيض", "price": 0},
+-+                {"id": "addon-opt-28", "name": "أرز بالزعفران", "price": 3000},
+-+                {"id": "addon-opt-29", "name": "أرز بالخضار", "price": 2000}
+-+            ],
+-+            "created_at": datetime.utcnow()
+-+        },
+-+        {
+-+            "id": "addon-group-9",
+-+            "menu_item_id": "item-17",  # مشكل مشاوي
+-+            "restaurant_id": "rest-4",
+-+            "name": "السلطات",
+-+            "is_required": False,
+-+            "max_selections": 2,
+-+            "options": [
+-+                {"id": "addon-opt-30", "name": "سلطة خضراء", "price": 3000},
+-+                {"id": "addon-opt-31", "name": "تبولة", "price": 4000},
+-+                {"id": "addon-opt-32", "name": "فتوش", "price": 4500}
+-+            ],
+-+            "created_at": datetime.utcnow()
+-+        }
+-+    ]
+-+    
+-+    # Insert add-on groups
+-+    await db.addon_groups.insert_many(addon_groups)
+-+    
+-+    return {"message": "تم إضافة البيانات التجريبية بنجاح", "restaurants": len(restaurants), "menu_items": len(menu_items), "addon_groups": len(addon_groups)}
+- 
+- # ==================== Health Check ====================
+- 
 -diff --git a/model.patch b/model.patch
--index ef2b74a..e69de29 100644
+-index c71dc4c..2edfff6 100644
 ---- a/model.patch
 -+++ b/model.patch
--@@ -1,14 +0,0 @@
---diff --git a/frontend/app/(main)/checkout.tsx b/frontend/app/(main)/checkout.tsx
---index 4144c62..6381027 100644
------ a/frontend/app/(main)/checkout.tsx
---+++ b/frontend/app/(main)/checkout.tsx
---@@ -114,8 +114,7 @@ export default function CheckoutScreen() {
---       } else {
---         // COD - Order placed successfully
---         clearCart();
----        Alert.alert('
----تم الطلب', 'تم إرسال طلبك بنجاح!', [
---+        Alert.alert('تم الطلب', 'تم إرسال طلبك بنجاح!', [
---           {
---             text: 'تتبع الطلب',
---             onPress: () => router.replace('/(main)/orders'),
+-@@ -1,19 +0,0 @@
+--diff --git a/model.patch b/model.patch
+--index ef2b74a..e69de29 100644
+----- a/model.patch
+--+++ b/model.patch
+--@@ -1,14 +0,0 @@
+---diff --git a/frontend/app/(main)/checkout.tsx b/frontend/app/(main)/checkout.tsx
+---index 4144c62..6381027 100644
+------ a/frontend/app/(main)/checkout.tsx
+---+++ b/frontend/app/(main)/checkout.tsx
+---@@ -114,8 +114,7 @@ export default function CheckoutScreen() {
+---       } else {
+---         // COD - Order placed successfully
+---         clearCart();
+----        Alert.alert('
+----تم الطلب', 'تم إرسال طلبك بنجاح!', [
+---+        Alert.alert('تم الطلب', 'تم إرسال طلبك بنجاح!', [
+---           {
+---             text: 'تتبع الطلب',
+---             onPress: () => router.replace('/(main)/orders'),
