@@ -412,16 +412,20 @@ const styles = StyleSheet.create({
   categoriesContent: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
+    flexDirection: 'row',
   },
   categoryTab: {
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.sm,
-    marginRight: SPACING.sm,
-    borderRadius: RADIUS.full,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginRight: 8,
+    borderRadius: 20,
     backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   categoryTabActive: {
     backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
   },
   categoryTabText: {
     fontSize: 14,
