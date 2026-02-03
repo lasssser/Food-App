@@ -3,67 +3,64 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
+  ScrollView,
   TouchableOpacity,
+  Image,
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useCartStore } from '../../src/store/cartStore';
+import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 export default function CartScreen() {
   const router = useRouter();
-  const {
-    items,
-    restaurant,
-    updateQuantity,
-    removeItem,
-    clearCart,
-    getSubtotal,
-    getTotal,
-  } = useCartStore();
+  const { items, updateQuantity, removeItem, clearCart, getTotal, getRestaurantId } = useCartStore();
 
-  const subtotal = getSubtotal();
-  const deliveryFee = restaurant?.delivery_fee || 0;
-  const total = getTotal();
-
-  const handleCheckout = () => {
-    if (!restaurant) return;
-    
-    if (subtotal < restaurant.min_order) {
-      Alert.alert(
-        'الحد الأدنى',
-        `الحد الأدنى للطلب من ${restaurant.name} هو ${restaurant.min_order.toLocaleString()} ل.س`
-      );
-      return;
-    }
-    
-    router.push('/(main)/checkout' as any);
-  };
+  const restaurantId = getRestaurantId();
+  const subtotal = getTotal();
+  const deliveryFee = 5000; // Fixed delivery fee
+  const total = subtotal + deliveryFee;
 
   const handleClearCart = () => {
-    Alert.alert('تأكيد', 'هل تريد إفراغ السلة؟', [
-      { text: 'إلغاء', style: 'cancel' },
-      { text: 'إفراغ', style: 'destructive', onPress: clearCart },
-    ]);
+    Alert.alert(
+      'تأكيد',
+      'هل تريد مسح السلة بالكامل؟',
+      [
+        { text: 'إلغاء', style: 'cancel' },
+        { text: 'نعم', style: 'destructive', onPress: clearCart },
+      ]
+    );
   };
 
   if (items.length === 0) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>سلة الطلب</Text>
+          <View style={{ width: 44 }} />
+          <Text style={styles.headerTitle}>السلة</Text>
+          <View style={{ width: 44 }} />
         </View>
+        
         <View style={styles.emptyContainer}>
-          <Ionicons name="cart-outline" size={80} color="#ccc" />
-          <Text style={styles.emptyText}>سلتك فارغة</Text>
-          <Text style={styles.emptySubtext}>أضف أصنافاً من المطاعم لبدء الطلب</Text>
+          <View style={styles.emptyIconContainer}>
+            <Text style={styles.emptyIcon}>🛒</Text>
+          </View>
+          <Text style={styles.emptyTitle}>سلتك فارغة</Text>
+          <Text style={styles.emptySubtitle}>أضف بعض الأطعمة الشهية!</Text>
           <TouchableOpacity
             style={styles.browseButton}
             onPress={() => router.push('/(main)/home')}
           >
-            <Text style={styles.browseButtonText}>تصفح المطاعم</Text>
+            <LinearGradient
+              colors={[COLORS.primary, COLORS.primaryDark]}
+              style={styles.browseButtonGradient}
+            >
+              <Text style={styles.browseButtonText}>تصفح المطاعم</Text>
+              <Ionicons name="restaurant-outline" size={20} color={COLORS.textWhite} />
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -75,92 +72,109 @@ export default function CartScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleClearCart}>
-          <Text style={styles.clearButton}>إفراغ</Text>
+          <Text style={styles.clearText}>مسح الكل</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>سلة الطلب</Text>
-        <View style={{ width: 50 }} />
+        <Text style={styles.headerTitle}>السلة</Text>
+        <View style={{ width: 60 }} />
       </View>
 
       {/* Restaurant Info */}
-      <View style={styles.restaurantBar}>
-        <Text style={styles.restaurantName}>{restaurant?.name}</Text>
-        <Ionicons name="restaurant" size={20} color="#FF6B35" />
+      <View style={styles.restaurantInfo}>
+        <View style={styles.restaurantIcon}>
+          <Ionicons name="restaurant" size={24} color={COLORS.primary} />
+        </View>
+        <View style={styles.restaurantDetails}>
+          <Text style={styles.restaurantName}>{items[0]?.restaurantName}</Text>
+          <Text style={styles.itemCount}>{items.length} عناصر في السلة</Text>
+        </View>
       </View>
 
       {/* Cart Items */}
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.menuItem.id}
-        renderItem={({ item }) => (
-          <View style={styles.cartItem}>
-            <View style={styles.itemInfo}>
-              <Text style={styles.itemName}>{item.menuItem.name}</Text>
-              <Text style={styles.itemPrice}>
-                {(item.menuItem.price * item.quantity).toLocaleString()} ل.س
-              </Text>
-            </View>
+      <ScrollView 
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 200 }}
+      >
+        {items.map((item) => (
+          <View key={item.id} style={styles.cartItem}>
+            {item.image && (
+              <Image source={{ uri: item.image }} style={styles.itemImage} />
+            )}
             
-            <View style={styles.quantityControl}>
+            <View style={styles.itemDetails}>
+              <Text style={styles.itemName}>{item.name}</Text>
+              <Text style={styles.itemPrice}>{item.price.toLocaleString()} ل.س</Text>
+            </View>
+
+            <View style={styles.quantityContainer}>
               <TouchableOpacity
                 style={styles.quantityButton}
                 onPress={() => {
-                  if (item.quantity > 1) {
-                    updateQuantity(item.menuItem.id, item.quantity - 1);
+                  if (item.quantity === 1) {
+                    removeItem(item.id);
                   } else {
-                    removeItem(item.menuItem.id);
+                    updateQuantity(item.id, item.quantity - 1);
                   }
                 }}
               >
-                <Ionicons
-                  name={item.quantity === 1 ? 'trash-outline' : 'remove'}
-                  size={18}
-                  color="#FF6B35"
+                <Ionicons 
+                  name={item.quantity === 1 ? "trash-outline" : "remove"} 
+                  size={18} 
+                  color={item.quantity === 1 ? COLORS.error : COLORS.primary} 
                 />
               </TouchableOpacity>
+              
               <Text style={styles.quantityText}>{item.quantity}</Text>
+              
               <TouchableOpacity
-                style={styles.quantityButton}
-                onPress={() => updateQuantity(item.menuItem.id, item.quantity + 1)}
+                style={[styles.quantityButton, styles.quantityButtonAdd]}
+                onPress={() => updateQuantity(item.id, item.quantity + 1)}
               >
-                <Ionicons name="add" size={18} color="#FF6B35" />
+                <Ionicons name="add" size={18} color={COLORS.textWhite} />
               </TouchableOpacity>
             </View>
           </View>
-        )}
-        contentContainerStyle={styles.listContent}
-      />
+        ))}
 
-      {/* Summary */}
-      <View style={styles.summary}>
+        {/* Add Notes */}
+        <TouchableOpacity style={styles.notesButton}>
+          <Text style={styles.notesText}>إضافة ملاحظات للطلب</Text>
+          <Ionicons name="create-outline" size={20} color={COLORS.primary} />
+        </TouchableOpacity>
+      </ScrollView>
+
+      {/* Order Summary Card */}
+      <View style={styles.summaryCard}>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryValue}>{subtotal.toLocaleString()} ل.س</Text>
           <Text style={styles.summaryLabel}>المجموع الفرعي</Text>
+          <Text style={styles.summaryValue}>{subtotal.toLocaleString()} ل.س</Text>
         </View>
+        
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryValue}>{deliveryFee.toLocaleString()} ل.س</Text>
           <Text style={styles.summaryLabel}>رسوم التوصيل</Text>
+          <Text style={styles.summaryValue}>{deliveryFee.toLocaleString()} ل.س</Text>
         </View>
+        
         <View style={styles.divider} />
+        
         <View style={styles.summaryRow}>
-          <Text style={styles.totalValue}>{total.toLocaleString()} ل.س</Text>
           <Text style={styles.totalLabel}>الإجمالي</Text>
+          <Text style={styles.totalValue}>{total.toLocaleString()} ل.س</Text>
         </View>
 
-        {restaurant && subtotal < restaurant.min_order && (
-          <Text style={styles.minOrderWarning}>
-            الحد الأدنى للطلب: {restaurant.min_order.toLocaleString()} ل.س
-          </Text>
-        )}
-
+        {/* Checkout Button */}
         <TouchableOpacity
-          style={[
-            styles.checkoutButton,
-            restaurant && subtotal < restaurant.min_order && styles.checkoutButtonDisabled,
-          ]}
-          onPress={handleCheckout}
-          disabled={restaurant && subtotal < restaurant.min_order}
+          style={styles.checkoutButton}
+          onPress={() => router.push('/(main)/checkout')}
+          activeOpacity={0.9}
         >
-          <Text style={styles.checkoutButtonText}>إتمام الطلب</Text>
+          <LinearGradient
+            colors={[COLORS.primary, COLORS.primaryDark]}
+            style={styles.checkoutButtonGradient}
+          >
+            <Ionicons name="cart-outline" size={24} color={COLORS.textWhite} />
+            <Text style={styles.checkoutButtonText}>اطلب الآن 🔥</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -170,172 +184,259 @@ export default function CartScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: COLORS.background,
   },
+  
+  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: COLORS.divider,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textPrimary,
   },
-  clearButton: {
+  clearText: {
     fontSize: 14,
-    color: '#FF6B35',
+    color: COLORS.error,
+    fontWeight: '600',
   },
-  restaurantBar: {
+
+  // Restaurant Info
+  restaurantInfo: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#FFF5F2',
-    gap: 8,
+    backgroundColor: COLORS.surface,
+    padding: SPACING.lg,
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    ...SHADOWS.small,
   },
-  restaurantName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
-  },
-  emptyContainer: {
-    flex: 1,
+  restaurantIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: `${COLORS.primary}15`,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
-  emptyText: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
-    marginTop: 16,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 8,
-  },
-  browseButton: {
-    marginTop: 24,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    backgroundColor: '#FF6B35',
-    borderRadius: 8,
-  },
-  browseButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  listContent: {
-    padding: 16,
-  },
-  cartItem: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 8,
-  },
-  itemInfo: {
+  restaurantDetails: {
     flex: 1,
     alignItems: 'flex-end',
+    marginRight: SPACING.md,
+  },
+  restaurantName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  itemCount: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+
+  // Scroll View
+  scrollView: {
+    flex: 1,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.lg,
+  },
+
+  // Cart Item
+  cartItem: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
+    marginBottom: SPACING.md,
+    ...SHADOWS.small,
+  },
+  itemImage: {
+    width: 70,
+    height: 70,
+    borderRadius: RADIUS.md,
+  },
+  itemDetails: {
+    flex: 1,
+    alignItems: 'flex-end',
+    marginRight: SPACING.md,
   },
   itemName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: COLORS.textPrimary,
+    textAlign: 'right',
+    marginBottom: 4,
   },
   itemPrice: {
-    fontSize: 14,
-    color: '#FF6B35',
-    marginTop: 4,
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: COLORS.primary,
   },
-  quantityControl: {
+  quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.full,
     padding: 4,
   },
   quantityButton: {
     width: 32,
     height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.surface,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  quantityButtonAdd: {
+    backgroundColor: COLORS.primary,
+    borderWidth: 0,
   },
   quantityText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    minWidth: 30,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    marginHorizontal: SPACING.md,
+    minWidth: 24,
     textAlign: 'center',
   },
-  summary: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
+
+  // Notes Button
+  notesButton: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginTop: SPACING.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderStyle: 'dashed',
+  },
+  notesText: {
+    fontSize: 14,
+    color: COLORS.primary,
+    fontWeight: '600',
+    marginLeft: SPACING.sm,
+  },
+
+  // Summary Card
+  summaryCard: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: COLORS.surface,
+    borderTopLeftRadius: RADIUS.xl,
+    borderTopRightRadius: RADIUS.xl,
+    padding: SPACING.xl,
+    ...SHADOWS.large,
   },
   summaryRow: {
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
   },
   summaryLabel: {
     fontSize: 14,
-    color: '#666',
+    color: COLORS.textSecondary,
   },
   summaryValue: {
     fontSize: 14,
-    color: '#333',
+    color: COLORS.textPrimary,
+    fontWeight: '500',
   },
   divider: {
     height: 1,
-    backgroundColor: '#f0f0f0',
-    marginVertical: 8,
+    backgroundColor: COLORS.divider,
+    marginVertical: SPACING.md,
   },
   totalLabel: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textPrimary,
   },
   totalValue: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#FF6B35',
-  },
-  minOrderWarning: {
-    fontSize: 12,
-    color: '#e74c3c',
-    textAlign: 'center',
-    marginTop: 8,
+    color: COLORS.primary,
   },
   checkoutButton: {
-    backgroundColor: '#FF6B35',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 16,
+    marginTop: SPACING.lg,
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
   },
-  checkoutButtonDisabled: {
-    backgroundColor: '#ccc',
+  checkoutButtonGradient: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.lg,
+    gap: SPACING.sm,
   },
   checkoutButtonText: {
-    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+    color: COLORS.textWhite,
+  },
+
+  // Empty State
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.xl,
+  },
+  emptyIconContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: `${COLORS.primary}10`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.xl,
+  },
+  emptyIcon: {
+    fontSize: 60,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
+  },
+  emptySubtitle: {
+    fontSize: 16,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xl,
+  },
+  browseButton: {
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
+  },
+  browseButtonGradient: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.xxl,
+    gap: SPACING.sm,
+  },
+  browseButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.textWhite,
   },
 });
