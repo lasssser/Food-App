@@ -495,4 +495,63 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textLight,
   },
+
+  // Confirm Modal
+  confirmModal: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.xl,
+    margin: SPACING.xl,
+    alignItems: 'center',
+  },
+  confirmIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: `${COLORS.error}15`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+  },
+  confirmTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
+  },
+  confirmMessage: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginBottom: SPACING.xl,
+  },
+  confirmButtons: {
+    flexDirection: 'row',
+    gap: SPACING.md,
+    width: '100%',
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  confirmButton: {
+    flex: 1,
+    backgroundColor: COLORS.error,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    alignItems: 'center',
+  },
+  confirmButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textWhite,
+  },
 });
