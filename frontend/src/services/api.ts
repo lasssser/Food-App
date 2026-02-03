@@ -198,6 +198,23 @@ export const restaurantPanelAPI = {
     const response = await api.get('/restaurant/stats');
     return response.data;
   },
+  // Add-ons management
+  getMenuItemAddOns: async (itemId: string) => {
+    const response = await api.get(`/restaurant/menu/${itemId}/addons`);
+    return response.data;
+  },
+  createAddOnGroup: async (itemId: string, data: { name: string; is_required: boolean; max_selections: number; options: { name: string; price: number }[] }) => {
+    const response = await api.post(`/restaurant/menu/${itemId}/addons`, data);
+    return response.data;
+  },
+  updateAddOnGroup: async (groupId: string, data: { name: string; is_required: boolean; max_selections: number; options: { name: string; price: number }[] }) => {
+    const response = await api.put(`/restaurant/addons/${groupId}`, data);
+    return response.data;
+  },
+  deleteAddOnGroup: async (groupId: string) => {
+    const response = await api.delete(`/restaurant/addons/${groupId}`);
+    return response.data;
+  },
 };
 
 // Driver API
