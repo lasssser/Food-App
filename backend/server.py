@@ -191,15 +191,20 @@ class Order(BaseModel):
     user_id: str
     restaurant_id: str
     restaurant_name: str
+    # Driver info
     driver_id: Optional[str] = None
     driver_name: Optional[str] = None
+    driver_phone: Optional[str] = None  # نحفظ الرقم وقت التعيين
+    driver_type: Optional[str] = None  # restaurant_driver or platform_driver
+    delivery_mode: str = "pending"  # pending, restaurant_driver, platform_driver
+    # Order details
     items: List[OrderItem]
     subtotal: float
     delivery_fee: float
     total: float
     payment_method: str
     payment_status: str = "unpaid"  # unpaid, pending, paid, failed, cod
-    order_status: str = "pending"  # pending, accepted, preparing, ready, assigned, picked_up, out_for_delivery, delivered, cancelled
+    order_status: str = "pending"  # pending, accepted, preparing, ready, driver_assigned, picked_up, out_for_delivery, delivered, cancelled
     address: dict
     notes: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
