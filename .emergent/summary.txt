@@ -1,181 +1,195 @@
 <analysis>
+**original_problem_statement**: The user wants to build a food delivery mobile application named يلا ناكل؟ (Yalla Nakol?). After an initial UI/UX redesign and bug-fixing phase, the user requested the implementation of an Add-ons feature for menu items.
 
-**original_problem_statement**: The user wants to build a food delivery mobile application named يلا ناكل؟ (Yalla Nakol?), similar to Yemeksepeti.
-
-**PRODUCT REQUIREMENTS (MVP)**:
-- User registration/login with phone number and password (JWT).
-- List restaurants, filter by area/cuisine.
-- View restaurant menus with items, images, and prices.
-- A shopping cart to add/modify orders.
-- Address management.
-- Payment options: Cash on Delivery (COD) and a manual verification flow for a local provider called ShamCash.
-- Order tracking with statuses (e.g., pending, preparing, out for delivery).
-- A basic rating system.
-- Separate web panels/interfaces for Restaurants and Drivers to manage orders.
-- A notification system for users.
+Following the successful completion of the Add-ons feature, the user provided detailed product requirements for a more sophisticated delivery system, including:
+1.  **Location-Based Filtering**: Users should see restaurants based on their selected city. The app should allow both automatic (GPS-based in the future) and manual city selection.
+2.  **Hybrid Driver Model**: The system must support two types of drivers:
+    *   **Restaurant Drivers**: Drivers added and managed by the restaurant owner directly, who are contacted manually (no app needed).
+    *   **Platform Drivers**: Drivers using the driver-specific app who can accept available orders from a pool.
+3.  **Expanded Order Statuses**: Implement a more detailed order tracking flow for the customer (e.g., , , , ).
+4.  **Push Notifications**: Implement push notifications to alert drivers of new orders and customers of status updates.
+5.  **UI Updates**:
+    *   Create a UI for restaurant owners to manage their own drivers.
+    *   Update the driver-facing app with the new design system.
+    *   Update order pages for all roles (customer, owner) to reflect the new driver and status information.
 
 **User's preferred language**: اللغة العربية (Arabic). The next agent MUST respond in Arabic.
 
 **what currently exists?**
-A full-stack MVP has been successfully built. The backend is a FastAPI server, and the frontend is an Expo/React Native application.
-- **Completed MVP Features**: User authentication (JWT), restaurant/menu browsing, cart functionality, checkout with COD & ShamCash (manual flow), order history, and user profile management. Demo data is seeded via an API endpoint.
-- **In-Progress Features**: The application has been extended to support new features requested by the user. The backend code () has been updated to include image support, user roles (customer, owner, driver), and APIs for restaurant/driver control panels and a notification system. The frontend code has been created for these new interfaces (restaurant panel, driver panel, notifications screen) and role-based navigation has been implemented.
+The application is a full-stack Expo (React Native) and FastAPI project. The Add-ons feature is fully implemented on both the backend and frontend. The core location-based filtering is also complete, allowing users to select a city and view relevant restaurants. The backend has been significantly updated with new models and APIs for , , and an expanded  schema to support the new delivery logic.
+
+The frontend has been updated with:
+-   A  (Zustand) and a city selection modal on the home screen.
+-   A new Drivers management page in the restaurant owner's panel.
+-   An updated restaurant Orders page to allow assigning a restaurant-specific driver to an order.
+-   An updated customer Orders page to show more detailed status tracking.
+-   A redesigned dashboard for the driver panel.
 
 **Last working item**:
-- **Last item agent was working**: Implementing the frontend UI for the new Phase 2 features: Restaurant Panel, Driver Interface, Notification Screen, and displaying images for food items/restaurants. The agent has written all the necessary files for these UIs and updated the core navigation logic to handle different user roles.
-- **Status**: IN PROGRESS
-- **Agent Testing Done**: N (Code has been written, but the new UIs have not been tested).
-- **Which testing method agent to use?**: both. Start with  to test the new backend endpoints for restaurant/driver panels. Then, use the  to visually verify the new frontend screens for each user role (owner, driver, customer).
-- **User Testing Done**: N
+-   **Last item agent was working**: The agent was in the process of redesigning the driver-facing application to match the new, modern design system and to add more relevant information for the driver. It successfully redesigned the driver's main dashboard and then overwrote  to update the Available Orders screen. The next step was to update the My Orders screen.
+-   **Status**: IN PROGRESS
+-   **Agent Testing Done**: N (The change was just made, no testing was performed on the new  screen).
+-   **Which testing method agent to use?**: screenshot tool. After updating all the driver panel screens (), the agent should log in as a driver and use the screenshot tool to verify the new UI for the dashboard, available orders, and my orders pages.
+-   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1**: Add to Cart button is not clickable by the testing agent (P1)
-- **Issue 2**: The new Restaurant Panel, Driver Interface, and Notification system are not tested (P0)
+-   **Issue 1**: An automated test for clicking the Add to Cart (+) button fails with a non-visible element error. (P2)
 
 **Issues Detail**:
-- **Issue 1**:
-    - **Description**: During automated UI testing, the agent failed to click the + button to add items to the cart from the restaurant menu screen. The error was . The agent worked around this by testing other parts of the app but did not fix the underlying issue.
-    - **Attempted fixes**: The agent tried clicking the button using a different selector, which also failed.
-    - **Next debug checklist**:
+-   **Issue 1**:
+    -   **Description**: This is a recurring issue from a previous session. The automated testing agent cannot click the + button on the restaurant menu screen. This blocks automated end-to-end testing of the core ordering flow, although the button works for human users.
+    -   **Attempted fixes**: None in this session. The agent has prioritized feature development.
+    -   **Next debug checklist**:
         1.  Examine .
-        2.  Check the styling of the + button () and its parent . Ensure it has no , , or is not being overlapped by another element.
-        3.  Verify the  or accessibility label used by the testing agent to locate the button.
-        4.  Try adding a  property to the  to make it easier for the test runner to find.
-    - **Why fix this issue and what will be achieved with the fix?**: This is a critical part of the user flow. Fixing it will allow for complete end-to-end testing of the ordering process from the UI.
-    - **Status**: NOT STARTED
-    - **Is recurring issue?**: Y
-    - **Should Test frontend/backend/both after fix?**: frontend
-
-- **Issue 2**:
-    - **Description**: The code for the Restaurant Panel, Driver Interface, and Notification system has been written but remains completely untested. This includes both the backend APIs and the frontend screens.
-    - **Attempted fixes**: None. This is the next step.
-    - **Next debug checklist**:
-        1.  **Backend**: Use  to test the new endpoints:
-            - , 
-            - , 
-            - , 
-            - 
-        2.  **Frontend**: Use the  after logging in as each user type (owner, driver, customer) to verify the correct UI is displayed.
-            - Log in as an  and navigate to .
-            - Log in as a  and navigate to .
-            - Log in as a , check the home page for images, and navigate to the new  screen.
-    - **Why fix this issue and what will be achieved with the fix?**: To verify that the newly added features are working as expected and complete the user's request.
-    - **Status**: NOT STARTED
-    - **Is recurring issue?**: N
-    - **Should Test frontend/backend/both after fix?**: both
+        2.  Inspect the styling and layout of the  for the + button to ensure it's not obstructed or has zero size.
+        3.  Add a specific  to the button to make it easier for the testing agent to target.
+    -   **Why fix this issue and what will be achieved with the fix?**: Fixing this will enable reliable, automated UI testing, which is crucial for preventing future regressions in the core ordering functionality.
+    -   **Status**: NOT STARTED
+    -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: frontend
+    -   **Blocked on other issue**: None.
 
 **In progress Task List**:
-- **Task 1**: Test and validate the Phase 2 features (P0)
-    - **Where to resume**: Start by testing the new backend APIs with  as outlined in Issue 2 above. After backend validation, proceed to test the frontend UI for each user role using the .
-    - **What will be achieved with this?**: Completion and verification of the user's request to add images, a restaurant panel, a driver interface, and a notification system.
-    - **Status**: IN PROGRESS
-    - **Should Test frontend/backend/both after fix?**: both
-    - **Blocked on something**: No.
+-   **Task 1**: Complete the Driver Panel redesign and functionality update. (P0)
+
+**Task Detail**:
+-   **Task 1**:
+    -   **Where to resume**: The agent just updated . The next step is to update the My Orders screen for the driver.
+    -   **Next Steps**:
+        1.  Read the contents of .
+        2.  Rewrite the file to implement the new, modern design, consistent with  and . The page should clearly display orders the driver has accepted, showing restaurant/customer addresses and order status.
+        3.  Log in as a driver and use the  to test the full driver flow: dashboard -> available orders -> my orders.
+    -   **What will be achieved with this?**: This will complete the UI refresh for the driver role, making it consistent with the rest of the application.
+    -   **Status**: IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?**: frontend
+    -   **Blocked on something**: No.
 
 **Upcoming and Future Tasks**
-- **Upcoming Tasks**:
-    - Implement real-time push notifications using the installed  library (P1). Currently, it's just a screen that fetches notifications via API.
-- **Future Tasks**:
-    - Build out the full rating and review system for restaurants and drivers.
-    - Integrate the official ShamCash API if/when it becomes available.
-    - Add a live chat feature between customers and drivers.
-    - Develop a loyalty/points system.
+-   **Upcoming Tasks**:
+    -   **P0**: Implement Push Notifications. The user has agreed to use the  service. This is the highest priority after the driver UI is complete.
+        -   **Backend**: Store user push tokens. Create a service to send notifications via Expo's API for events like new order available (to drivers) and order status updated (to customers).
+        -   **Frontend**: Add logic to request notification permissions, get the push token, and send it to the backend. Handle receiving notifications while the app is in the foreground/background.
+    -   **P1**: Redesign the remaining Restaurant Panel screens (, ) to match the new design system.
+-   **Future Tasks**:
+    -   Build out the full rating and review system.
+    -   Integrate the official ShamCash API when it becomes available.
+    -   Implement a location-based auto-dispatch system for platform drivers.
+    -   Allow users to specify their location using a pin on a map.
 
 **Completed work in this session**
-- **Recently completed**:
-  - Full MVP of the يلا ناكل؟ food delivery application (DONE)
-  - Backend and frontend structure for Phase 2 features (images, user roles, restaurant/driver panels, notifications) (DONE)
+-   **Recently completed**:
+    -   **Add-ons Feature**: Fully implemented, including backend CRUD APIs, frontend selection modal, cart integration, and a management UI for restaurant owners. (DONE)
+    -   **Location-Based Filtering**: Implemented city selection for users, allowing the app to filter restaurants by city. (DONE)
+    -   **Restaurant Driver Management**: Restaurant owners can now add their own drivers (who are contacted manually) and assign them to orders via their dashboard. (DONE)
+    -   **Platform Driver Logic**: Backend APIs updated to allow platform drivers to see and accept available orders in their city, with a locking mechanism to prevent multiple drivers from accepting the same order. (DONE)
+    -   **Order Status Expansion**: The order model and customer-facing order tracking page were updated with more detailed statuses. (DONE)
+    -   **Driver Panel Redesign (Partial)**: The driver's main dashboard () and available orders page () have been updated with the new UI. (IN PROGRESS)
 
 **Earlier issues found/mentioned but not fixed**
-   - **Issue 1**: The automated test for clicking the add to cart button fails.
-     - **Debug checklist**: Inspect the component in , check for overlapping elements or incorrect styling, and consider adding a .
-     - **Why to solve this issue and what will be achieved with this?**: It's a core user action required for placing an order and for enabling complete end-to-end automated testing.
-     - **Should Test frontend/backend/both after fix**: frontend
-     - **Is recurring issue?**: Y
+-   **Issue 1**: Automated UI test for the add to cart button is failing.
+    -   **Debug checklist**: Inspect , check for overlapping elements, and add a .
+    -   **Why to solve this issue and what will be achieved with this?**: It is required for enabling complete end-to-end automated testing.
+    -   **Should Test frontend/backend/both after fix**: frontend
+    -   **Is recurring issue?**: Y
 
 **Known issue recurrence from previous fork**
-- None.
+-   None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Backend**: FastAPI, Python, MongoDB (via ), JWT for authentication.
-- **Frontend**: Expo, React Native, TypeScript, Expo Router for navigation.
-- **State Management**: Zustand.
-- **Styling**: React Native .
-- **API Communication**: Axios.
+-   **Backend**: FastAPI, Python, MongoDB.
+-   **Frontend**: Expo, React Native, TypeScript, Expo Router.
+-   **State Management**: Zustand (, , ).
+-   **API Communication**: Centralized  instance in  with interceptors.
+-   **App Logic**:
+    -   Hybrid Driver Model (Restaurant-owned vs. Platform).
+    -   Location-based data filtering.
+    -   Atomic updates () on the backend to lock an order when a driver accepts it.
+    -   Handling async state in React (fixed a bug where UI didn't update immediately after an API call).
 
 **key DB schema**
-- : {, , ,  (, , )}
-- : {, ,  (base64 string), }
-- : {, , ,  (base64 string)}
-- : {, , , , , }
-- : {, , }
-- : {, , , , }
+-   : {, , , : } (NEW)
+-   : {, , , , , } (NEW)
+-   : {, ..., : } (UPDATED)
+-   : {, ..., : , : , : , : } (UPDATED)
+-   , : Unchanged from the previous step.
 
 **changes in tech stack**
-- None. The stack is consistent.
+-   None.
 
 **All files of reference**
-- : **Updated**. Contains all backend logic including new APIs for roles, panels, and notifications.
-- : **Updated**. Contains the critical logic for redirecting users to the correct screen , , or  based on their role after login.
-- : **New**. Screens for the restaurant owner dashboard.
-- : **New**. Screens for the driver dashboard.
-- : **New**. Screen for users to view their notifications.
-- : **Updated**. Now stores the user's role.
-- : **Updated**. Includes new functions for interacting with the restaurant, driver, and notification APIs.
+-   **/app/backend/server.py**: **HEAVILY UPDATED** with new models, APIs, and business logic for cities, location filtering, driver management, and order assignment.
+-   **/app/frontend/src/store/locationStore.ts**: **NEW**. Manages the user's selected city.
+-   **/app/frontend/app/(auth)/select-location.tsx**: **NEW**. The initial screen for users to select their city if not set.
+-   **/app/frontend/app/(main)/home.tsx**: **OVERWRITTEN**. Implements the location selection header and filters displayed restaurants based on the city in .
+-   **/app/frontend/app/(restaurant)/drivers.tsx**: **NEW**. Provides a UI for restaurant owners to add and view their private drivers.
+-   **/app/frontend/app/(restaurant)/orders.tsx**: **OVERWRITTEN**. Updated to allow owners to see the assigned driver and assign one from their list.
+-   **/app/frontend/app/(main)/orders.tsx**: **OVERWRITTEN**. The customer's order tracking screen now displays a more detailed timeline of order statuses.
+-   **/app/frontend/app/(driver)/dashboard.tsx**: **OVERWRITTEN**. Redesigned with the new UI theme.
+-   **/app/frontend/app/(driver)/available.tsx**: **OVERWRITTEN**. Redesigned with the new UI theme.
+-   **/app/frontend/src/services/api.ts**: **UPDATED** with numerous new functions for fetching cities and managing drivers.
 
 **Areas that need refactoring**:
-- The  file is becoming large (over 600 lines). For future development, it would be beneficial to refactor it by splitting the API logic into multiple router files (e.g., , , ).
+-   The  file in the driver panel needs to be updated to match the new design.
+-   The original  and  pages in the restaurant panel still use the old UI and should be updated to use the common  constants for consistency.
 
 **key api endpoints**
--  |  |  | 
-- 
-- 
--  (POST, GET)
--  (GET)
--  (PUT)
--  (GET)
--  (PUT)
--  (GET)
+-   : (GET) Fetches all cities and their areas.
+-   : (GET) Fetches restaurants filtered by city.
+-   : (GET, POST) For restaurant owners to manage their drivers.
+-   : (POST) For owners to assign a driver to an order.
+-   : (GET) For platform drivers to see available orders in their city.
+-   : (POST) For a platform driver to accept an order (with a lock).
 
 **Critical Info for New Agent**
-- The application now supports three user roles: , , and .
-- Authentication is role-based. After login, the root  file checks the user's role from the Zustand store and redirects them to the appropriate part of the app.
-- To test the new panels, you must first register users with the  and  roles using the new registration endpoints. Test credentials are not yet created.
+-   **User's Next Priority is Push Notifications**: The user has explicitly confirmed that implementing push notifications via  is the next major task after the driver UI is finished.
+-   **Driver Logic**: Remember the two driver types. Restaurant-owned drivers are managed via the restaurant panel and contacted manually. Platform drivers use the app to accept orders from a shared pool.
+-   **Transient Build Error**: The agent encountered a persistent  error which prevented the web preview from loading. This was resolved by simply restarting the expo server (expo: ERROR (not running)
+expo: started). If the app gets stuck on a loading screen, try this first.
+-   **Manual Driver Contact**: The user decided that for restaurant-owned drivers (without the app), the restaurant owner will contact them manually. No SMS/WhatsApp integration is required.
 
 **documents created in this job**
-- None.
+-   
+-   
+-   
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (Message 74)**: اكمل مع 1و 2 و 3 و4 (Continue with 1, 2, 3, and 4) - **Status: IN PROGRESS**. This was a request to implement images, restaurant panel, driver interface, and notifications. The code has been written but not tested.
+1.  **User (latest)**: Confirmed agreement to use Expo for push notifications and clarified that the app should be deployable to their own server and the app stores, which the agent confirmed is possible. **Status: INFO/AGREED**.
+2.  **User**: Asked about the best push notification service for Syria (Cloudflare vs. Firebase), leading to the agent proposing Expo's service. **Status: ADDRESSED**.
+3.  **User**: Instructed the agent to proceed with the next action items: update driver pages, add push notifications. **Status: IN PROGRESS**.
+4.  **User**: Provided detailed, excellent product requirements for the location and driver system, confirming the agent's proposed plan. **Status: INFO/AGREED**.
+5.  **User**: Clarified that for drivers without the app, the restaurant owner will call them manually, eliminating the need for SMS integration. **Status: INFO/DECISION MADE**.
+6.  **User**: Asked a critical question about how SMS integration would work in Syria. **Status: ADDRESSED**.
+7.  **User**: Confirmed the agent's detailed execution plan for the location/driver features. **Status: AGREED**.
+8.  **User**: Provided an extremely detailed breakdown of requirements for location, driver types, order statuses, and notifications, which the agent adopted as the plan. **Status: INFO/AGREED**.
+9.  **User**: Posed critical questions about driver availability and location-based filtering, initiating the current set of features. **Status: ADDRESSED**.
+10. **User**: Confirmed completion of the Add-ons feature and instructed the agent to start on the next items (restaurant panel UI for addons, driver panel redesign). **Status: ADDRESSED**.
 
 **Project Health Check:**
-- **Working**: Core MVP customer application (Login/Register, View Restaurants/Menus, Create Orders). Backend APIs for MVP are stable.
-- **Broken**: The UI testing automation for add to cart is broken.
-- **Mocked**: The ShamCash payment flow is a manual verification process, not a real integration. Restaurant/menu data is currently demo data seeded via an API.
+-   **Working**: Core customer flow (browsing, cart, checkout), Add-ons feature, Location-based restaurant filtering, Restaurant owner panels for managing add-ons and drivers.
+-   **Broken**: The driver's My Orders page has an outdated UI. The push notification system is entirely missing.
+-   **Mocked**: All data is from a backend seeder. Payments are a placeholder. Driver assignment is tracked, but real-time communication relies on manual calls or future push notifications.
 
 **3rd Party Integrations**
-- None explicitly configured yet, other than standard Python/JS libraries.
+-   : Used for UI styling.
+-   (Upcoming) : Agreed upon for implementing push notifications.
 
 **Testing status**
-- **Testing agent used after significant changes**: YES (for the initial MVP)
-- **Troubleshoot agent used after agent stuck in loop**: NO
-- **Test files created**: None.
-- **Known regressions**: None.
+-   **Testing agent used after significant changes**: NO. Agent has been performing manual verification using the  with great success.
+-   **Troubleshoot agent used after agent stuck in loop**: NO.
+-   **Test files created**: None.
+-   **Known regressions**: None from this session's work.
 
 **Credentials to test flow:**
-- No fixed credentials exist. You need to register new users for each role (, , ) using the respective API endpoints:
-  - 
-  - 
-  - 
+-   **Restaurant Owner**: Phone: , Password: 
+-   **Driver**: Phone: , Password: 
+-   **Customer**: Phone: , Password: 
 
 **What agent forgot to execute**
-- The agent did not fix the failing add to cart UI test, choosing to work around it. This remains a pending technical debt.
+-   The agent has correctly followed the user's priorities. The only long-standing task that remains unaddressed is fixing the automated test for the Add to Cart button, as new feature development has consistently been a higher priority for the user.
+-   The agent has not yet updated all screens in the restaurant panel (, ) to the new design, focusing instead on the user's more recent requests for the driver panel.
 
 </analysis>
-<SYS_PROMPT_SEPARATOR>
-<workspace_dir>
-/app
-</workspace_dir>
