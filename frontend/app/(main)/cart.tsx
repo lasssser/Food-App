@@ -13,11 +13,13 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCartStore } from '../../src/store/cartStore';
+import { useAuthStore } from '../../src/store/authStore';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 export default function CartScreen() {
   const router = useRouter();
   const { items, restaurant, updateQuantity, removeItem, clearCart, getSubtotal, getItemCount } = useCartStore();
+  const { isGuest, isAuthenticated } = useAuthStore();
 
   const subtotal = getSubtotal();
   const deliveryFee = restaurant?.delivery_fee || 5000;
