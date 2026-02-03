@@ -1,0 +1,166 @@
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
+
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
+
+const api = axios.create({
+  baseURL: `${API_URL}/api`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Token management
+const getToken = async (): Promise<string | null> => {
+  try {
+    if (Platform.OS === 'web') {
+      return localStorage.getItem('token');
+    }
+    return await SecureStore.getItemAsync('token');
+  } catch {
+    return null;
+  }
+};
+
+const setToken = async (token: string): Promise<void> => {
+  try {
+    if (Platform.OS === 'web') {
+      localStorage.setItem('token', token);
+    } else {
+      await SecureStore.setItemAsync('token', token);
+    }
+  } catch (error) {
+    console.error('Error saving token:', error);
+  }
+};
+
+const removeToken = async (): Promise<void> => {
+  try {
+    if (Platform.OS === 'web') {
+      localStorage.removeItem('token');
+    } else {
+      await SecureStore.deleteItemAsync('token');
+    }
+  } catch (error) {
+    console.error('Error removing token:', error);
+  }
+};
+
+// Add auth header to requests
+api.interceptors.request.use(async (config) => {
+  const token = await getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// API Functions
+export const authAPI = {
+  register: async (name: string, phone: string, password: string) => {
+    const response = await api.post('/auth/register', { name, phone, password });
+    await setToken(response.data.access_token);
+    return response.data;
+  },
+  login: async (phone: string, password: string) => {
+    const response = await api.post('/auth/login', { phone, password });
+    await setToken(response.data.access_token);
+    return response.data;
+  },
+  getMe: async () => {
+    const response = await api.get('/auth/me');
+    return response.data;
+  },
+  logout: async () => {
+    await removeToken();
+  },
+  getToken,
+};
+
+export const restaurantAPI = {
+  getAll: async (filters?: { area?: string; cuisine?: string; is_open?: boolean }) => {
+    const params = new URLSearchParams();
+    if (filters?.area) params.append('area', filters.area);
+    if (filters?.cuisine) params.append('cuisine', filters.cuisine);
+    if (filters?.is_open !== undefined) params.append('is_open', String(filters.is_open));
+    const response = await api.get(`/restaurants?${params.toString()}`);
+    return response.data;
+  },
+  getById: async (id: string) => {
+    const response = await api.get(`/restaurants/${id}`);
+    return response.data;
+  },
+  getMenu: async (restaurantId: string, category?: string) => {
+    const params = category ? `?category=${category}` : '';
+    const response = await api.get(`/restaurants/${restaurantId}/menu${params}`);
+    return response.data;
+  },
+};
+
+export const addressAPI = {
+  getAll: async () => {
+    const response = await api.get('/addresses');
+    return response.data;
+  },
+  create: async (data: { label: string; address_line: string; area?: string }) => {
+    const response = await api.post('/addresses', data);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/addresses/${id}`);
+    return response.data;
+  },
+};
+
+export const orderAPI = {
+  create: async (data: {
+    restaurant_id: string;
+    items: { menu_item_id: string; quantity: number; notes?: string }[];
+    address_id: string;
+    payment_method: string;
+    notes?: string;
+  }) => {
+    const response = await api.post('/orders', data);
+    return response.data;
+  },
+  getAll: async () => {
+    const response = await api.get('/orders');
+    return response.data;
+  },
+  getById: async (id: string) => {
+    const response = await api.get(`/orders/${id}`);
+    return response.data;
+  },
+  cancel: async (id: string) => {
+    const response = await api.post(`/orders/${id}/cancel`);
+    return response.data;
+  },
+};
+
+export const paymentAPI = {
+  verifyPayment: async (data: { order_id: string; reference: string; screenshot_base64?: string }) => {
+    const response = await api.post('/payments/verify', data);
+    return response.data;
+  },
+  getShamCashInfo: async () => {
+    const response = await api.get('/payments/shamcash-info');
+    return response.data;
+  },
+};
+
+export const ratingAPI = {
+  create: async (data: { order_id: string; restaurant_rating: number; comment?: string }) => {
+    const response = await api.post('/ratings', data);
+    return response.data;
+  },
+};
+
+export const seedAPI = {
+  seed: async () => {
+    const response = await api.post('/seed');
+    return response.data;
+  },
+};
+
+export default api;
