@@ -17,11 +17,10 @@ import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 export default function CartScreen() {
   const router = useRouter();
-  const { items, updateQuantity, removeItem, clearCart, getTotal, getRestaurantId } = useCartStore();
+  const { items, restaurant, updateQuantity, removeItem, clearCart, getSubtotal, getItemCount } = useCartStore();
 
-  const restaurantId = getRestaurantId();
-  const subtotal = getTotal();
-  const deliveryFee = 5000; // Fixed delivery fee
+  const subtotal = getSubtotal();
+  const deliveryFee = restaurant?.delivery_fee || 5000;
   const total = subtotal + deliveryFee;
 
   const handleClearCart = () => {
@@ -79,15 +78,17 @@ export default function CartScreen() {
       </View>
 
       {/* Restaurant Info */}
-      <View style={styles.restaurantInfo}>
-        <View style={styles.restaurantIcon}>
-          <Ionicons name="restaurant" size={24} color={COLORS.primary} />
+      {restaurant && (
+        <View style={styles.restaurantInfo}>
+          <View style={styles.restaurantIcon}>
+            <Ionicons name="restaurant" size={24} color={COLORS.primary} />
+          </View>
+          <View style={styles.restaurantDetails}>
+            <Text style={styles.restaurantName}>{restaurant.name}</Text>
+            <Text style={styles.itemCount}>{getItemCount()} عناصر في السلة</Text>
+          </View>
         </View>
-        <View style={styles.restaurantDetails}>
-          <Text style={styles.restaurantName}>{items[0]?.restaurantName}</Text>
-          <Text style={styles.itemCount}>{items.length} عناصر في السلة</Text>
-        </View>
-      </View>
+      )}
 
       {/* Cart Items */}
       <ScrollView 
@@ -96,14 +97,14 @@ export default function CartScreen() {
         contentContainerStyle={{ paddingBottom: 200 }}
       >
         {items.map((item) => (
-          <View key={item.id} style={styles.cartItem}>
-            {item.image && (
-              <Image source={{ uri: item.image }} style={styles.itemImage} />
+          <View key={item.menuItem.id} style={styles.cartItem}>
+            {item.menuItem.image && (
+              <Image source={{ uri: item.menuItem.image }} style={styles.itemImage} />
             )}
             
             <View style={styles.itemDetails}>
-              <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemPrice}>{item.price.toLocaleString()} ل.س</Text>
+              <Text style={styles.itemName}>{item.menuItem.name}</Text>
+              <Text style={styles.itemPrice}>{item.menuItem.price.toLocaleString()} ل.س</Text>
             </View>
 
             <View style={styles.quantityContainer}>
@@ -111,9 +112,9 @@ export default function CartScreen() {
                 style={styles.quantityButton}
                 onPress={() => {
                   if (item.quantity === 1) {
-                    removeItem(item.id);
+                    removeItem(item.menuItem.id);
                   } else {
-                    updateQuantity(item.id, item.quantity - 1);
+                    updateQuantity(item.menuItem.id, item.quantity - 1);
                   }
                 }}
               >
@@ -128,7 +129,7 @@ export default function CartScreen() {
               
               <TouchableOpacity
                 style={[styles.quantityButton, styles.quantityButtonAdd]}
-                onPress={() => updateQuantity(item.id, item.quantity + 1)}
+                onPress={() => updateQuantity(item.menuItem.id, item.quantity + 1)}
               >
                 <Ionicons name="add" size={18} color={COLORS.textWhite} />
               </TouchableOpacity>
