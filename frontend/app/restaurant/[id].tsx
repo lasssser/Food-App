@@ -8,7 +8,6 @@ import {
   Image,
   ActivityIndicator,
   Dimensions,
-  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
@@ -16,34 +15,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { restaurantAPI } from '../../src/services/api';
 import { useCartStore } from '../../src/store/cartStore';
+import { Restaurant, MenuItem } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 const HERO_HEIGHT = height * 0.35;
-
-interface Restaurant {
-  id: string;
-  name: string;
-  description: string;
-  image?: string;
-  address: string;
-  cuisine_type: string;
-  rating: number;
-  review_count: number;
-  delivery_fee: number;
-  delivery_time: string;
-  is_open: boolean;
-}
-
-interface MenuItem {
-  id: string;
-  name: string;
-  description?: string;
-  price: number;
-  image?: string;
-  category: string;
-  is_available: boolean;
-}
 
 export default function RestaurantScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -55,8 +31,6 @@ export default function RestaurantScreen() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('الأكثر طلباً');
   const [addedItems, setAddedItems] = useState<Set<string>>(new Set());
-
-  const scrollY = new Animated.Value(0);
 
   useFocusEffect(
     useCallback(() => {
@@ -84,32 +58,33 @@ export default function RestaurantScreen() {
     ? menuItems.slice(0, 6)
     : menuItems.filter((item) => item.category === selectedCategory);
 
-  const handleAddToCart = (item: MenuItem) => {
+  const handleAddToCart = (menuItem: MenuItem) => {
     if (!restaurant) return;
     
-    addItem({
-      id: item.id,
-      name: item.name,
-      price: item.price,
-      image: item.image,
-      restaurantId: restaurant.id,
-      restaurantName: restaurant.name,
-    });
+    addItem(menuItem, restaurant);
 
     // Show animation feedback
-    setAddedItems(prev => new Set(prev).add(item.id));
+    setAddedItems(prev => new Set(prev).add(menuItem.id));
     setTimeout(() => {
       setAddedItems(prev => {
         const next = new Set(prev);
-        next.delete(item.id);
+        next.delete(menuItem.id);
         return next;
       });
     }, 500);
   };
 
   const getItemQuantity = (itemId: string) => {
-    const cartItem = items.find(i => i.id === itemId);
+    const cartItem = items.find(i => i.menuItem.id === itemId);
     return cartItem?.quantity || 0;
+  };
+
+  const getTotalCartItems = () => {
+    return items.reduce((sum, item) => sum + item.quantity, 0);
+  };
+
+  const getTotalCartPrice = () => {
+    return items.reduce((sum, item) => sum + item.menuItem.price * item.quantity, 0);
   };
 
   if (loading) {
@@ -236,8 +211,12 @@ export default function RestaurantScreen() {
                 </View>
                 
                 <View style={styles.menuItemImageContainer}>
-                  {item.image && (
+                  {item.image ? (
                     <Image source={{ uri: item.image }} style={styles.menuItemImage} />
+                  ) : (
+                    <View style={[styles.menuItemImage, styles.menuItemImagePlaceholder]}>
+                      <Ionicons name="restaurant-outline" size={30} color={COLORS.textLight} />
+                    </View>
                   )}
                   
                   {/* Add Button */}
@@ -284,12 +263,12 @@ export default function RestaurantScreen() {
             <View style={styles.floatingCartContent}>
               <View style={styles.cartBadge}>
                 <Text style={styles.cartBadgeText}>
-                  {items.reduce((sum, item) => sum + item.quantity, 0)}
+                  {getTotalCartItems()}
                 </Text>
               </View>
               <Text style={styles.floatingCartText}>عرض السلة</Text>
               <Text style={styles.floatingCartPrice}>
-                {items.reduce((sum, item) => sum + item.price * item.quantity, 0).toLocaleString()} ل.س
+                {getTotalCartPrice().toLocaleString()} ل.س
               </Text>
             </View>
           </LinearGradient>
@@ -500,6 +479,11 @@ const styles = StyleSheet.create({
     height: 90,
     borderRadius: RADIUS.md,
     resizeMode: 'cover',
+  },
+  menuItemImagePlaceholder: {
+    backgroundColor: COLORS.background,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   addButton: {
     position: 'absolute',
