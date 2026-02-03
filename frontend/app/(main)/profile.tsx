@@ -751,6 +751,14 @@ const styles = StyleSheet.create({
   deleteButton: {
     padding: SPACING.sm,
   },
+  deleteIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: `${COLORS.error}15`,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
   // Menu Section
   menuSection: {
