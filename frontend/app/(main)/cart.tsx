@@ -98,46 +98,63 @@ export default function CartScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 200 }}
       >
-        {items.map((item) => (
-          <View key={item.menuItem.id} style={styles.cartItem}>
-            {item.menuItem.image && (
-              <Image source={{ uri: item.menuItem.image }} style={styles.itemImage} />
-            )}
-            
-            <View style={styles.itemDetails}>
-              <Text style={styles.itemName}>{item.menuItem.name}</Text>
-              <Text style={styles.itemPrice}>{item.menuItem.price.toLocaleString()} ل.س</Text>
-            </View>
+        {items.map((item) => {
+          const addOnsTotal = item.selectedAddOns?.reduce((sum, addon) => sum + addon.price, 0) || 0;
+          const itemTotal = (item.menuItem.price + addOnsTotal) * item.quantity;
+          const itemKey = item.itemKey || item.menuItem.id;
+          
+          return (
+            <View key={itemKey} style={styles.cartItem}>
+              {item.menuItem.image && (
+                <Image source={{ uri: item.menuItem.image }} style={styles.itemImage} />
+              )}
+              
+              <View style={styles.itemDetails}>
+                <Text style={styles.itemName}>{item.menuItem.name}</Text>
+                {/* Show selected add-ons */}
+                {item.selectedAddOns && item.selectedAddOns.length > 0 && (
+                  <View style={styles.addOnsContainer}>
+                    {item.selectedAddOns.map((addon, index) => (
+                      <Text key={index} style={styles.addOnText}>
+                        + {addon.option_name}
+                        {addon.price > 0 && ` (${addon.price.toLocaleString()} ل.س)`}
+                      </Text>
+                    ))}
+                  </View>
+                )}
+                <Text style={styles.itemPrice}>{itemTotal.toLocaleString()} ل.س</Text>
+              </View>
 
-            <View style={styles.quantityContainer}>
-              <TouchableOpacity
-                style={styles.quantityButton}
-                onPress={() => {
-                  if (item.quantity === 1) {
-                    removeItem(item.menuItem.id);
-                  } else {
-                    updateQuantity(item.menuItem.id, item.quantity - 1);
-                  }
-                }}
-              >
-                <Ionicons 
-                  name={item.quantity === 1 ? "trash-outline" : "remove"} 
-                  size={18} 
-                  color={item.quantity === 1 ? COLORS.error : COLORS.primary} 
-                />
-              </TouchableOpacity>
-              
-              <Text style={styles.quantityText}>{item.quantity}</Text>
-              
-              <TouchableOpacity
-                style={[styles.quantityButton, styles.quantityButtonAdd]}
-                onPress={() => updateQuantity(item.menuItem.id, item.quantity + 1)}
-              >
-                <Ionicons name="add" size={18} color={COLORS.textWhite} />
-              </TouchableOpacity>
+              <View style={styles.quantityContainer}>
+                <TouchableOpacity
+                  style={styles.quantityButton}
+                  onPress={() => {
+                    if (item.quantity === 1) {
+                      removeItem(itemKey);
+                    } else {
+                      updateQuantity(itemKey, item.quantity - 1);
+                    }
+                  }}
+                >
+                  <Ionicons 
+                    name={item.quantity === 1 ? "trash-outline" : "remove"} 
+                    size={18} 
+                    color={item.quantity === 1 ? COLORS.error : COLORS.primary} 
+                  />
+                </TouchableOpacity>
+                
+                <Text style={styles.quantityText}>{item.quantity}</Text>
+                
+                <TouchableOpacity
+                  style={[styles.quantityButton, styles.quantityButtonAdd]}
+                  onPress={() => updateQuantity(itemKey, item.quantity + 1)}
+                >
+                  <Ionicons name="add" size={18} color={COLORS.textWhite} />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        ))}
+          );
+        })}
 
         {/* Add Notes */}
         <TouchableOpacity style={styles.notesButton}>
