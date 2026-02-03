@@ -114,8 +114,7 @@ export default function CheckoutScreen() {
       } else {
         // COD - Order placed successfully
         clearCart();
-        Alert.alert('
-تم الطلب', 'تم إرسال طلبك بنجاح!', [
+        Alert.alert('تم الطلب', 'تم إرسال طلبك بنجاح!', [
           {
             text: 'تتبع الطلب',
             onPress: () => router.replace('/(main)/orders'),
