@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet } from 'react-native';
 import { useCartStore } from '../../src/store/cartStore';
 import { notificationAPI } from '../../src/services/api';
+import { COLORS, RADIUS, SHADOWS } from '../../src/constants/theme';
 
 export default function MainLayout() {
   const itemCount = useCartStore((state) => state.getItemCount());
@@ -19,7 +20,6 @@ export default function MainLayout() {
       }
     };
     fetchUnreadCount();
-    // Refresh every 30 seconds
     const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -29,8 +29,8 @@ export default function MainLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: '#FF6B35',
-        tabBarInactiveTintColor: '#999',
+        tabBarActiveTintColor: COLORS.primary,
+        tabBarInactiveTintColor: COLORS.textLight,
         tabBarLabelStyle: styles.tabBarLabel,
       }}
     >
@@ -38,8 +38,10 @@ export default function MainLayout() {
         name="home"
         options={{
           title: 'الرئيسية',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeIconContainer : undefined}>
+              <Ionicons name={focused ? "home" : "home-outline"} size={24} color={color} />
+            </View>
           ),
         }}
       />
@@ -47,9 +49,9 @@ export default function MainLayout() {
         name="cart"
         options={{
           title: 'السلة',
-          tabBarIcon: ({ color, size }) => (
-            <View>
-              <Ionicons name="cart" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeIconContainer : undefined}>
+              <Ionicons name={focused ? "cart" : "cart-outline"} size={24} color={color} />
               {itemCount > 0 && (
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>{itemCount > 9 ? '9+' : itemCount}</Text>
@@ -63,8 +65,10 @@ export default function MainLayout() {
         name="orders"
         options={{
           title: 'طلباتي',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="receipt" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeIconContainer : undefined}>
+              <Ionicons name={focused ? "receipt" : "receipt-outline"} size={24} color={color} />
+            </View>
           ),
         }}
       />
@@ -72,9 +76,9 @@ export default function MainLayout() {
         name="notifications"
         options={{
           title: 'الإشعارات',
-          tabBarIcon: ({ color, size }) => (
-            <View>
-              <Ionicons name="notifications" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeIconContainer : undefined}>
+              <Ionicons name={focused ? "notifications" : "notifications-outline"} size={24} color={color} />
               {unreadCount > 0 && (
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
@@ -88,15 +92,17 @@ export default function MainLayout() {
         name="profile"
         options={{
           title: 'حسابي',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeIconContainer : undefined}>
+              <Ionicons name={focused ? "person" : "person-outline"} size={24} color={color} />
+            </View>
           ),
         }}
       />
       <Tabs.Screen
         name="checkout"
         options={{
-          href: null, // Hide from tab bar
+          href: null,
         }}
       />
     </Tabs>
@@ -105,30 +111,37 @@ export default function MainLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    height: 60,
-    paddingBottom: 8,
-    paddingTop: 8,
+    backgroundColor: COLORS.surface,
+    borderTopWidth: 0,
+    height: 70,
+    paddingBottom: 10,
+    paddingTop: 10,
+    ...SHADOWS.medium,
   },
   tabBarLabel: {
     fontSize: 11,
     fontWeight: '600',
   },
+  activeIconContainer: {
+    backgroundColor: `${COLORS.primary}15`,
+    borderRadius: RADIUS.md,
+    padding: 8,
+  },
   badge: {
     position: 'absolute',
-    top: -4,
-    right: -8,
-    backgroundColor: '#FF6B35',
+    top: -6,
+    right: -10,
+    backgroundColor: COLORS.primary,
     borderRadius: 10,
-    minWidth: 18,
-    height: 18,
+    minWidth: 20,
+    height: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: COLORS.surface,
   },
   badgeText: {
-    color: '#fff',
+    color: COLORS.textWhite,
     fontSize: 10,
     fontWeight: 'bold',
   },
