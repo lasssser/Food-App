@@ -182,6 +182,7 @@ class OrderItem(BaseModel):
     price: float
     quantity: int
     notes: Optional[str] = None
+    addons: Optional[List[OrderAddOnSelection]] = []  # الإضافات المختارة
     subtotal: float
 
 class Order(BaseModel):
