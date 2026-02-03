@@ -1,6 +1,4 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface District {
   id: string;
@@ -30,53 +28,45 @@ interface LocationState {
   getDistrictName: () => string;
 }
 
-export const useLocationStore = create<LocationState>()(
-  persist(
-    (set, get) => ({
-      cities: [],
+export const useLocationStore = create<LocationState>()((set, get) => ({
+  cities: [],
+  selectedCity: null,
+  selectedDistrict: null,
+  lat: null,
+  lng: null,
+  isLocationSet: false,
+
+  setCities: (cities: City[]) => {
+    set({ cities });
+  },
+
+  setLocation: (city: City, district?: District, lat?: number, lng?: number) => {
+    set({
+      selectedCity: city,
+      selectedDistrict: district || null,
+      lat: lat || null,
+      lng: lng || null,
+      isLocationSet: true,
+    });
+  },
+
+  clearLocation: () => {
+    set({
       selectedCity: null,
       selectedDistrict: null,
       lat: null,
       lng: null,
       isLocationSet: false,
+    });
+  },
 
-      setCities: (cities: City[]) => {
-        set({ cities });
-      },
+  getCityName: () => {
+    const { selectedCity } = get();
+    return selectedCity?.name || 'اختر المدينة';
+  },
 
-      setLocation: (city: City, district?: District, lat?: number, lng?: number) => {
-        set({
-          selectedCity: city,
-          selectedDistrict: district || null,
-          lat: lat || null,
-          lng: lng || null,
-          isLocationSet: true,
-        });
-      },
-
-      clearLocation: () => {
-        set({
-          selectedCity: null,
-          selectedDistrict: null,
-          lat: null,
-          lng: null,
-          isLocationSet: false,
-        });
-      },
-
-      getCityName: () => {
-        const { selectedCity } = get();
-        return selectedCity?.name || 'اختر المدينة';
-      },
-
-      getDistrictName: () => {
-        const { selectedDistrict } = get();
-        return selectedDistrict?.name || '';
-      },
-    }),
-    {
-      name: 'location-storage',
-      storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
-);
+  getDistrictName: () => {
+    const { selectedDistrict } = get();
+    return selectedDistrict?.name || '';
+  },
+}));
