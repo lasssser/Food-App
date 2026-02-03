@@ -32,8 +32,15 @@ export default function LoginScreen() {
 
     setLoading(true);
     try {
-      await login(phone, password);
-      router.replace('/(main)/home');
+      const user = await login(phone, password);
+      // Route based on user role
+      if (user.role === 'restaurant') {
+        router.replace('/(restaurant)/dashboard');
+      } else if (user.role === 'driver') {
+        router.replace('/(driver)/dashboard');
+      } else {
+        router.replace('/(main)/home');
+      }
     } catch (error: any) {
       Alert.alert('خطأ', error.response?.data?.detail || 'فشل تسجيل الدخول');
     } finally {
