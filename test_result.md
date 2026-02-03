@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "بناء تطبيق توصيل طعام MVP باسم 'يلا ناكل؟' مع تسجيل دخول JWT، قائمة مطاعم، سلة طلب، والدفع (COD + ShamCash)"
+user_problem_statement: "بناء تطبيق توصيل طعام MVP باسم 'يلا ناكل؟' مع تسجيل دخول JWT، قائمة مطاعم، سلة طلب، والدفع (COD + ShamCash) + لوحة مطعم، واجهة سائق، نظام إشعارات"
 
 backend:
   - task: "User Authentication (Register/Login)"
