@@ -78,9 +78,35 @@ export const authAPI = {
   getToken,
 };
 
+// Location & Cities API
+export const locationAPI = {
+  getCities: async () => {
+    const response = await api.get('/cities');
+    return response.data;
+  },
+  getCity: async (cityId: string) => {
+    const response = await api.get(`/cities/${cityId}`);
+    return response.data;
+  },
+  updateUserLocation: async (cityId: string, districtId?: string, lat?: number, lng?: number) => {
+    const response = await api.put('/users/location', {
+      city_id: cityId,
+      district_id: districtId,
+      lat,
+      lng,
+    });
+    return response.data;
+  },
+  getUserLocation: async () => {
+    const response = await api.get('/users/location');
+    return response.data;
+  },
+};
+
 export const restaurantAPI = {
-  getAll: async (filters?: { area?: string; cuisine?: string; is_open?: boolean }) => {
+  getAll: async (filters?: { city_id?: string; area?: string; cuisine?: string; is_open?: boolean }) => {
     const params = new URLSearchParams();
+    if (filters?.city_id) params.append('city_id', filters.city_id);
     if (filters?.area) params.append('area', filters.area);
     if (filters?.cuisine) params.append('cuisine', filters.cuisine);
     if (filters?.is_open !== undefined) params.append('is_open', String(filters.is_open));
