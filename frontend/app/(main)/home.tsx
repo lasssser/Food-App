@@ -212,10 +212,30 @@ export default function HomeScreen() {
           colors={[COLORS.primary, COLORS.primaryDark]}
           style={styles.header}
         >
+          {/* Location Bar */}
+          <TouchableOpacity 
+            style={styles.locationBar}
+            onPress={() => setShowLocationModal(true)}
+          >
+            <Ionicons name="chevron-down" size={20} color={COLORS.textWhite} />
+            <View style={styles.locationInfo}>
+              <Text style={styles.locationLabel}>التوصيل إلى</Text>
+              <Text style={styles.locationText}>
+                {selectedCity?.name || 'اختر موقعك'}
+                {selectedDistrict && ` - ${selectedDistrict.name}`}
+              </Text>
+            </View>
+            <Ionicons name="location" size={24} color={COLORS.textWhite} />
+          </TouchableOpacity>
+
           <View style={styles.headerContent}>
             <View style={styles.headerTextContainer}>
               <Text style={styles.headerGreeting}>شو ناكل اليوم؟ 😋</Text>
-              <Text style={styles.headerSubtitle}>أكتر من {restaurants.length * 40} مطعم بانتظارك</Text>
+              <Text style={styles.headerSubtitle}>
+                {selectedCity 
+                  ? `${restaurants.length} مطعم في ${selectedCity.name}` 
+                  : 'اختر موقعك لعرض المطاعم'}
+              </Text>
             </View>
             <View style={styles.headerIcon}>
               <Text style={styles.headerEmoji}>🍽️</Text>
