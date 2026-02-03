@@ -1,33 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
+  Modal,
+  Platform,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../src/store/authStore';
+import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 export default function DriverProfile() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
-  const handleLogout = () => {
-    Alert.alert('تسجيل الخروج', 'هل تريد تسجيل الخروج؟', [
-      { text: 'إلغاء', style: 'cancel' },
-      {
-        text: 'خروج',
-        style: 'destructive',
-        onPress: async () => {
-          await logout();
-          router.replace('/(auth)/login');
-        },
-      },
-    ]);
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/(auth)/login');
+  };
+
+  const handleContactSupport = () => {
+    if (Platform.OS === 'web') {
+      window.open('https://wa.me/963999999999', '_blank');
+    } else {
+      Linking.openURL('https://wa.me/963999999999');
+    }
   };
 
   return (
@@ -36,59 +41,157 @@ export default function DriverProfile() {
         <Text style={styles.headerTitle}>حسابي</Text>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.profileCard}>
           <View style={styles.avatarContainer}>
-            <Ionicons name="person" size={40} color="#FF6B35" />
+            <Ionicons name="person" size={40} color={COLORS.primary} />
           </View>
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{user?.name}</Text>
             <Text style={styles.userPhone}>{user?.phone}</Text>
-            <Text style={styles.userRole}>سائق توصيل</Text>
+            <View style={styles.roleTag}>
+              <Text style={styles.roleText}>سائق توصيل</Text>
+            </View>
           </View>
         </View>
 
         <View style={styles.menuSection}>
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="chevron-back" size={20} color="#999" />
+          <TouchableOpacity 
+            style={styles.menuItem} 
+            onPress={() => router.push('/(driver)/myorders')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
             <View style={styles.menuItemContent}>
               <Text style={styles.menuItemText}>سجل التوصيلات</Text>
-              <Ionicons name="document-text-outline" size={22} color="#666" />
+              <View style={[styles.menuIcon, { backgroundColor: `${COLORS.info}15` }]}>
+                <Ionicons name="document-text" size={20} color={COLORS.info} />
+              </View>
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="chevron-back" size={20} color="#999" />
+          <TouchableOpacity 
+            style={styles.menuItem} 
+            onPress={() => router.push('/(driver)/dashboard')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
             <View style={styles.menuItemContent}>
               <Text style={styles.menuItemText}>الأرباح</Text>
-              <Ionicons name="wallet-outline" size={22} color="#666" />
+              <View style={[styles.menuIcon, { backgroundColor: `${COLORS.success}15` }]}>
+                <Ionicons name="wallet" size={20} color={COLORS.success} />
+              </View>
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="chevron-back" size={20} color="#999" />
+          <TouchableOpacity 
+            style={styles.menuItem} 
+            onPress={() => router.push('/(driver)/available')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
             <View style={styles.menuItemContent}>
               <Text style={styles.menuItemText}>الإشعارات</Text>
-              <Ionicons name="notifications-outline" size={22} color="#666" />
+              <View style={[styles.menuIcon, { backgroundColor: `${COLORS.warning}15` }]}>
+                <Ionicons name="notifications" size={20} color={COLORS.warning} />
+              </View>
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="chevron-back" size={20} color="#999" />
+          <TouchableOpacity 
+            style={styles.menuItem} 
+            onPress={() => setShowHelpModal(true)}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
             <View style={styles.menuItemContent}>
               <Text style={styles.menuItemText}>المساعدة</Text>
-              <Ionicons name="help-circle-outline" size={22} color="#666" />
+              <View style={[styles.menuIcon, { backgroundColor: `${COLORS.accent}15` }]}>
+                <Ionicons name="help-circle" size={20} color={COLORS.accent} />
+              </View>
             </View>
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <TouchableOpacity 
+          style={styles.logoutButton} 
+          onPress={() => setShowLogoutModal(true)}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="log-out-outline" size={22} color={COLORS.error} />
           <Text style={styles.logoutText}>تسجيل الخروج</Text>
-          <Ionicons name="log-out-outline" size={22} color="#e74c3c" />
         </TouchableOpacity>
 
         <Text style={styles.version}>يلا ناكل؟ - تطبيق السائق v1.0.0</Text>
       </ScrollView>
+
+      {/* Logout Confirmation Modal */}
+      <Modal visible={showLogoutModal} animationType="fade" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.confirmModal}>
+            <View style={styles.confirmIconContainer}>
+              <Ionicons name="log-out-outline" size={40} color={COLORS.error} />
+            </View>
+            <Text style={styles.confirmTitle}>تسجيل الخروج</Text>
+            <Text style={styles.confirmMessage}>هل تريد تسجيل الخروج من حسابك؟</Text>
+            
+            <View style={styles.confirmButtons}>
+              <TouchableOpacity 
+                style={styles.cancelButton} 
+                onPress={() => setShowLogoutModal(false)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cancelButtonText}>إلغاء</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.confirmButton} 
+                onPress={handleLogout}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.confirmButtonText}>خروج</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Help Modal */}
+      <Modal visible={showHelpModal} animationType="slide" transparent>
+        <View style={styles.helpModalOverlay}>
+          <View style={styles.helpModalContent}>
+            <View style={styles.helpModalHeader}>
+              <TouchableOpacity onPress={() => setShowHelpModal(false)} activeOpacity={0.7}>
+                <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+              </TouchableOpacity>
+              <Text style={styles.helpModalTitle}>المساعدة والدعم</Text>
+              <View style={{ width: 24 }} />
+            </View>
+
+            <View style={styles.helpContent}>
+              <TouchableOpacity style={styles.helpItem} onPress={handleContactSupport} activeOpacity={0.7}>
+                <View style={[styles.helpIcon, { backgroundColor: `${COLORS.success}15` }]}>
+                  <Ionicons name="logo-whatsapp" size={24} color={COLORS.success} />
+                </View>
+                <View style={styles.helpInfo}>
+                  <Text style={styles.helpTitle}>تواصل معنا</Text>
+                  <Text style={styles.helpDesc}>راسلنا عبر واتساب</Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.helpItem} activeOpacity={0.7}>
+                <View style={[styles.helpIcon, { backgroundColor: `${COLORS.info}15` }]}>
+                  <Ionicons name="call" size={24} color={COLORS.info} />
+                </View>
+                <View style={styles.helpInfo}>
+                  <Text style={styles.helpTitle}>اتصل بالدعم</Text>
+                  <Text style={styles.helpDesc}>+963 999 999 999</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -96,19 +199,19 @@ export default function DriverProfile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: COLORS.background,
   },
   header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: COLORS.divider,
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textPrimary,
     textAlign: 'center',
   },
   content: {
@@ -117,80 +220,221 @@ const styles = StyleSheet.create({
   profileCard: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 20,
-    marginBottom: 12,
+    backgroundColor: COLORS.surface,
+    padding: SPACING.xl,
+    marginBottom: SPACING.md,
+    ...SHADOWS.small,
   },
   avatarContainer: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: '#FFF5F2',
+    backgroundColor: `${COLORS.primary}15`,
     justifyContent: 'center',
     alignItems: 'center',
   },
   userInfo: {
     flex: 1,
-    marginRight: 16,
+    marginRight: SPACING.lg,
     alignItems: 'flex-end',
   },
   userName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textPrimary,
   },
   userPhone: {
     fontSize: 14,
-    color: '#666',
+    color: COLORS.textSecondary,
     marginTop: 4,
   },
-  userRole: {
+  roleTag: {
+    backgroundColor: `${COLORS.primary}15`,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    borderRadius: RADIUS.full,
+    marginTop: SPACING.sm,
+  },
+  roleText: {
     fontSize: 12,
-    color: '#FF6B35',
-    marginTop: 4,
+    color: COLORS.primary,
+    fontWeight: '600',
   },
   menuSection: {
-    backgroundColor: '#fff',
-    marginBottom: 12,
+    backgroundColor: COLORS.surface,
+    marginBottom: SPACING.md,
+    ...SHADOWS.small,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: COLORS.divider,
   },
   menuItemContent: {
     flex: 1,
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    gap: 12,
+    gap: SPACING.md,
+  },
+  menuIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   menuItemText: {
     flex: 1,
     fontSize: 15,
-    color: '#333',
+    color: COLORS.textPrimary,
     textAlign: 'right',
   },
   logoutButton: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
-    gap: 8,
-    marginBottom: 12,
+    backgroundColor: COLORS.surface,
+    padding: SPACING.lg,
+    gap: SPACING.sm,
+    marginBottom: SPACING.md,
+    marginHorizontal: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    ...SHADOWS.small,
   },
   logoutText: {
     fontSize: 16,
-    color: '#e74c3c',
+    color: COLORS.error,
     fontWeight: '600',
   },
   version: {
     fontSize: 12,
-    color: '#999',
+    color: COLORS.textLight,
     textAlign: 'center',
-    paddingBottom: 30,
+    paddingBottom: 100,
+  },
+
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.xl,
+  },
+  confirmModal: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.xl,
+    width: '100%',
+    alignItems: 'center',
+  },
+  confirmIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: `${COLORS.error}15`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+  },
+  confirmTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
+  },
+  confirmMessage: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginBottom: SPACING.xl,
+  },
+  confirmButtons: {
+    flexDirection: 'row',
+    gap: SPACING.md,
+    width: '100%',
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  confirmButton: {
+    flex: 1,
+    backgroundColor: COLORS.error,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    alignItems: 'center',
+  },
+  confirmButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textWhite,
+  },
+
+  // Help Modal
+  helpModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  helpModalContent: {
+    backgroundColor: COLORS.surface,
+    borderTopLeftRadius: RADIUS.xl,
+    borderTopRightRadius: RADIUS.xl,
+    padding: SPACING.xl,
+  },
+  helpModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.xl,
+  },
+  helpModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  helpContent: {
+    gap: SPACING.md,
+  },
+  helpItem: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    backgroundColor: COLORS.background,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.lg,
+  },
+  helpIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  helpInfo: {
+    flex: 1,
+    marginRight: SPACING.md,
+    alignItems: 'flex-end',
+  },
+  helpTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  helpDesc: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginTop: 2,
   },
 });
