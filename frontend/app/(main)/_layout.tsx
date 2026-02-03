@@ -7,6 +7,22 @@ import { notificationAPI } from '../../src/services/api';
 
 export default function MainLayout() {
   const itemCount = useCartStore((state) => state.getItemCount());
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const data = await notificationAPI.getUnreadCount();
+        setUnreadCount(data.count);
+      } catch (error) {
+        // Ignore errors silently
+      }
+    };
+    fetchUnreadCount();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <Tabs
@@ -53,12 +69,34 @@ export default function MainLayout() {
         }}
       />
       <Tabs.Screen
+        name="notifications"
+        options={{
+          title: 'الإشعارات',
+          tabBarIcon: ({ color, size }) => (
+            <View>
+              <Ionicons name="notifications" size={size} color={color} />
+              {unreadCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
+                </View>
+              )}
+            </View>
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'حسابي',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="checkout"
+        options={{
+          href: null, // Hide from tab bar
         }}
       />
     </Tabs>
