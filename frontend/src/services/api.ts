@@ -58,8 +58,8 @@ api.interceptors.request.use(async (config) => {
 
 // API Functions
 export const authAPI = {
-  register: async (name: string, phone: string, password: string) => {
-    const response = await api.post('/auth/register', { name, phone, password });
+  register: async (name: string, phone: string, password: string, role: string = 'customer') => {
+    const response = await api.post('/auth/register', { name, phone, password, role });
     await setToken(response.data.access_token);
     return response.data;
   },
@@ -150,8 +150,104 @@ export const paymentAPI = {
 };
 
 export const ratingAPI = {
-  create: async (data: { order_id: string; restaurant_rating: number; comment?: string }) => {
+  create: async (data: { order_id: string; restaurant_rating: number; driver_rating?: number; comment?: string }) => {
     const response = await api.post('/ratings', data);
+    return response.data;
+  },
+};
+
+// Restaurant Panel API
+export const restaurantPanelAPI = {
+  getOrders: async () => {
+    const response = await api.get('/restaurant/orders');
+    return response.data;
+  },
+  getOrderHistory: async () => {
+    const response = await api.get('/restaurant/orders/history');
+    return response.data;
+  },
+  updateOrderStatus: async (orderId: string, status: string) => {
+    const response = await api.put(`/restaurant/orders/${orderId}/status`, { status });
+    return response.data;
+  },
+  toggleStatus: async () => {
+    const response = await api.put('/restaurant/toggle-status');
+    return response.data;
+  },
+  getMenu: async () => {
+    const response = await api.get('/restaurant/menu');
+    return response.data;
+  },
+  addMenuItem: async (data: { name: string; description?: string; price: number; category: string; image?: string }) => {
+    const response = await api.post('/restaurant/menu', data);
+    return response.data;
+  },
+  updateMenuItem: async (itemId: string, data: { name?: string; description?: string; price?: number; is_available?: boolean }) => {
+    const response = await api.put(`/restaurant/menu/${itemId}`, data);
+    return response.data;
+  },
+  deleteMenuItem: async (itemId: string) => {
+    const response = await api.delete(`/restaurant/menu/${itemId}`);
+    return response.data;
+  },
+  getStats: async () => {
+    const response = await api.get('/restaurant/stats');
+    return response.data;
+  },
+};
+
+// Driver API
+export const driverAPI = {
+  updateStatus: async (isOnline: boolean) => {
+    const response = await api.put('/driver/status', { is_online: isOnline });
+    return response.data;
+  },
+  updateLocation: async (lat: number, lng: number) => {
+    const response = await api.put('/driver/location', { lat, lng });
+    return response.data;
+  },
+  getAvailableOrders: async () => {
+    const response = await api.get('/driver/available-orders');
+    return response.data;
+  },
+  getMyOrders: async () => {
+    const response = await api.get('/driver/my-orders');
+    return response.data;
+  },
+  getHistory: async () => {
+    const response = await api.get('/driver/history');
+    return response.data;
+  },
+  acceptOrder: async (orderId: string) => {
+    const response = await api.post(`/driver/accept-order/${orderId}`);
+    return response.data;
+  },
+  updateOrderStatus: async (orderId: string, status: string) => {
+    const response = await api.put(`/driver/orders/${orderId}/status`, { status });
+    return response.data;
+  },
+  getStats: async () => {
+    const response = await api.get('/driver/stats');
+    return response.data;
+  },
+};
+
+// Notifications API
+export const notificationAPI = {
+  getAll: async () => {
+    const response = await api.get('/notifications');
+    return response.data;
+  },
+  getUnreadCount: async () => {
+    const response = await api.get('/notifications/unread-count');
+    return response.data;
+  },
+  markAsRead: async (notificationId: string) => {
+    const response = await api.put(`/notifications/${notificationId}/read`);
+    return response.data;
+  },
+  markAllAsRead: async () => {
+    const response = await api.put('/notifications/mark-all-read');
     return response.data;
   },
 };
