@@ -14,7 +14,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCartStore } from '../../src/store/cartStore';
-import { addressAPI, orderAPI, paymentAPI } from '../../src/services/api';
+import { addressAPI, orderAPI } from '../../src/services/api';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 interface Address {
@@ -26,7 +26,7 @@ interface Address {
 
 export default function CheckoutScreen() {
   const router = useRouter();
-  const { items, getTotal, getRestaurantId, clearCart } = useCartStore();
+  const { items, restaurant, getSubtotal, clearCart } = useCartStore();
   
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
@@ -36,8 +36,8 @@ export default function CheckoutScreen() {
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [newAddress, setNewAddress] = useState({ label: '', address_line: '', area: '' });
 
-  const subtotal = getTotal();
-  const deliveryFee = 5000;
+  const subtotal = getSubtotal();
+  const deliveryFee = restaurant?.delivery_fee || 5000;
   const total = subtotal + deliveryFee;
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function CheckoutScreen() {
       return;
     }
 
-    if (items.length === 0) {
+    if (items.length === 0 || !restaurant) {
       Alert.alert('خطأ', 'السلة فارغة');
       return;
     }
@@ -90,9 +90,9 @@ export default function CheckoutScreen() {
 
     try {
       const orderData = {
-        restaurant_id: getRestaurantId()!,
+        restaurant_id: restaurant.id,
         items: items.map((item) => ({
-          menu_item_id: item.id,
+          menu_item_id: item.menuItem.id,
           quantity: item.quantity,
         })),
         address_id: selectedAddress,
@@ -262,12 +262,12 @@ export default function CheckoutScreen() {
           
           <View style={styles.summaryCard}>
             {items.map((item) => (
-              <View key={item.id} style={styles.summaryItem}>
+              <View key={item.menuItem.id} style={styles.summaryItem}>
                 <Text style={styles.summaryItemName}>
-                  {item.name} × {item.quantity}
+                  {item.menuItem.name} × {item.quantity}
                 </Text>
                 <Text style={styles.summaryItemPrice}>
-                  {(item.price * item.quantity).toLocaleString()} ل.س
+                  {(item.menuItem.price * item.quantity).toLocaleString()} ل.س
                 </Text>
               </View>
             ))}
