@@ -1157,7 +1157,9 @@ async def seed_database():
             "created_at": datetime.utcnow()
         }
         await db.users.insert_one(owner)
-        await db.restaurants.update_one({"id": "rest-1"}, {"$set": {"owner_id": "owner-1"}})
+    
+    # Always update restaurant owner_id
+    await db.restaurants.update_one({"id": "rest-1"}, {"$set": {"owner_id": "owner-1"}})
     
     # Create demo driver account
     existing_driver = await db.users.find_one({"phone": "0900000002"})
