@@ -783,6 +783,167 @@ async def get_restaurant_stats(current_user: dict = Depends(get_current_user)):
         "today_revenue": today_revenue
     }
 
+# ==================== Restaurant Drivers Management ====================
+
+@api_router.get("/restaurant/drivers")
+async def get_restaurant_drivers(current_user: dict = Depends(get_current_user)):
+    """Get restaurant's own drivers (without app)"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    drivers = await db.restaurant_drivers.find({"restaurant_id": restaurant["id"]}).to_list(50)
+    return drivers
+
+@api_router.post("/restaurant/drivers")
+async def add_restaurant_driver(
+    driver_data: RestaurantDriverCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Add a driver to restaurant (without app)"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    driver = RestaurantDriver(
+        restaurant_id=restaurant["id"],
+        name=driver_data.name,
+        phone=driver_data.phone,
+        notes=driver_data.notes
+    )
+    
+    await db.restaurant_drivers.insert_one(driver.dict())
+    return driver.dict()
+
+@api_router.put("/restaurant/drivers/{driver_id}")
+async def update_restaurant_driver(
+    driver_id: str,
+    driver_data: RestaurantDriverCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update restaurant driver"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    result = await db.restaurant_drivers.update_one(
+        {"id": driver_id, "restaurant_id": restaurant["id"]},
+        {"$set": {
+            "name": driver_data.name,
+            "phone": driver_data.phone,
+            "notes": driver_data.notes
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    return {"message": "تم تحديث بيانات السائق"}
+
+@api_router.delete("/restaurant/drivers/{driver_id}")
+async def delete_restaurant_driver(driver_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete restaurant driver"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    result = await db.restaurant_drivers.delete_one({"id": driver_id, "restaurant_id": restaurant["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    return {"message": "تم حذف السائق"}
+
+@api_router.post("/restaurant/orders/{order_id}/assign-driver")
+async def assign_driver_to_order(
+    order_id: str,
+    assignment: AssignDriverRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Assign a driver to an order"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    order = await db.orders.find_one({"id": order_id, "restaurant_id": restaurant["id"]})
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    update_data = {"updated_at": datetime.utcnow()}
+    
+    if assignment.driver_type == "restaurant_driver":
+        # Assign restaurant's own driver
+        if not assignment.driver_id:
+            raise HTTPException(status_code=400, detail="يجب تحديد السائق")
+        
+        driver = await db.restaurant_drivers.find_one({
+            "id": assignment.driver_id,
+            "restaurant_id": restaurant["id"]
+        })
+        if not driver:
+            raise HTTPException(status_code=404, detail="السائق غير موجود")
+        
+        update_data.update({
+            "delivery_mode": "restaurant_driver",
+            "driver_type": "restaurant_driver",
+            "driver_id": driver["id"],
+            "driver_name": driver["name"],
+            "driver_phone": driver["phone"],
+            "order_status": "driver_assigned"
+        })
+        
+    elif assignment.driver_type == "platform_driver":
+        # Request platform drivers
+        update_data.update({
+            "delivery_mode": "platform_driver",
+            "order_status": "ready"  # Mark as ready for platform drivers to see
+        })
+        
+        # Notify nearby platform drivers
+        city_id = restaurant.get("city_id", "damascus")
+        platform_drivers = await db.users.find({
+            "role": "driver",
+            "is_online": True,
+            "city_id": city_id
+        }).to_list(50)
+        
+        for driver in platform_drivers:
+            await create_notification(
+                driver["id"],
+                "🚀 طلب جديد قريب منك",
+                f"طلب من {restaurant['name']} جاهز للتوصيل",
+                "new_order",
+                {"order_id": order_id, "restaurant_name": restaurant["name"]}
+            )
+    
+    await db.orders.update_one({"id": order_id}, {"$set": update_data})
+    
+    # Notify customer
+    if assignment.driver_type == "restaurant_driver":
+        await create_notification(
+            order["user_id"],
+            "تم تعيين سائق لطلبك",
+            f"السائق {update_data.get('driver_name', '')} في الطريق لاستلام طلبك",
+            "order_update",
+            {"order_id": order_id}
+        )
+    
+    return {"message": "تم تعيين السائق بنجاح"}
+
 # ==================== Driver Routes ====================
 
 @api_router.put("/driver/status")
