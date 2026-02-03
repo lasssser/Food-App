@@ -4,13 +4,14 @@ import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator, StyleSheet, I18nManager } from 'react-native';
 import { useAuthStore } from '../src/store/authStore';
 import { seedAPI } from '../src/services/api';
+import { COLORS } from '../src/constants/theme';
 
 // Force RTL for Arabic
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
 
 export default function RootLayout() {
-  const { isLoading, isAuthenticated, user, checkAuth } = useAuthStore();
+  const { isLoading, isAuthenticated, isGuest, user, checkAuth } = useAuthStore();
   const router = useRouter();
   const segments = useSegments();
   const [isReady, setIsReady] = useState(false);
@@ -33,11 +34,22 @@ export default function RootLayout() {
     if (!isReady || isLoading) return;
 
     const inAuthGroup = segments[0] === '(auth)';
+    const inMainGroup = segments[0] === '(main)';
+    const inRestaurantGroup = segments[0] === '(restaurant)';
+    const inDriverGroup = segments[0] === '(driver)';
 
-    if (!isAuthenticated && !inAuthGroup) {
+    // Guest mode - allow browsing main screens
+    if (isGuest && inAuthGroup) {
+      router.replace('/(main)/home');
+      return;
+    }
+
+    // Not authenticated and not guest - redirect to login
+    if (!isAuthenticated && !isGuest && !inAuthGroup) {
       router.replace('/(auth)/login');
-    } else if (isAuthenticated && inAuthGroup) {
-      // Route based on user role
+    } 
+    // Authenticated user in auth group - redirect based on role
+    else if (isAuthenticated && inAuthGroup) {
       const role = user?.role || 'customer';
       if (role === 'restaurant') {
         router.replace('/(restaurant)/dashboard');
@@ -47,12 +59,12 @@ export default function RootLayout() {
         router.replace('/(main)/home');
       }
     }
-  }, [isAuthenticated, segments, isLoading, isReady, user]);
+  }, [isAuthenticated, isGuest, segments, isLoading, isReady, user]);
 
   if (!isReady || isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B35" />
+        <ActivityIndicator size="large" color={COLORS.primary} />
       </View>
     );
   }
@@ -82,6 +94,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.background,
   },
 });
