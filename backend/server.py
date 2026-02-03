@@ -961,6 +961,134 @@ async def get_shamcash_info():
         ]
     }
 
+# ==================== Add-ons Routes (الإضافات) ====================
+
+@api_router.get("/restaurants/{restaurant_id}/menu/{item_id}/addons")
+async def get_menu_item_addons(restaurant_id: str, item_id: str):
+    """Get add-on groups for a menu item (Public - for customers)"""
+    addon_groups = await db.addon_groups.find({
+        "restaurant_id": restaurant_id,
+        "menu_item_id": item_id
+    }).to_list(50)
+    return [AddOnGroup(**group) for group in addon_groups]
+
+@api_router.get("/restaurant/menu/{item_id}/addons")
+async def get_restaurant_menu_item_addons(item_id: str, current_user: dict = Depends(get_current_user)):
+    """Get add-on groups for a menu item (Restaurant Panel)"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    # Verify item belongs to restaurant
+    item = await db.menu_items.find_one({"id": item_id, "restaurant_id": restaurant["id"]})
+    if not item:
+        raise HTTPException(status_code=404, detail="الصنف غير موجود")
+    
+    addon_groups = await db.addon_groups.find({
+        "restaurant_id": restaurant["id"],
+        "menu_item_id": item_id
+    }).to_list(50)
+    return [AddOnGroup(**group) for group in addon_groups]
+
+@api_router.post("/restaurant/menu/{item_id}/addons")
+async def create_addon_group(
+    item_id: str,
+    addon_data: AddOnGroupCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create an add-on group for a menu item"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    # Verify item belongs to restaurant
+    item = await db.menu_items.find_one({"id": item_id, "restaurant_id": restaurant["id"]})
+    if not item:
+        raise HTTPException(status_code=404, detail="الصنف غير موجود")
+    
+    # Create options with IDs
+    options = [
+        AddOnOption(
+            name=opt.name,
+            price=opt.price
+        )
+        for opt in addon_data.options
+    ]
+    
+    addon_group = AddOnGroup(
+        menu_item_id=item_id,
+        restaurant_id=restaurant["id"],
+        name=addon_data.name,
+        is_required=addon_data.is_required,
+        max_selections=addon_data.max_selections,
+        options=options
+    )
+    
+    await db.addon_groups.insert_one(addon_group.dict())
+    return addon_group
+
+@api_router.put("/restaurant/addons/{group_id}")
+async def update_addon_group(
+    group_id: str,
+    addon_data: AddOnGroupCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update an add-on group"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    # Verify group belongs to restaurant
+    group = await db.addon_groups.find_one({"id": group_id, "restaurant_id": restaurant["id"]})
+    if not group:
+        raise HTTPException(status_code=404, detail="مجموعة الإضافات غير موجودة")
+    
+    # Create new options with IDs
+    options = [
+        AddOnOption(
+            name=opt.name,
+            price=opt.price
+        ).dict()
+        for opt in addon_data.options
+    ]
+    
+    await db.addon_groups.update_one(
+        {"id": group_id},
+        {"$set": {
+            "name": addon_data.name,
+            "is_required": addon_data.is_required,
+            "max_selections": addon_data.max_selections,
+            "options": options
+        }}
+    )
+    
+    return {"message": "تم تحديث مجموعة الإضافات"}
+
+@api_router.delete("/restaurant/addons/{group_id}")
+async def delete_addon_group(group_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete an add-on group"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    result = await db.addon_groups.delete_one({"id": group_id, "restaurant_id": restaurant["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="مجموعة الإضافات غير موجودة")
+    
+    return {"message": "تم حذف مجموعة الإضافات"}
+
 # ==================== Rating Routes ====================
 
 @api_router.post("/ratings")
