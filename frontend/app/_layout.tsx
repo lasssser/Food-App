@@ -10,7 +10,7 @@ I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
 
 export default function RootLayout() {
-  const { isLoading, isAuthenticated, checkAuth } = useAuthStore();
+  const { isLoading, isAuthenticated, user, checkAuth } = useAuthStore();
   const router = useRouter();
   const segments = useSegments();
   const [isReady, setIsReady] = useState(false);
@@ -37,9 +37,17 @@ export default function RootLayout() {
     if (!isAuthenticated && !inAuthGroup) {
       router.replace('/(auth)/login');
     } else if (isAuthenticated && inAuthGroup) {
-      router.replace('/(main)/home');
+      // Route based on user role
+      const role = user?.role || 'customer';
+      if (role === 'restaurant') {
+        router.replace('/(restaurant)/dashboard');
+      } else if (role === 'driver') {
+        router.replace('/(driver)/dashboard');
+      } else {
+        router.replace('/(main)/home');
+      }
     }
-  }, [isAuthenticated, segments, isLoading, isReady]);
+  }, [isAuthenticated, segments, isLoading, isReady, user]);
 
   if (!isReady || isLoading) {
     return (
