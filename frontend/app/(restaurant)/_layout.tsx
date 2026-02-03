@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet } from 'react-native';
+import { COLORS } from '../../src/constants/theme';
 
 export default function RestaurantLayout() {
   return (
@@ -9,15 +10,15 @@ export default function RestaurantLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: '#FF6B35',
-        tabBarInactiveTintColor: '#999',
+        tabBarActiveTintColor: COLORS.primary,
+        tabBarInactiveTintColor: COLORS.textLight,
         tabBarLabelStyle: styles.tabBarLabel,
       }}
     >
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: 'لوحة التحكم',
+          title: 'الرئيسية',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="grid" size={size} color={color} />
           ),
@@ -42,6 +43,15 @@ export default function RestaurantLayout() {
         }}
       />
       <Tabs.Screen
+        name="addons"
+        options={{
+          title: 'الإضافات',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="options" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'الإعدادات',
@@ -56,15 +66,15 @@ export default function RestaurantLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.surface,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    height: 60,
+    borderTopColor: COLORS.divider,
+    height: 65,
     paddingBottom: 8,
     paddingTop: 8,
   },
   tabBarLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
   },
 });
