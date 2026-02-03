@@ -8,6 +8,7 @@ import {
   Alert,
   Modal,
   Linking,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -15,6 +16,21 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../src/store/authStore';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+
+// Custom alert function that works on web and mobile
+const showAlert = (title: string, message: string, buttons: Array<{text: string, onPress?: () => void, style?: string}>) => {
+  if (Platform.OS === 'web') {
+    const confirmed = window.confirm(`${title}\n\n${message}`);
+    if (confirmed && buttons.length > 0) {
+      const confirmButton = buttons.find(b => b.style === 'destructive') || buttons[buttons.length - 1];
+      if (confirmButton?.onPress) {
+        confirmButton.onPress();
+      }
+    }
+  } else {
+    Alert.alert(title, message, buttons);
+  }
+};
 
 export default function RestaurantSettings() {
   const router = useRouter();
