@@ -157,7 +157,7 @@ export default function RestaurantSettings() {
         {/* Logout Button */}
         <TouchableOpacity 
           style={styles.logoutButton} 
-          onPress={handleLogout}
+          onPress={() => setShowLogoutModal(true)}
           activeOpacity={0.7}
         >
           <View style={styles.logoutContent}>
