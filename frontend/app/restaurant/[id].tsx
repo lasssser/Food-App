@@ -107,17 +107,6 @@ export default function RestaurantScreen() {
     }
   };
 
-  // This effect handles the case when addOnGroups is loaded
-  useEffect(() => {
-    if (selectedMenuItem && !loadingAddOns) {
-      if (addOnGroups.length === 0 && !showAddOnModal) {
-        addToCartDirectly(selectedMenuItem);
-      } else if (addOnGroups.length > 0 && !showAddOnModal) {
-        setShowAddOnModal(true);
-      }
-    }
-  }, [addOnGroups, loadingAddOns]);
-
   const addToCartDirectly = (menuItem: MenuItem) => {
     if (!restaurant) return;
     addItem(menuItem, restaurant, []);
