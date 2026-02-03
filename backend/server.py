@@ -238,6 +238,49 @@ class DriverLocation(BaseModel):
 class DriverStatus(BaseModel):
     is_online: bool
 
+# ==================== NEW: Location & City Models ====================
+
+class City(BaseModel):
+    id: str
+    name: str
+    name_en: str
+    districts: List[dict]  # [{id, name, name_en}]
+
+class UserLocationUpdate(BaseModel):
+    city_id: str
+    district_id: Optional[str] = None
+    lat: Optional[float] = None
+    lng: Optional[float] = None
+
+# Restaurant Driver (سائق تابع للمطعم - بدون تطبيق)
+class RestaurantDriverCreate(BaseModel):
+    name: str
+    phone: str
+    notes: Optional[str] = None
+
+class RestaurantDriver(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    restaurant_id: str
+    name: str
+    phone: str
+    notes: Optional[str] = None
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Driver Offer (لمنع التضارب في قبول الطلبات)
+class DriverOffer(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    order_id: str
+    driver_id: str
+    status: str = "offered"  # offered, accepted, rejected, expired
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Order Assignment
+class AssignDriverRequest(BaseModel):
+    driver_type: str  # restaurant_driver or platform_driver
+    driver_id: Optional[str] = None  # Required for restaurant_driver
+    request_platform_drivers: bool = False  # True to notify platform drivers
+
 # Notification Models
 class Notification(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
