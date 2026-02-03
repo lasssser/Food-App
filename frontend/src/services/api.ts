@@ -241,6 +241,28 @@ export const restaurantPanelAPI = {
     const response = await api.delete(`/restaurant/addons/${groupId}`);
     return response.data;
   },
+  // Restaurant Drivers Management
+  getDrivers: async () => {
+    const response = await api.get('/restaurant/drivers');
+    return response.data;
+  },
+  addDriver: async (data: { name: string; phone: string; notes?: string }) => {
+    const response = await api.post('/restaurant/drivers', data);
+    return response.data;
+  },
+  updateDriver: async (driverId: string, data: { name: string; phone: string; notes?: string }) => {
+    const response = await api.put(`/restaurant/drivers/${driverId}`, data);
+    return response.data;
+  },
+  deleteDriver: async (driverId: string) => {
+    const response = await api.delete(`/restaurant/drivers/${driverId}`);
+    return response.data;
+  },
+  // Order Driver Assignment
+  assignDriver: async (orderId: string, data: { driver_type: string; driver_id?: string }) => {
+    const response = await api.post(`/restaurant/orders/${orderId}/assign-driver`, data);
+    return response.data;
+  },
 };
 
 // Driver API
