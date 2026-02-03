@@ -14,32 +14,35 @@ interface AuthState {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isGuest: boolean;
   login: (phone: string, password: string) => Promise<User>;
   register: (name: string, phone: string, password: string, role?: string) => Promise<User>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  setGuestMode: (value: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: true,
   isAuthenticated: false,
+  isGuest: false,
 
   login: async (phone: string, password: string) => {
     const response = await authAPI.login(phone, password);
-    set({ user: response.user, isAuthenticated: true });
+    set({ user: response.user, isAuthenticated: true, isGuest: false });
     return response.user;
   },
 
   register: async (name: string, phone: string, password: string, role: string = 'customer') => {
     const response = await authAPI.register(name, phone, password, role);
-    set({ user: response.user, isAuthenticated: true });
+    set({ user: response.user, isAuthenticated: true, isGuest: false });
     return response.user;
   },
 
   logout: async () => {
     await authAPI.logout();
-    set({ user: null, isAuthenticated: false });
+    set({ user: null, isAuthenticated: false, isGuest: false });
   },
 
   checkAuth: async () => {
@@ -54,5 +57,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch {
       set({ user: null, isAuthenticated: false, isLoading: false });
     }
+  },
+
+  setGuestMode: (value: boolean) => {
+    set({ isGuest: value, isLoading: false });
   },
 }));
