@@ -340,9 +340,16 @@ export default function ProfileScreen() {
               <View key={address.id} style={styles.addressCard}>
                 <TouchableOpacity
                   style={styles.deleteButton}
-                  onPress={() => handleDeleteAddress(address.id)}
+                  onPress={() => {
+                    console.log('Delete pressed for:', address.id);
+                    handleDeleteAddress(address.id);
+                  }}
+                  hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+                  activeOpacity={0.6}
                 >
-                  <Ionicons name="trash-outline" size={18} color={COLORS.error} />
+                  <View style={styles.deleteIconContainer}>
+                    <Ionicons name="trash" size={20} color={COLORS.error} />
+                  </View>
                 </TouchableOpacity>
                 <View style={styles.addressInfo}>
                   <Text style={styles.addressLabel}>{address.label}</Text>
