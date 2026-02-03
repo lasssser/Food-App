@@ -10,18 +10,24 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
+  Image,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../src/store/authStore';
+import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+
+const { width, height } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { login } = useAuthStore();
+  const { login, setGuestMode } = useAuthStore();
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -33,7 +39,6 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       const user = await login(phone, password);
-      // Route based on user role
       if (user.role === 'restaurant') {
         router.replace('/(restaurant)/dashboard');
       } else if (user.role === 'driver') {
@@ -48,89 +53,177 @@ export default function LoginScreen() {
     }
   };
 
+  const handleGuestBrowse = () => {
+    if (setGuestMode) {
+      setGuestMode(true);
+    }
+    router.replace('/(main)/home');
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
+    <View style={styles.container}>
+      {/* Background Image */}
+      <Image
+        source={{ uri: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800' }}
+        style={styles.backgroundImage}
+      />
+      <LinearGradient
+        colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)', COLORS.secondary]}
+        style={styles.overlay}
+      />
+
+      <SafeAreaView style={styles.safeArea}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}
         >
-          <View style={styles.header}>
-            <View style={styles.logoContainer}>
-              <Ionicons name="restaurant" size={60} color="#FF6B35" />
-            </View>
-            <Text style={styles.title}>يلا ناكل؟</Text>
-            <Text style={styles.subtitle}>أهلاً بك مجدداً</Text>
-          </View>
-
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Ionicons name="call-outline" size={22} color="#999" style={styles.inputIcon} />
-              <TextInput
-                style={styles.input}
-                placeholder="رقم الهاتف"
-                placeholderTextColor="#999"
-                value={phone}
-                onChangeText={setPhone}
-                keyboardType="phone-pad"
-                textAlign="right"
-              />
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Logo Section */}
+            <View style={styles.header}>
+              <View style={styles.logoContainer}>
+                <Text style={styles.logoEmoji}>🍔</Text>
+              </View>
+              <Text style={styles.title}>يلا ناكل؟</Text>
+              <Text style={styles.subtitle}>اطلب أشهى المأكولات بضغطة زر</Text>
             </View>
 
-            <View style={styles.inputContainer}>
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Ionicons
-                  name={showPassword ? 'eye-outline' : 'eye-off-outline'}
-                  size={22}
-                  color="#999"
+            {/* Form Card */}
+            <View style={styles.formCard}>
+              <Text style={styles.formTitle}>تسجيل الدخول</Text>
+
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="رقم الهاتف"
+                  placeholderTextColor={COLORS.textLight}
+                  value={phone}
+                  onChangeText={setPhone}
+                  keyboardType="phone-pad"
+                  textAlign="right"
                 />
-              </TouchableOpacity>
-              <TextInput
-                style={styles.input}
-                placeholder="كلمة المرور"
-                placeholderTextColor="#999"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                textAlign="right"
-              />
-              <Ionicons name="lock-closed-outline" size={22} color="#999" style={styles.inputIcon} />
-            </View>
+                <View style={styles.inputIconContainer}>
+                  <Ionicons name="call-outline" size={20} color={COLORS.textLight} />
+                </View>
+              </View>
 
-            <TouchableOpacity
-              style={[styles.loginButton, loading && styles.loginButtonDisabled]}
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.loginButtonText}>تسجيل الدخول</Text>
-              )}
-            </TouchableOpacity>
-
-            <View style={styles.registerContainer}>
-              <Link href="/(auth)/register" asChild>
-                <TouchableOpacity>
-                  <Text style={styles.registerLink}>إنشاء حساب جديد</Text>
+              <View style={styles.inputContainer}>
+                <TouchableOpacity 
+                  style={styles.eyeButton}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Ionicons
+                    name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                    size={20}
+                    color={COLORS.textLight}
+                  />
                 </TouchableOpacity>
-              </Link>
-              <Text style={styles.registerText}>ليس لديك حساب؟ </Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="كلمة المرور"
+                  placeholderTextColor={COLORS.textLight}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  textAlign="right"
+                />
+                <View style={styles.inputIconContainer}>
+                  <Ionicons name="lock-closed-outline" size={20} color={COLORS.textLight} />
+                </View>
+              </View>
+
+              {/* Login Button */}
+              <TouchableOpacity
+                style={styles.loginButton}
+                onPress={handleLogin}
+                disabled={loading}
+                activeOpacity={0.9}
+              >
+                <LinearGradient
+                  colors={[COLORS.primary, COLORS.primaryDark]}
+                  style={styles.loginButtonGradient}
+                >
+                  {loading ? (
+                    <ActivityIndicator color={COLORS.textWhite} />
+                  ) : (
+                    <>
+                      <Text style={styles.loginButtonText}>تسجيل الدخول</Text>
+                      <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
+                    </>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+
+              {/* Divider */}
+              <View style={styles.dividerContainer}>
+                <View style={styles.divider} />
+                <Text style={styles.dividerText}>أو</Text>
+                <View style={styles.divider} />
+              </View>
+
+              {/* Guest Browse Button */}
+              <TouchableOpacity
+                style={styles.guestButton}
+                onPress={handleGuestBrowse}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.guestButtonText}>تصفح كضيف 👀</Text>
+              </TouchableOpacity>
+
+              {/* Register Link */}
+              <View style={styles.registerContainer}>
+                <Link href="/(auth)/register" asChild>
+                  <TouchableOpacity>
+                    <Text style={styles.registerLink}>إنشاء حساب جديد</Text>
+                  </TouchableOpacity>
+                </Link>
+                <Text style={styles.registerText}>ليس لديك حساب؟ </Text>
+              </View>
             </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+
+            {/* Features */}
+            <View style={styles.featuresContainer}>
+              <View style={styles.featureItem}>
+                <Ionicons name="bicycle" size={20} color={COLORS.accent} />
+                <Text style={styles.featureText}>توصيل سريع</Text>
+              </View>
+              <View style={styles.featureItem}>
+                <Ionicons name="restaurant" size={20} color={COLORS.accent} />
+                <Text style={styles.featureText}>+200 مطعم</Text>
+              </View>
+              <View style={styles.featureItem}>
+                <Ionicons name="star" size={20} color={COLORS.accent} />
+                <Text style={styles.featureText}>أفضل العروض</Text>
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.secondary,
+  },
+  backgroundImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: height * 0.45,
+    resizeMode: 'cover',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  safeArea: {
+    flex: 1,
   },
   keyboardView: {
     flex: 1,
@@ -138,82 +231,157 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 24,
+    padding: SPACING.xl,
   },
+
+  // Header
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: SPACING.xxl,
   },
   logoContainer: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#FFF5F2',
+    backgroundColor: 'rgba(255,255,255,0.15)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: SPACING.lg,
+    borderWidth: 3,
+    borderColor: COLORS.primary,
+  },
+  logoEmoji: {
+    fontSize: 50,
   },
   title: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: 'bold',
-    color: '#FF6B35',
-    marginBottom: 8,
+    color: COLORS.textWhite,
+    marginBottom: SPACING.xs,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: 'rgba(255,255,255,0.8)',
   },
-  form: {
-    width: '100%',
+
+  // Form Card
+  formCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.xl,
+    ...SHADOWS.large,
+  },
+  formTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    textAlign: 'center',
+    marginBottom: SPACING.xl,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f8f8',
-    borderRadius: 12,
-    marginBottom: 16,
-    paddingHorizontal: 16,
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.md,
+    marginBottom: SPACING.md,
+    paddingHorizontal: SPACING.md,
     height: 56,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: COLORS.border,
   },
-  inputIcon: {
-    marginLeft: 8,
+  inputIconContainer: {
+    width: 40,
+    alignItems: 'center',
   },
   input: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
-    paddingHorizontal: 8,
+    color: COLORS.textPrimary,
+    paddingHorizontal: SPACING.sm,
   },
+  eyeButton: {
+    padding: SPACING.sm,
+  },
+
+  // Login Button
   loginButton: {
-    backgroundColor: '#FF6B35',
-    borderRadius: 12,
-    height: 56,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 8,
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
+    marginTop: SPACING.sm,
   },
-  loginButtonDisabled: {
-    opacity: 0.7,
+  loginButtonGradient: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.lg,
+    gap: SPACING.sm,
   },
   loginButtonText: {
-    color: '#fff',
+    color: COLORS.textWhite,
     fontSize: 18,
     fontWeight: 'bold',
   },
+
+  // Divider
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: SPACING.lg,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: COLORS.border,
+  },
+  dividerText: {
+    marginHorizontal: SPACING.md,
+    color: COLORS.textLight,
+    fontSize: 14,
+  },
+
+  // Guest Button
+  guestButton: {
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.md,
+    paddingVertical: SPACING.lg,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: COLORS.border,
+  },
+  guestButtonText: {
+    color: COLORS.textPrimary,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  // Register
   registerContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 24,
+    marginTop: SPACING.xl,
   },
   registerText: {
     fontSize: 14,
-    color: '#666',
+    color: COLORS.textSecondary,
   },
   registerLink: {
     fontSize: 14,
-    color: '#FF6B35',
-    fontWeight: '600',
+    color: COLORS.primary,
+    fontWeight: 'bold',
+  },
+
+  // Features
+  featuresContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: SPACING.xxl,
+  },
+  featureItem: {
+    alignItems: 'center',
+    gap: SPACING.xs,
+  },
+  featureText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
   },
 });
