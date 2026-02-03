@@ -11,8 +11,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { driverAPI } from '../../src/services/api';
 import { useAuthStore } from '../../src/store/authStore';
+import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 export default function DriverDashboard() {
   const { user } = useAuthStore();
@@ -56,31 +58,36 @@ export default function DriverDashboard() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B35" />
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
+      {/* Header with Gradient */}
+      <LinearGradient colors={[COLORS.primary, COLORS.primaryDark]} style={styles.header}>
+        <SafeAreaView edges={['top']}>
+          <View style={styles.headerContent}>
+            <View style={styles.headerInfo}>
+              <Text style={styles.welcomeText}>مرحباً</Text>
+              <Text style={styles.driverName}>{user?.name}</Text>
+            </View>
+            <View style={styles.logoContainer}>
+              <Ionicons name="bicycle" size={32} color={COLORS.primary} />
+            </View>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+
       <ScrollView
         style={styles.content}
+        showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF6B35']} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
         }
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerInfo}>
-            <Text style={styles.welcomeText}>مرحباً</Text>
-            <Text style={styles.driverName}>{user?.name}</Text>
-          </View>
-          <View style={styles.logoContainer}>
-            <Ionicons name="bicycle" size={30} color="#FF6B35" />
-          </View>
-        </View>
-
         {/* Status Toggle */}
         <TouchableOpacity
           style={[
@@ -88,86 +95,129 @@ export default function DriverDashboard() {
             stats?.is_online ? styles.statusOnline : styles.statusOffline,
           ]}
           onPress={handleToggleStatus}
+          activeOpacity={0.9}
         >
           <View style={styles.statusContent}>
-            <Text style={styles.statusLabel}>حالتك</Text>
+            <Text style={styles.statusLabel}>حالتك الآن</Text>
             <Text style={styles.statusText}>
-              {stats?.is_online ? 'متصل - جاهز للتوصيل' : 'غير متصل'}
+              {stats?.is_online ? 'متصل - جاهز للتوصيل 🚀' : 'غير متصل'}
+            </Text>
+            <Text style={styles.statusHint}>
+              {stats?.is_online ? 'اضغط للتوقف عن استلام الطلبات' : 'اضغط للبدء بالتوصيل'}
             </Text>
           </View>
-          <Ionicons
-            name={stats?.is_online ? 'radio-button-on' : 'radio-button-off'}
-            size={40}
-            color="#fff"
-          />
+          <View style={[styles.statusIcon, stats?.is_online && styles.statusIconOnline]}>
+            <Ionicons
+              name={stats?.is_online ? 'power' : 'power-outline'}
+              size={32}
+              color={stats?.is_online ? COLORS.success : COLORS.textLight}
+            />
+          </View>
         </TouchableOpacity>
 
         {/* Stats Cards */}
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
-            <View style={styles.statCardInner}>
-              <Ionicons name="today" size={28} color="#FF6B35" />
+            <LinearGradient
+              colors={['#FFF5F2', '#FFE8E0']}
+              style={styles.statCardGradient}
+            >
+              <View style={styles.statIconContainer}>
+                <Ionicons name="today" size={24} color={COLORS.primary} />
+              </View>
               <Text style={styles.statValue}>{stats?.today_deliveries || 0}</Text>
               <Text style={styles.statLabel}>توصيلات اليوم</Text>
-            </View>
+            </LinearGradient>
           </View>
           
           <View style={styles.statCard}>
-            <View style={styles.statCardInner}>
-              <Ionicons name="checkmark-done" size={28} color="#66BB6A" />
+            <LinearGradient
+              colors={['#E8F5E9', '#C8E6C9']}
+              style={styles.statCardGradient}
+            >
+              <View style={[styles.statIconContainer, { backgroundColor: '#A5D6A7' }]}>
+                <Ionicons name="checkmark-done" size={24} color={COLORS.success} />
+              </View>
               <Text style={styles.statValue}>{stats?.total_deliveries || 0}</Text>
               <Text style={styles.statLabel}>إجمالي التوصيلات</Text>
-            </View>
+            </LinearGradient>
           </View>
           
           <View style={styles.statCard}>
-            <View style={styles.statCardInner}>
-              <Ionicons name="star" size={28} color="#FFD700" />
+            <LinearGradient
+              colors={['#FFF8E1', '#FFECB3']}
+              style={styles.statCardGradient}
+            >
+              <View style={[styles.statIconContainer, { backgroundColor: '#FFD54F' }]}>
+                <Ionicons name="star" size={24} color="#F57C00" />
+              </View>
               <Text style={styles.statValue}>{stats?.average_rating?.toFixed(1) || '0.0'}</Text>
               <Text style={styles.statLabel}>تقييمك</Text>
+            </LinearGradient>
+          </View>
+        </View>
+
+        {/* Today's Earnings */}
+        <View style={styles.earningsCard}>
+          <View style={styles.earningsHeader}>
+            <Ionicons name="wallet" size={24} color={COLORS.primary} />
+            <Text style={styles.earningsTitle}>أرباح اليوم</Text>
+          </View>
+          <Text style={styles.earningsAmount}>
+            {(stats?.today_earnings || 0).toLocaleString()} ل.س
+          </Text>
+          <Text style={styles.earningsHint}>تحديث تلقائي عند إكمال كل توصيلة</Text>
+        </View>
+
+        {/* Tips Card */}
+        <View style={styles.tipsCard}>
+          <Text style={styles.tipsTitle}>💡 نصائح للسائق المتميز</Text>
+          <View style={styles.tipsList}>
+            <View style={styles.tipRow}>
+              <View style={styles.tipBullet}>
+                <Ionicons name="checkmark" size={14} color={COLORS.textWhite} />
+              </View>
+              <Text style={styles.tipText}>كن متصلاً لاستلام الطلبات الجديدة</Text>
+            </View>
+            <View style={styles.tipRow}>
+              <View style={styles.tipBullet}>
+                <Ionicons name="checkmark" size={14} color={COLORS.textWhite} />
+              </View>
+              <Text style={styles.tipText}>التزم بوقت التوصيل المحدد للعميل</Text>
+            </View>
+            <View style={styles.tipRow}>
+              <View style={styles.tipBullet}>
+                <Ionicons name="checkmark" size={14} color={COLORS.textWhite} />
+              </View>
+              <Text style={styles.tipText}>تعامل بلطف للحصول على تقييم عالي</Text>
             </View>
           </View>
         </View>
 
-        {/* Info Card */}
-        <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>نصائح للسائق</Text>
-          <View style={styles.tipRow}>
-            <Ionicons name="checkmark-circle" size={20} color="#66BB6A" />
-            <Text style={styles.tipText}>كن متصلاً لاستلام الطلبات</Text>
-          </View>
-          <View style={styles.tipRow}>
-            <Ionicons name="checkmark-circle" size={20} color="#66BB6A" />
-            <Text style={styles.tipText}>التزم بوقت التوصيل المحدد</Text>
-          </View>
-          <View style={styles.tipRow}>
-            <Ionicons name="checkmark-circle" size={20} color="#66BB6A" />
-            <Text style={styles.tipText}>حافظ على تقييم عالي</Text>
-          </View>
-        </View>
+        <View style={{ height: 30 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: COLORS.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  content: {
-    flex: 1,
-  },
   header: {
+    paddingBottom: SPACING.xl,
+  },
+  headerContent: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.md,
   },
   headerInfo: {
     flex: 1,
@@ -175,96 +225,175 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 14,
-    color: '#666',
+    color: 'rgba(255,255,255,0.8)',
   },
   driverName: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textWhite,
   },
   logoContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#FFF5F2',
+    backgroundColor: COLORS.textWhite,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 16,
+    marginLeft: SPACING.lg,
+    ...SHADOWS.medium,
+  },
+  content: {
+    flex: 1,
+    marginTop: -SPACING.lg,
+    borderTopLeftRadius: RADIUS.xl,
+    borderTopRightRadius: RADIUS.xl,
+    backgroundColor: COLORS.background,
+    paddingTop: SPACING.lg,
   },
   statusCard: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'space-between',
-    margin: 16,
-    padding: 20,
-    borderRadius: 16,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+    padding: SPACING.xl,
+    borderRadius: RADIUS.lg,
+    ...SHADOWS.medium,
   },
   statusOnline: {
-    backgroundColor: '#66BB6A',
+    backgroundColor: COLORS.success,
   },
   statusOffline: {
-    backgroundColor: '#9E9E9E',
+    backgroundColor: COLORS.secondary,
   },
   statusContent: {
+    flex: 1,
     alignItems: 'flex-end',
   },
   statusLabel: {
-    fontSize: 14,
+    fontSize: 13,
     color: 'rgba(255,255,255,0.8)',
   },
   statusText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: COLORS.textWhite,
+    marginTop: 4,
+  },
+  statusHint: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.7)',
+    marginTop: 4,
+  },
+  statusIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  statusIconOnline: {
+    backgroundColor: 'rgba(255,255,255,0.3)',
   },
   statsGrid: {
     flexDirection: 'row',
-    paddingHorizontal: 8,
+    paddingHorizontal: SPACING.md,
+    marginBottom: SPACING.lg,
   },
   statCard: {
     flex: 1,
-    padding: 8,
+    paddingHorizontal: SPACING.xs,
   },
-  statCardInner: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
+  statCardGradient: {
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
     alignItems: 'center',
+    ...SHADOWS.small,
+  },
+  statIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFCCBC',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
   },
   statValue: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#333',
-    marginTop: 8,
+    color: COLORS.textPrimary,
   },
   statLabel: {
     fontSize: 11,
-    color: '#666',
+    color: COLORS.textSecondary,
     marginTop: 4,
     textAlign: 'center',
   },
-  infoCard: {
-    backgroundColor: '#fff',
-    margin: 16,
-    borderRadius: 16,
-    padding: 16,
+  earningsCard: {
+    backgroundColor: COLORS.surface,
+    marginHorizontal: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xl,
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+    ...SHADOWS.small,
   },
-  infoTitle: {
+  earningsHeader: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: SPACING.sm,
+    marginBottom: SPACING.md,
+  },
+  earningsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+  },
+  earningsAmount: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+  },
+  earningsHint: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    marginTop: SPACING.sm,
+  },
+  tipsCard: {
+    backgroundColor: COLORS.surface,
+    marginHorizontal: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xl,
+    ...SHADOWS.small,
+  },
+  tipsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textPrimary,
     textAlign: 'right',
-    marginBottom: 16,
+    marginBottom: SPACING.lg,
+  },
+  tipsList: {
+    gap: SPACING.md,
   },
   tipRow: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 12,
+    gap: SPACING.md,
+  },
+  tipBullet: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: COLORS.success,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   tipText: {
     fontSize: 14,
-    color: '#333',
+    color: COLORS.textPrimary,
     flex: 1,
     textAlign: 'right',
   },
