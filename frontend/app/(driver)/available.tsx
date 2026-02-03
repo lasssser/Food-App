@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,18 +7,24 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-  Alert,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { driverAPI } from '../../src/services/api';
 import { Order } from '../../src/types';
+import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 export default function AvailableOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [accepting, setAccepting] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const fetchOrders = async () => {
     try {
@@ -35,7 +41,8 @@ export default function AvailableOrders() {
   useFocusEffect(
     useCallback(() => {
       fetchOrders();
-      const interval = setInterval(fetchOrders, 15000);
+      // Auto-refresh every 10 seconds for real-time updates
+      const interval = setInterval(fetchOrders, 10000);
       return () => clearInterval(interval);
     }, [])
   );
@@ -46,61 +53,129 @@ export default function AvailableOrders() {
   };
 
   const handleAcceptOrder = async (orderId: string) => {
+    setAccepting(orderId);
     try {
       await driverAPI.acceptOrder(orderId);
-      Alert.alert('تم', 'تم قبول الطلب');
+      setShowSuccessModal(true);
       fetchOrders();
     } catch (error: any) {
-      Alert.alert('خطأ', error.response?.data?.detail || 'فشل قبول الطلب');
+      const message = error.response?.data?.detail || 'فشل قبول الطلب';
+      setErrorMessage(message);
+      setShowErrorModal(true);
+    } finally {
+      setAccepting(null);
     }
   };
 
-  const renderOrder = ({ item: order }: { item: Order }) => (
-    <View style={styles.orderCard}>
-      <View style={styles.orderHeader}>
-        <View style={styles.restaurantInfo}>
-          <Ionicons name="restaurant" size={20} color="#FF6B35" />
-          <Text style={styles.restaurantName}>{order.restaurant_name}</Text>
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
+    
+    if (diffMinutes < 1) return 'الآن';
+    if (diffMinutes < 60) return `منذ ${diffMinutes} دقيقة`;
+    return date.toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const renderOrder = ({ item: order }: { item: Order }) => {
+    const isAccepting = accepting === order.id;
+    
+    return (
+      <View style={styles.orderCard}>
+        {/* Urgency Badge */}
+        <View style={styles.urgencyBadge}>
+          <Ionicons name="time" size={14} color={COLORS.textWhite} />
+          <Text style={styles.urgencyText}>{formatTime(order.created_at)}</Text>
         </View>
-        <Text style={styles.orderId}>طلب #{order.id.slice(0, 8)}</Text>
-      </View>
 
-      <View style={styles.addressSection}>
-        <View style={styles.addressRow}>
-          <Ionicons name="location" size={18} color="#666" />
-          <Text style={styles.addressText}>
-            {order.address.label} - {order.address.address_line}
-          </Text>
+        {/* Restaurant Info */}
+        <View style={styles.restaurantSection}>
+          <View style={styles.restaurantIcon}>
+            <Ionicons name="restaurant" size={24} color={COLORS.primary} />
+          </View>
+          <View style={styles.restaurantInfo}>
+            <Text style={styles.restaurantName}>{order.restaurant_name}</Text>
+            <Text style={styles.orderId}>طلب #{order.id.slice(0, 8)}</Text>
+          </View>
         </View>
-      </View>
 
-      <View style={styles.itemsPreview}>
-        <Text style={styles.itemsCount}>
-          {order.items.length} صنف • {order.items.reduce((sum, i) => sum + i.quantity, 0)} قطعة
-        </Text>
-      </View>
+        {/* Pickup & Delivery */}
+        <View style={styles.routeSection}>
+          <View style={styles.routePoint}>
+            <View style={[styles.routeDot, styles.pickupDot]} />
+            <View style={styles.routeInfo}>
+              <Text style={styles.routeLabel}>استلام من المطعم</Text>
+              <Text style={styles.routeAddress}>{order.restaurant_address || 'عنوان المطعم'}</Text>
+            </View>
+          </View>
+          <View style={styles.routeLine} />
+          <View style={styles.routePoint}>
+            <View style={[styles.routeDot, styles.deliveryDot]} />
+            <View style={styles.routeInfo}>
+              <Text style={styles.routeLabel}>توصيل إلى</Text>
+              <Text style={styles.routeAddress}>
+                {order.address?.label} - {order.address?.address_line}
+              </Text>
+            </View>
+          </View>
+        </View>
 
-      <View style={styles.footer}>
+        {/* Order Summary */}
+        <View style={styles.summarySection}>
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryValue}>{order.items.length}</Text>
+            <Text style={styles.summaryLabel}>أصناف</Text>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryValue}>
+              {order.items.reduce((sum, i) => sum + i.quantity, 0)}
+            </Text>
+            <Text style={styles.summaryLabel}>قطع</Text>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryItem}>
+            <Text style={[styles.summaryValue, styles.earningsValue]}>
+              {order.delivery_fee.toLocaleString()}
+            </Text>
+            <Text style={styles.summaryLabel}>ربحك (ل.س)</Text>
+          </View>
+        </View>
+
+        {/* Accept Button */}
         <TouchableOpacity
           style={styles.acceptButton}
           onPress={() => handleAcceptOrder(order.id)}
+          disabled={isAccepting}
+          activeOpacity={0.8}
         >
-          <Text style={styles.acceptButtonText}>قبول الطلب</Text>
-          <Ionicons name="checkmark" size={20} color="#fff" />
+          <LinearGradient
+            colors={[COLORS.success, '#43A047']}
+            style={styles.acceptButtonGradient}
+          >
+            {isAccepting ? (
+              <ActivityIndicator color={COLORS.textWhite} />
+            ) : (
+              <>
+                <Ionicons name="checkmark-circle" size={22} color={COLORS.textWhite} />
+                <Text style={styles.acceptButtonText}>قبول الطلب</Text>
+                <View style={styles.totalBadge}>
+                  <Text style={styles.totalBadgeText}>{order.total.toLocaleString()} ل.س</Text>
+                </View>
+              </>
+            )}
+          </LinearGradient>
         </TouchableOpacity>
-        <View style={styles.totalContainer}>
-          <Text style={styles.totalLabel}>الإجمالي</Text>
-          <Text style={styles.totalValue}>{order.total.toLocaleString()} ل.س</Text>
-        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B35" />
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingText}>جاري البحث عن طلبات...</Text>
         </View>
       </SafeAreaView>
     );
@@ -108,26 +183,85 @@ export default function AvailableOrders() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>طلبات متاحة للتوصيل</Text>
-      </View>
+      {/* Header */}
+      <LinearGradient colors={[COLORS.primary, COLORS.primaryDark]} style={styles.header}>
+        <View style={styles.headerContent}>
+          <View style={styles.headerInfo}>
+            <Text style={styles.headerTitle}>طلبات متاحة</Text>
+            <Text style={styles.headerSubtitle}>
+              {orders.length > 0 ? `${orders.length} طلبات جاهزة للتوصيل` : 'لا توجد طلبات حالياً'}
+            </Text>
+          </View>
+          <View style={styles.liveIndicator}>
+            <View style={styles.liveDot} />
+            <Text style={styles.liveText}>مباشر</Text>
+          </View>
+        </View>
+      </LinearGradient>
 
+      {/* Orders List */}
       <FlatList
         data={orders}
         keyExtractor={(item) => item.id}
         renderItem={renderOrder}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF6B35']} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="bicycle-outline" size={60} color="#ccc" />
-            <Text style={styles.emptyText}>لا توجد طلبات متاحة حالياً</Text>
-            <Text style={styles.emptySubtext}>تأكد من أنك متصل</Text>
+            <View style={styles.emptyIconContainer}>
+              <Ionicons name="bicycle" size={50} color={COLORS.textLight} />
+            </View>
+            <Text style={styles.emptyTitle}>لا توجد طلبات متاحة</Text>
+            <Text style={styles.emptySubtitle}>
+              سيتم إشعارك فور توفر طلبات جديدة في منطقتك
+            </Text>
+            <TouchableOpacity style={styles.refreshButton} onPress={onRefresh}>
+              <Ionicons name="refresh" size={20} color={COLORS.primary} />
+              <Text style={styles.refreshButtonText}>تحديث</Text>
+            </TouchableOpacity>
           </View>
         }
       />
+
+      {/* Success Modal */}
+      <Modal visible={showSuccessModal} animationType="fade" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.successIcon}>
+              <Ionicons name="checkmark" size={40} color={COLORS.textWhite} />
+            </View>
+            <Text style={styles.modalTitle}>تم قبول الطلب! 🎉</Text>
+            <Text style={styles.modalMessage}>توجه للمطعم لاستلام الطلب</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setShowSuccessModal(false)}
+            >
+              <Text style={styles.modalButtonText}>حسناً</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Error Modal */}
+      <Modal visible={showErrorModal} animationType="fade" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={[styles.successIcon, { backgroundColor: COLORS.error }]}>
+              <Ionicons name="close" size={40} color={COLORS.textWhite} />
+            </View>
+            <Text style={styles.modalTitle}>لم يتم قبول الطلب</Text>
+            <Text style={styles.modalMessage}>{errorMessage}</Text>
+            <TouchableOpacity
+              style={[styles.modalButton, { backgroundColor: COLORS.error }]}
+              onPress={() => setShowErrorModal(false)}
+            >
+              <Text style={styles.modalButtonText}>حسناً</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -135,128 +269,307 @@ export default function AvailableOrders() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: COLORS.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-  },
-  listContent: {
-    padding: 16,
-  },
-  orderCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  orderHeader: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  restaurantInfo: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 8,
-  },
-  restaurantName: {
+  loadingText: {
+    marginTop: SPACING.md,
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textSecondary,
   },
-  orderId: {
-    fontSize: 12,
-    color: '#999',
+  header: {
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.xl,
+    paddingTop: SPACING.xxl,
   },
-  addressSection: {
-    marginBottom: 12,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  addressRow: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 8,
-  },
-  addressText: {
-    fontSize: 14,
-    color: '#666',
-    flex: 1,
-    textAlign: 'right',
-  },
-  itemsPreview: {
-    marginBottom: 12,
-  },
-  itemsCount: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'right',
-  },
-  footer: {
+  headerContent: {
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  totalContainer: {
+  headerInfo: {
     alignItems: 'flex-end',
   },
-  totalLabel: {
-    fontSize: 12,
-    color: '#666',
-  },
-  totalValue: {
-    fontSize: 18,
+  headerTitle: {
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#FF6B35',
+    color: COLORS.textWhite,
   },
-  acceptButton: {
+  headerSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+    marginTop: 4,
+  },
+  liveIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.full,
+    gap: 6,
+  },
+  liveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#4CAF50',
+  },
+  liveText: {
+    color: COLORS.textWhite,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  listContent: {
+    padding: SPACING.lg,
+    paddingBottom: SPACING.xxxl,
+  },
+  orderCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
+    marginBottom: SPACING.lg,
+    ...SHADOWS.medium,
+  },
+  urgencyBadge: {
+    position: 'absolute',
+    top: SPACING.md,
+    left: SPACING.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.warning,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 4,
+    borderRadius: RADIUS.sm,
+    gap: 4,
+  },
+  urgencyText: {
+    color: COLORS.textWhite,
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  restaurantSection: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    backgroundColor: '#66BB6A',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    gap: 8,
+    marginBottom: SPACING.lg,
+    paddingTop: SPACING.sm,
+  },
+  restaurantIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: `${COLORS.primary}15`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: SPACING.md,
+  },
+  restaurantInfo: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  restaurantName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  orderId: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  routeSection: {
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.md,
+    padding: SPACING.md,
+    marginBottom: SPACING.md,
+  },
+  routePoint: {
+    flexDirection: 'row-reverse',
+    alignItems: 'flex-start',
+  },
+  routeDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginLeft: SPACING.md,
+    marginTop: 4,
+  },
+  pickupDot: {
+    backgroundColor: COLORS.primary,
+  },
+  deliveryDot: {
+    backgroundColor: COLORS.success,
+  },
+  routeInfo: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  routeLabel: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+  },
+  routeAddress: {
+    fontSize: 14,
+    color: COLORS.textPrimary,
+    marginTop: 2,
+    textAlign: 'right',
+  },
+  routeLine: {
+    width: 2,
+    height: 20,
+    backgroundColor: COLORS.border,
+    marginRight: 5,
+    marginVertical: 4,
+    alignSelf: 'flex-end',
+  },
+  summarySection: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.md,
+    paddingVertical: SPACING.md,
+    marginBottom: SPACING.md,
+  },
+  summaryItem: {
+    alignItems: 'center',
+  },
+  summaryValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  summaryLabel: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  summaryDivider: {
+    width: 1,
+    backgroundColor: COLORS.border,
+  },
+  earningsValue: {
+    color: COLORS.success,
+  },
+  acceptButton: {
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
+  },
+  acceptButtonGradient: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.lg,
+    gap: SPACING.sm,
   },
   acceptButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: COLORS.textWhite,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  totalBadge: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 4,
+    borderRadius: RADIUS.sm,
+    marginRight: SPACING.sm,
+  },
+  totalBadgeText: {
+    color: COLORS.textWhite,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   emptyContainer: {
     alignItems: 'center',
     paddingTop: 60,
   },
-  emptyText: {
-    fontSize: 16,
-    color: '#999',
-    marginTop: 12,
+  emptyIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: COLORS.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+    ...SHADOWS.small,
   },
-  emptySubtext: {
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  emptySubtitle: {
     fontSize: 14,
-    color: '#ccc',
-    marginTop: 4,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginTop: SPACING.sm,
+    paddingHorizontal: SPACING.xl,
+  },
+  refreshButton: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: SPACING.sm,
+    marginTop: SPACING.xl,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
+    backgroundColor: `${COLORS.primary}15`,
+    borderRadius: RADIUS.md,
+  },
+  refreshButtonText: {
+    color: COLORS.primary,
+    fontWeight: '600',
+    fontSize: 16,
+  },
+
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: COLORS.overlay,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.xl,
+  },
+  modalContent: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xl,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 320,
+  },
+  successIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: COLORS.success,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  modalMessage: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginTop: SPACING.sm,
+  },
+  modalButton: {
+    backgroundColor: COLORS.success,
+    paddingHorizontal: SPACING.xxl,
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.md,
+    marginTop: SPACING.xl,
+  },
+  modalButtonText: {
+    color: COLORS.textWhite,
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
