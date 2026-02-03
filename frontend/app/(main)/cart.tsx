@@ -165,20 +165,45 @@ export default function CartScreen() {
           <Text style={styles.totalValue}>{total.toLocaleString()} ل.س</Text>
         </View>
 
-        {/* Checkout Button */}
-        <TouchableOpacity
-          style={styles.checkoutButton}
-          onPress={() => router.push('/(main)/checkout')}
-          activeOpacity={0.9}
-        >
-          <LinearGradient
-            colors={[COLORS.primary, COLORS.primaryDark]}
-            style={styles.checkoutButtonGradient}
+        {/* Checkout Button - Show login prompt for guests */}
+        {isGuest ? (
+          <TouchableOpacity
+            style={styles.checkoutButton}
+            onPress={() => {
+              Alert.alert(
+                'تسجيل الدخول مطلوب',
+                'يرجى تسجيل الدخول أو إنشاء حساب لإتمام الطلب',
+                [
+                  { text: 'إلغاء', style: 'cancel' },
+                  { text: 'تسجيل الدخول', onPress: () => router.push('/(auth)/login') },
+                ]
+              );
+            }}
+            activeOpacity={0.9}
           >
-            <Ionicons name="cart-outline" size={24} color={COLORS.textWhite} />
-            <Text style={styles.checkoutButtonText}>اطلب الآن 🔥</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+            <LinearGradient
+              colors={[COLORS.primary, COLORS.primaryDark]}
+              style={styles.checkoutButtonGradient}
+            >
+              <Ionicons name="log-in-outline" size={24} color={COLORS.textWhite} />
+              <Text style={styles.checkoutButtonText}>سجل دخولك للطلب</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.checkoutButton}
+            onPress={() => router.push('/(main)/checkout')}
+            activeOpacity={0.9}
+          >
+            <LinearGradient
+              colors={[COLORS.primary, COLORS.primaryDark]}
+              style={styles.checkoutButtonGradient}
+            >
+              <Ionicons name="cart-outline" size={24} color={COLORS.textWhite} />
+              <Text style={styles.checkoutButtonText}>اطلب الآن 🔥</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
