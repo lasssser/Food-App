@@ -384,4 +384,77 @@ export const seedAPI = {
   },
 };
 
+// Admin API
+export const adminAPI = {
+  getStats: async () => {
+    const response = await api.get('/admin/stats');
+    return response.data;
+  },
+  getUsers: async (role?: string, search?: string, page: number = 1, limit: number = 20) => {
+    const params = new URLSearchParams();
+    if (role) params.append('role', role);
+    if (search) params.append('search', search);
+    params.append('page', page.toString());
+    params.append('limit', limit.toString());
+    const response = await api.get(`/admin/users?${params.toString()}`);
+    return response.data;
+  },
+  getUserDetails: async (userId: string) => {
+    const response = await api.get(`/admin/users/${userId}`);
+    return response.data;
+  },
+  updateUserStatus: async (userId: string, isActive: boolean) => {
+    const response = await api.put(`/admin/users/${userId}/status`, { is_active: isActive });
+    return response.data;
+  },
+  getRestaurants: async (status?: string, page: number = 1, limit: number = 20) => {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    params.append('page', page.toString());
+    params.append('limit', limit.toString());
+    const response = await api.get(`/admin/restaurants?${params.toString()}`);
+    return response.data;
+  },
+  approveRestaurant: async (restaurantId: string, approved: boolean) => {
+    const response = await api.put(`/admin/restaurants/${restaurantId}/approve`, { approved });
+    return response.data;
+  },
+  getDrivers: async (status?: string, page: number = 1, limit: number = 20) => {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    params.append('page', page.toString());
+    params.append('limit', limit.toString());
+    const response = await api.get(`/admin/drivers?${params.toString()}`);
+    return response.data;
+  },
+  approveDriver: async (driverId: string, approved: boolean) => {
+    const response = await api.put(`/admin/drivers/${driverId}/approve`, { approved });
+    return response.data;
+  },
+  getComplaints: async (status?: string, page: number = 1, limit: number = 20) => {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    params.append('page', page.toString());
+    params.append('limit', limit.toString());
+    const response = await api.get(`/admin/complaints?${params.toString()}`);
+    return response.data;
+  },
+  getComplaintDetails: async (complaintId: string) => {
+    const response = await api.get(`/admin/complaints/${complaintId}`);
+    return response.data;
+  },
+  respondToComplaint: async (complaintId: string, response: string, status: string) => {
+    const res = await api.put(`/admin/complaints/${complaintId}/respond`, { response, status });
+    return res.data;
+  },
+  getOrders: async (status?: string, page: number = 1, limit: number = 20) => {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    params.append('page', page.toString());
+    params.append('limit', limit.toString());
+    const response = await api.get(`/admin/orders?${params.toString()}`);
+    return response.data;
+  },
+};
+
 export default api;
