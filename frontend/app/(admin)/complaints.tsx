@@ -124,7 +124,7 @@ export default function AdminComplaints() {
         </View>
 
         <Text style={styles.complaintDescription} numberOfLines={2}>
-          {item.description}
+          {item.message}
         </Text>
 
         <View style={styles.complaintFooter}>
