@@ -72,11 +72,17 @@ export default function MyOrders() {
   const [updating, setUpdating] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
+  const [historyOrders, setHistoryOrders] = useState<Order[]>([]);
 
   const fetchOrders = async () => {
     try {
-      const data = await driverAPI.getMyOrders();
-      setOrders(data);
+      const [activeData, historyData] = await Promise.all([
+        driverAPI.getMyOrders(),
+        driverAPI.getHistory(),
+      ]);
+      setOrders(activeData);
+      setHistoryOrders(historyData);
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
