@@ -157,9 +157,6 @@ export default function MyOrders() {
     const action = ACTION_CONFIG[order.order_status];
     const isUpdating = updating === order.id;
 
-    // Debug log
-    console.log('Order status:', order.order_status, 'Action:', action);
-
     return (
       <View style={styles.orderCard}>
         {/* Status Header */}
