@@ -272,8 +272,8 @@ export const restaurantPanelAPI = {
     return response.data;
   },
   // Platform Drivers
-  getPlatformDrivers: async () => {
-    const response = await api.get('/restaurant/platform-drivers');
+  getPlatformDrivers: async (sortBy: string = 'distance') => {
+    const response = await api.get(`/restaurant/platform-drivers?sort_by=${sortBy}`);
     return response.data;
   },
   // Order Driver Assignment
@@ -283,6 +283,11 @@ export const restaurantPanelAPI = {
   },
   changeDriver: async (orderId: string) => {
     const response = await api.post(`/restaurant/orders/${orderId}/change-driver`);
+    return response.data;
+  },
+  // Reports
+  getReports: async (period: string = 'week') => {
+    const response = await api.get(`/restaurant/reports?period=${period}`);
     return response.data;
   },
 };
