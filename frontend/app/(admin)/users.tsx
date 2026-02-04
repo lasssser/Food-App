@@ -474,6 +474,15 @@ export default function AdminUsers() {
                   </TouchableOpacity>
 
                   <TouchableOpacity
+                    style={[styles.actionBtn, { backgroundColor: '#dbeafe', borderColor: '#3b82f6', borderWidth: 1 }]}
+                    onPress={() => openRoleModal(selectedUser)}
+                    disabled={actionLoading}
+                  >
+                    <Ionicons name="swap-horizontal" size={20} color="#3b82f6" />
+                    <Text style={[styles.actionBtnText, { color: '#3b82f6' }]}>تغيير الدور</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
                     style={[styles.actionBtn, { backgroundColor: '#fee2e2', borderColor: '#ef4444', borderWidth: 1 }]}
                     onPress={openDeleteModal}
                     disabled={actionLoading}
