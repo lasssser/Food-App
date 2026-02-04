@@ -614,6 +614,53 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
+  // Chart Styles
+  chartTabs: {
+    flexDirection: 'row-reverse',
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.md,
+    padding: 4,
+    marginBottom: SPACING.md,
+  },
+  chartTab: {
+    flex: 1,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.sm,
+    gap: SPACING.sm,
+  },
+  chartTabActive: {
+    backgroundColor: COLORS.surface,
+  },
+  chartTabText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  chartTabTextActive: {
+    color: COLORS.primary,
+    fontWeight: '600',
+  },
+  chartCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
+    alignItems: 'center',
+    ...SHADOWS.small,
+  },
+  chart: {
+    borderRadius: RADIUS.md,
+  },
+  pieChartContainer: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
+    marginBottom: SPACING.md,
+    alignItems: 'center',
+    ...SHADOWS.small,
+  },
+
   // Summary Grid
   summaryGrid: {
     flexDirection: 'row',
