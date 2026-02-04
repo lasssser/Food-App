@@ -925,6 +925,95 @@ async def get_restaurant_stats(current_user: dict = Depends(get_current_user)):
 
 # ==================== Restaurant Drivers Management ====================
 
+@api_router.get("/restaurant/platform-drivers")
+async def get_available_platform_drivers(current_user: dict = Depends(get_current_user)):
+    """Get available platform drivers for the restaurant's city"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    # Get online platform drivers
+    # In a real system, we'd filter by location/city
+    drivers = await db.users.find({
+        "role": "driver",
+        "is_online": True
+    }).to_list(20)
+    
+    result = []
+    for driver in drivers:
+        # Get driver stats
+        completed_orders = await db.orders.count_documents({
+            "driver_id": driver["id"],
+            "order_status": "delivered"
+        })
+        
+        result.append({
+            "id": driver["id"],
+            "name": driver.get("name", "سائق"),
+            "phone": driver.get("phone", ""),
+            "is_online": driver.get("is_online", False),
+            "total_deliveries": completed_orders,
+            "rating": 4.5,  # TODO: Calculate from ratings
+            "current_orders": await db.orders.count_documents({
+                "driver_id": driver["id"],
+                "order_status": {"$in": ["assigned", "picked_up", "out_for_delivery"]}
+            })
+        })
+    
+    # Sort by availability (fewer current orders first)
+    result.sort(key=lambda x: x["current_orders"])
+    
+    return result
+
+@api_router.post("/restaurant/orders/{order_id}/change-driver")
+async def change_order_driver(order_id: str, current_user: dict = Depends(get_current_user)):
+    """Remove current driver assignment so a new one can be assigned"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    order = await db.orders.find_one({"id": order_id, "restaurant_id": restaurant["id"]})
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    # Can only change driver if order is not yet picked up
+    if order.get("order_status") in ["picked_up", "out_for_delivery", "delivered"]:
+        raise HTTPException(status_code=400, detail="لا يمكن تغيير السائق بعد استلام الطلب")
+    
+    # Notify current driver if platform driver
+    old_driver_id = order.get("driver_id")
+    old_driver_type = order.get("driver_type")
+    
+    if old_driver_id and old_driver_type == "platform_driver":
+        await create_notification(
+            old_driver_id,
+            "تم إلغاء تعيينك",
+            f"تم إلغاء تعيينك على الطلب #{order_id[:8]}",
+            "order_update",
+            {"order_id": order_id}
+        )
+    
+    # Reset driver assignment
+    await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {
+            "driver_id": None,
+            "driver_type": None,
+            "driver_name": None,
+            "driver_phone": None,
+            "order_status": "ready",
+            "updated_at": datetime.utcnow()
+        }}
+    )
+    
+    return {"message": "تم إلغاء تعيين السائق، يمكنك تعيين سائق جديد"}
+
 @api_router.get("/restaurant/drivers")
 async def get_restaurant_drivers(current_user: dict = Depends(get_current_user)):
     """Get restaurant's own drivers (without app)"""
