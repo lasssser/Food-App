@@ -2883,10 +2883,13 @@ async def update_user_info(
     
     return {"message": "تم تحديث بيانات المستخدم بنجاح"}
 
+class ResetPasswordRequest(BaseModel):
+    new_password: str
+
 @api_router.put("/admin/users/{user_id}/reset-password")
 async def reset_user_password(
     user_id: str,
-    new_password: str,
+    request: ResetPasswordRequest,
     admin: dict = Depends(require_admin)
 ):
     """Reset user password (admin)"""
@@ -2898,10 +2901,10 @@ async def reset_user_password(
     if user.get("role") == "admin":
         raise HTTPException(status_code=403, detail="لا يمكن إعادة تعيين كلمة مرور المدير")
     
-    if len(new_password) < 6:
+    if len(request.new_password) < 6:
         raise HTTPException(status_code=400, detail="كلمة المرور يجب أن تكون 6 أحرف على الأقل")
     
-    hashed = hash_password(new_password)
+    hashed = hash_password(request.new_password)
     await db.users.update_one(
         {"id": user_id},
         {"$set": {"password_hash": hashed, "updated_at": datetime.utcnow()}}
