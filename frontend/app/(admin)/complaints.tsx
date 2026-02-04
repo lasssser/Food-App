@@ -26,7 +26,8 @@ interface Complaint {
   user_name?: string;
   order_id?: string;
   subject: string;
-  description: string;
+  message: string;
+  type?: string;
   status: string;
   admin_response?: string;
   created_at: string;
