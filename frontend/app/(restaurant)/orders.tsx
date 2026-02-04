@@ -95,8 +95,12 @@ export default function RestaurantOrders() {
 
   const fetchDrivers = async () => {
     try {
-      const data = await restaurantPanelAPI.getDrivers();
-      setDrivers(data);
+      const [myDrivers, platformDriversData] = await Promise.all([
+        restaurantPanelAPI.getDrivers(),
+        restaurantPanelAPI.getPlatformDrivers(),
+      ]);
+      setDrivers(myDrivers);
+      setPlatformDrivers(platformDriversData);
     } catch (error) {
       console.error('Error fetching drivers:', error);
     }
