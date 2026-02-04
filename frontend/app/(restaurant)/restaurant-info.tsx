@@ -166,6 +166,7 @@ export default function RestaurantInfoEdit() {
     } catch (error) {
       console.error('Error picking image:', error);
       Alert.alert('خطأ', 'فشل في اختيار الصورة');
+    } finally {
       setUploadingImage(false);
     }
   };
