@@ -925,9 +925,27 @@ async def get_restaurant_stats(current_user: dict = Depends(get_current_user)):
 
 # ==================== Restaurant Drivers Management ====================
 
+def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Calculate distance between two points using Haversine formula (in km)"""
+    import math
+    R = 6371  # Earth's radius in km
+    
+    lat1_rad = math.radians(lat1)
+    lat2_rad = math.radians(lat2)
+    delta_lat = math.radians(lat2 - lat1)
+    delta_lon = math.radians(lon2 - lon1)
+    
+    a = math.sin(delta_lat/2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(delta_lon/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    
+    return R * c
+
 @api_router.get("/restaurant/platform-drivers")
-async def get_available_platform_drivers(current_user: dict = Depends(get_current_user)):
-    """Get available platform drivers for the restaurant's city"""
+async def get_available_platform_drivers(
+    sort_by: str = "distance",  # distance, rating, availability
+    current_user: dict = Depends(get_current_user)
+):
+    """Get available platform drivers for the restaurant's city, sorted by preference"""
     if current_user.get("role") != "restaurant":
         raise HTTPException(status_code=403, detail="غير مصرح")
     
@@ -935,8 +953,11 @@ async def get_available_platform_drivers(current_user: dict = Depends(get_curren
     if not restaurant:
         raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
     
+    # Get restaurant location
+    rest_lat = restaurant.get("lat", 33.5138)  # Default Damascus
+    rest_lng = restaurant.get("lng", 36.2765)
+    
     # Get online platform drivers
-    # In a real system, we'd filter by location/city
     drivers = await db.users.find({
         "role": "driver",
         "is_online": True
@@ -950,21 +971,42 @@ async def get_available_platform_drivers(current_user: dict = Depends(get_curren
             "order_status": "delivered"
         })
         
+        # Get driver's average rating
+        ratings = await db.ratings.find({"driver_id": driver["id"]}).to_list(100)
+        avg_rating = sum(r.get("rating", 5) for r in ratings) / len(ratings) if ratings else 4.5
+        
+        # Calculate distance from restaurant
+        driver_lat = driver.get("last_lat", rest_lat + 0.01)  # Default nearby
+        driver_lng = driver.get("last_lng", rest_lng + 0.01)
+        distance = calculate_distance(rest_lat, rest_lng, driver_lat, driver_lng)
+        
+        current_orders_count = await db.orders.count_documents({
+            "driver_id": driver["id"],
+            "order_status": {"$in": ["driver_assigned", "picked_up", "out_for_delivery"]}
+        })
+        
         result.append({
             "id": driver["id"],
             "name": driver.get("name", "سائق"),
             "phone": driver.get("phone", ""),
             "is_online": driver.get("is_online", False),
             "total_deliveries": completed_orders,
-            "rating": 4.5,  # TODO: Calculate from ratings
-            "current_orders": await db.orders.count_documents({
-                "driver_id": driver["id"],
-                "order_status": {"$in": ["assigned", "picked_up", "out_for_delivery"]}
-            })
+            "rating": round(avg_rating, 1),
+            "current_orders": current_orders_count,
+            "distance_km": round(distance, 1),
+            "estimated_time": f"{int(distance * 3 + 5)} دقيقة"  # Rough estimate
         })
     
-    # Sort by availability (fewer current orders first)
-    result.sort(key=lambda x: x["current_orders"])
+    # Sort based on preference
+    if sort_by == "distance":
+        result.sort(key=lambda x: x["distance_km"])
+    elif sort_by == "rating":
+        result.sort(key=lambda x: -x["rating"])
+    elif sort_by == "availability":
+        result.sort(key=lambda x: x["current_orders"])
+    else:
+        # Default: combination of distance and availability
+        result.sort(key=lambda x: (x["current_orders"], x["distance_km"]))
     
     return result
 
