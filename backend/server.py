@@ -1739,6 +1739,75 @@ async def mark_all_notifications_read(current_user: dict = Depends(get_current_u
     )
     return {"message": "تم تحديث جميع الإشعارات"}
 
+# ==================== Push Token Routes ====================
+
+@api_router.post("/notifications/register-push-token")
+async def register_push_token(data: PushTokenRegister, current_user: dict = Depends(get_current_user)):
+    """Register or update Expo push token for the current user"""
+    user_id = current_user["id"]
+    
+    # Check if token already exists for this user
+    existing = await db.push_tokens.find_one({
+        "user_id": user_id,
+        "token": data.push_token
+    })
+    
+    if existing:
+        # Update existing token
+        await db.push_tokens.update_one(
+            {"_id": existing["_id"]},
+            {"$set": {
+                "is_active": True,
+                "last_used": datetime.utcnow()
+            }}
+        )
+        return {"message": "Token updated successfully"}
+    
+    # Deactivate old tokens for this user on same platform
+    await db.push_tokens.update_many(
+        {"user_id": user_id, "platform": data.platform},
+        {"$set": {"is_active": False}}
+    )
+    
+    # Create new token record
+    push_token = PushToken(
+        user_id=user_id,
+        token=data.push_token,
+        platform=data.platform
+    )
+    await db.push_tokens.insert_one(push_token.dict())
+    
+    logger.info(f"Push token registered for user {user_id}: {data.push_token[:20]}...")
+    return {"message": "Token registered successfully"}
+
+@api_router.delete("/notifications/push-token")
+async def unregister_push_token(current_user: dict = Depends(get_current_user)):
+    """Unregister all push tokens for the current user (logout)"""
+    user_id = current_user["id"]
+    
+    # Deactivate all tokens for this user
+    result = await db.push_tokens.update_many(
+        {"user_id": user_id},
+        {"$set": {"is_active": False}}
+    )
+    
+    logger.info(f"Deactivated {result.modified_count} push tokens for user {user_id}")
+    return {"message": "Tokens deactivated successfully", "count": result.modified_count}
+
+@api_router.post("/notifications/test-push")
+async def test_push_notification(current_user: dict = Depends(get_current_user)):
+    """Send a test push notification to the current user"""
+    title = "🔔 إشعار تجريبي"
+    body = "هذا إشعار تجريبي من يلا ناكل؟"
+    data = {"type": "test", "timestamp": datetime.utcnow().isoformat()}
+    
+    results = await send_push_to_user(current_user["id"], title, body, data)
+    
+    if not results:
+        raise HTTPException(status_code=404, detail="لا توجد أجهزة مسجلة لهذا المستخدم")
+    
+    return {"message": "تم إرسال الإشعار التجريبي", "results": results}
+
 # ==================== Seed Data ====================
 
 @api_router.post("/seed")
