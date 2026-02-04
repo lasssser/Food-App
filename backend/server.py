@@ -1697,6 +1697,7 @@ async def create_rating(rating_data: RatingCreate, current_user: dict = Depends(
         "id": str(uuid.uuid4()),
         "order_id": rating_data.order_id,
         "user_id": current_user["id"],
+        "user_name": current_user.get("name", "زبون"),
         "restaurant_id": order["restaurant_id"],
         "driver_id": order.get("driver_id"),
         "restaurant_rating": rating_data.restaurant_rating,
@@ -1714,7 +1715,54 @@ async def create_rating(rating_data: RatingCreate, current_user: dict = Depends(
         {"$set": {"rating": round(avg_rating, 1), "review_count": len(ratings)}}
     )
     
+    # Send notification to restaurant
+    await create_notification(
+        order["restaurant_id"],
+        "تقييم جديد ⭐",
+        f"حصلت على تقييم {rating_data.restaurant_rating} نجوم",
+        "rating",
+        {"rating": rating_data.restaurant_rating, "order_id": rating_data.order_id}
+    )
+    
     return {"message": "شكراً على تقييمك!"}
+
+@api_router.get("/ratings/restaurant/{restaurant_id}")
+async def get_restaurant_ratings(restaurant_id: str, limit: int = 20):
+    """Get ratings for a restaurant"""
+    ratings = await db.ratings.find(
+        {"restaurant_id": restaurant_id}
+    ).sort("created_at", -1).to_list(limit)
+    
+    result = []
+    for r in ratings:
+        if "_id" in r:
+            r["_id"] = str(r["_id"])
+        result.append(r)
+    return result
+
+@api_router.get("/ratings/my-ratings")
+async def get_my_ratings(current_user: dict = Depends(get_current_user)):
+    """Get current user's ratings"""
+    ratings = await db.ratings.find(
+        {"user_id": current_user["id"]}
+    ).sort("created_at", -1).to_list(50)
+    
+    result = []
+    for r in ratings:
+        if "_id" in r:
+            r["_id"] = str(r["_id"])
+        result.append(r)
+    return result
+
+@api_router.get("/ratings/order/{order_id}")
+async def get_order_rating(order_id: str, current_user: dict = Depends(get_current_user)):
+    """Check if order has been rated"""
+    rating = await db.ratings.find_one({"order_id": order_id})
+    if rating:
+        if "_id" in rating:
+            rating["_id"] = str(rating["_id"])
+        return {"rated": True, "rating": rating}
+    return {"rated": False, "rating": None}
 
 # ==================== Notifications Routes ====================
 
