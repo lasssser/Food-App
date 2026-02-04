@@ -213,7 +213,7 @@ export default function AdminUsers() {
   };
 
   const openRoleModal = (user: User) => {
-    setSelectedNewRole(user.role || 'customer');
+    setNewUserRole(user.role || 'customer');
     setShowUserModal(false);
     setShowRoleModal(true);
   };
