@@ -596,6 +596,54 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     marginBottom: SPACING.lg,
   },
+
+  // Image Styles
+  imageContainer: {
+    width: '100%',
+    height: 200,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
+    backgroundColor: COLORS.background,
+    position: 'relative',
+  },
+  restaurantImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  imagePlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: COLORS.divider,
+    borderStyle: 'dashed',
+    borderRadius: RADIUS.lg,
+  },
+  imagePlaceholderText: {
+    fontSize: 14,
+    color: COLORS.textLight,
+    marginTop: SPACING.sm,
+  },
+  imageOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editImageBadge: {
+    position: 'absolute',
+    bottom: SPACING.md,
+    right: SPACING.md,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.small,
+  },
+
   inputGroup: {
     marginBottom: SPACING.lg,
   },
