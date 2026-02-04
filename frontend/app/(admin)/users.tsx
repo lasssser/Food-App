@@ -557,6 +557,49 @@ export default function AdminUsers() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        visible={showDeleteModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowDeleteModal(false)}
+      >
+        <View style={styles.deleteModalOverlay}>
+          <View style={styles.deleteModalContent}>
+            <View style={styles.deleteIconContainer}>
+              <Ionicons name="warning" size={48} color="#ef4444" />
+            </View>
+            <Text style={styles.deleteModalTitle}>تأكيد الحذف</Text>
+            <Text style={styles.deleteModalText}>
+              هل أنت متأكد من حذف حساب "{selectedUser?.name}"؟
+            </Text>
+            <Text style={styles.deleteModalWarning}>
+              هذا الإجراء لا يمكن التراجع عنه!
+            </Text>
+            <View style={styles.deleteModalButtons}>
+              <TouchableOpacity
+                style={styles.cancelDeleteBtn}
+                onPress={() => setShowDeleteModal(false)}
+                disabled={actionLoading}
+              >
+                <Text style={styles.cancelDeleteBtnText}>إلغاء</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.confirmDeleteBtn}
+                onPress={handleDeleteUser}
+                disabled={actionLoading}
+              >
+                {actionLoading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.confirmDeleteBtnText}>نعم، احذف</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
