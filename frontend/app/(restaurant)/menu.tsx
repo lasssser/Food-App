@@ -14,11 +14,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as ImagePicker from 'expo-image-picker';
 import { restaurantPanelAPI } from '../../src/services/api';
 import { MenuItem } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
@@ -38,6 +40,8 @@ export default function RestaurantMenu() {
   const [formPrice, setFormPrice] = useState('');
   const [formCategory, setFormCategory] = useState('');
   const [formAvailable, setFormAvailable] = useState(true);
+  const [formImage, setFormImage] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const fetchMenu = async () => {
     try {
