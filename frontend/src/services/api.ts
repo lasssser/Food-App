@@ -179,6 +179,26 @@ export const paymentAPI = {
   },
 };
 
+// Ratings API
+export const ratingAPI = {
+  create: async (data: { order_id: string; restaurant_rating: number; driver_rating?: number; comment?: string }) => {
+    const response = await api.post('/ratings', data);
+    return response.data;
+  },
+  getRestaurantRatings: async (restaurantId: string, limit: number = 20) => {
+    const response = await api.get(`/ratings/restaurant/${restaurantId}?limit=${limit}`);
+    return response.data;
+  },
+  getMyRatings: async () => {
+    const response = await api.get('/ratings/my-ratings');
+    return response.data;
+  },
+  getOrderRating: async (orderId: string) => {
+    const response = await api.get(`/ratings/order/${orderId}`);
+    return response.data;
+  },
+};
+
 export const ratingAPI = {
   create: async (data: { order_id: string; restaurant_rating: number; driver_rating?: number; comment?: string }) => {
     const response = await api.post('/ratings', data);
