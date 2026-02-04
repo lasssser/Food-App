@@ -716,4 +716,38 @@ const styles = StyleSheet.create({
     color: COLORS.textWhite,
     fontWeight: '600',
   },
+
+  // Rating Button
+  rateButton: {
+    marginHorizontal: SPACING.md,
+    marginBottom: SPACING.md,
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
+  },
+  rateButtonGradient: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.md,
+    gap: SPACING.sm,
+  },
+  rateButtonText: {
+    color: COLORS.textWhite,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  ratedBadge: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: SPACING.md,
+    gap: SPACING.sm,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.divider,
+  },
+  ratedText: {
+    color: COLORS.success,
+    fontSize: 14,
+    fontWeight: '600',
+  },
 });
