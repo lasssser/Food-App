@@ -11,13 +11,15 @@ import {
   Platform,
   Switch,
   ActivityIndicator,
+  TextInput,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../src/store/authStore';
-import { restaurantPanelAPI } from '../../src/services/api';
+import { restaurantPanelAPI, complaintsAPI } from '../../src/services/api';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 interface RestaurantStats {
