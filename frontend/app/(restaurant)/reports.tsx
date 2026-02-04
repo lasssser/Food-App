@@ -806,17 +806,35 @@ const styles = StyleSheet.create({
     paddingTop: SPACING.xl,
     paddingBottom: SPACING.lg,
   },
+  headerRow: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: COLORS.textWhite,
-    textAlign: 'right',
   },
   headerSubtitle: {
     fontSize: 14,
     color: 'rgba(255,255,255,0.8)',
     textAlign: 'right',
     marginTop: 4,
+  },
+  exportButton: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.full,
+    gap: SPACING.xs,
+  },
+  exportButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.textWhite,
   },
 
   // Period Selector
