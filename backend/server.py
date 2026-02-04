@@ -2880,10 +2880,10 @@ async def update_user_info(
         update_data["name"] = request.name
     if request.phone:
         # Check if phone already exists for another user
-        existing = await db.users.find_one({"phone": phone, "id": {"$ne": user_id}})
+        existing = await db.users.find_one({"phone": request.phone, "id": {"$ne": user_id}})
         if existing:
             raise HTTPException(status_code=400, detail="رقم الهاتف مستخدم من قبل حساب آخر")
-        update_data["phone"] = phone
+        update_data["phone"] = request.phone
     
     await db.users.update_one({"id": user_id}, {"$set": update_data})
     
