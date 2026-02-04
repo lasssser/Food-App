@@ -35,10 +35,14 @@ export default function RestaurantSettings() {
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showComplaintModal, setShowComplaintModal] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [stats, setStats] = useState<RestaurantStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [complaintSubject, setComplaintSubject] = useState('');
+  const [complaintMessage, setComplaintMessage] = useState('');
+  const [submittingComplaint, setSubmittingComplaint] = useState(false);
 
   useEffect(() => {
     fetchStats();
