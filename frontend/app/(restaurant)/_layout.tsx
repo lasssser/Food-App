@@ -81,6 +81,12 @@ export default function RestaurantLayout() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="my-complaints"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
