@@ -59,6 +59,29 @@ export default function AdminSettings() {
     }, 1000);
   };
 
+  const handleClearTestData = async () => {
+    setClearingData(true);
+    try {
+      await api.delete('/admin/test-data');
+      setShowClearDataModal(false);
+      if (Platform.OS === 'web') {
+        alert('تم حذف البيانات التجريبية بنجاح!');
+      } else {
+        Alert.alert('نجاح', 'تم حذف البيانات التجريبية بنجاح!');
+      }
+    } catch (error: any) {
+      console.error('Error clearing test data:', error);
+      const msg = error.response?.data?.detail || 'فشل في حذف البيانات التجريبية';
+      if (Platform.OS === 'web') {
+        alert(msg);
+      } else {
+        Alert.alert('خطأ', msg);
+      }
+    } finally {
+      setClearingData(false);
+    }
+  };
+
   const MenuItem = ({ icon, title, subtitle, onPress, danger = false }: any) => (
     <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.menuItemContent}>
