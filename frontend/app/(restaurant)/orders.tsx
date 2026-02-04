@@ -657,15 +657,6 @@ export default function RestaurantOrders() {
                     </TouchableOpacity>
                   ))
                 )}
-                  </View>
-                  <View style={styles.platformDriverInfo}>
-                    <Text style={styles.platformDriverTitle}>طلب سائق من المنصة</Text>
-                    <Text style={styles.platformDriverDesc}>
-                      سيتم إشعار السائقين المتاحين في منطقتك
-                    </Text>
-                  </View>
-                  <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
-                </TouchableOpacity>
               </View>
             </ScrollView>
 
