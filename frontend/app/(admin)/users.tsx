@@ -148,18 +148,31 @@ export default function AdminUsers() {
   const handleResetPassword = async () => {
     if (!selectedUser) return;
     if (newPassword.length < 6) {
-      Alert.alert('خطأ', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      if (Platform.OS === 'web') {
+        alert('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      } else {
+        Alert.alert('خطأ', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      }
       return;
     }
     setActionLoading(true);
     try {
       await adminAPI.resetUserPassword(selectedUser.id, newPassword);
-      Alert.alert('نجاح', 'تم إعادة تعيين كلمة المرور');
+      if (Platform.OS === 'web') {
+        alert('تم إعادة تعيين كلمة المرور');
+      } else {
+        Alert.alert('نجاح', 'تم إعادة تعيين كلمة المرور');
+      }
       setShowPasswordModal(false);
       setNewPassword('');
     } catch (error: any) {
       console.error('Error resetting password:', error);
-      Alert.alert('خطأ', error.response?.data?.detail || 'فشل في إعادة تعيين كلمة المرور');
+      const errorMsg = error.response?.data?.detail || 'فشل في إعادة تعيين كلمة المرور';
+      if (Platform.OS === 'web') {
+        alert(errorMsg);
+      } else {
+        Alert.alert('خطأ', errorMsg);
+      }
     } finally {
       setActionLoading(false);
     }
