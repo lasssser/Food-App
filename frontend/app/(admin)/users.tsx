@@ -179,46 +179,35 @@ export default function AdminUsers() {
     }
   };
 
-  const handleDeleteUser = async (user: User) => {
-    const doDelete = async () => {
-      setActionLoading(true);
-      try {
-        await adminAPI.deleteUser(user.id);
-        if (Platform.OS === 'web') {
-          alert('تم حذف الحساب بنجاح');
-        } else {
-          Alert.alert('نجاح', 'تم حذف الحساب بنجاح');
-        }
-        setShowUserModal(false);
-        fetchUsers();
-      } catch (error: any) {
-        console.error('Error deleting user:', error);
-        const errorMsg = error.response?.data?.detail || 'فشل في حذف الحساب';
-        if (Platform.OS === 'web') {
-          alert(errorMsg);
-        } else {
-          Alert.alert('خطأ', errorMsg);
-        }
-      } finally {
-        setActionLoading(false);
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return;
+    setActionLoading(true);
+    try {
+      await adminAPI.deleteUser(selectedUser.id);
+      if (Platform.OS === 'web') {
+        alert('تم حذف الحساب بنجاح');
+      } else {
+        Alert.alert('نجاح', 'تم حذف الحساب بنجاح');
       }
-    };
-
-    if (Platform.OS === 'web') {
-      const confirmed = window.confirm(`هل أنت متأكد من حذف حساب "${user.name}"؟\nهذا الإجراء لا يمكن التراجع عنه.`);
-      if (confirmed) {
-        doDelete();
+      setShowDeleteModal(false);
+      setShowUserModal(false);
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      const errorMsg = error.response?.data?.detail || 'فشل في حذف الحساب';
+      if (Platform.OS === 'web') {
+        alert(errorMsg);
+      } else {
+        Alert.alert('خطأ', errorMsg);
       }
-    } else {
-      Alert.alert(
-        'تأكيد الحذف',
-        `هل أنت متأكد من حذف حساب "${user.name}"؟\nهذا الإجراء لا يمكن التراجع عنه.`,
-        [
-          { text: 'إلغاء', style: 'cancel' },
-          { text: 'حذف', style: 'destructive', onPress: doDelete },
-        ]
-      );
+    } finally {
+      setActionLoading(false);
     }
+  };
+
+  const openDeleteModal = () => {
+    setShowUserModal(false);
+    setShowDeleteModal(true);
   };
 
   const getRoleLabel = (role?: string) => ROLE_LABELS[role || 'customer'] || 'زبون';
