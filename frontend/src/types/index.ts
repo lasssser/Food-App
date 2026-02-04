@@ -91,6 +91,14 @@ export interface Order {
   user_id: string;
   restaurant_id: string;
   restaurant_name: string;
+  restaurant_address?: string;
+  // Driver info
+  driver_id?: string;
+  driver_name?: string;
+  driver_phone?: string;
+  driver_type?: string;
+  delivery_mode?: string;
+  // Order details
   items: OrderItem[];
   subtotal: number;
   delivery_fee: number;
