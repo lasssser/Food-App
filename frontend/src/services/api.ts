@@ -199,13 +199,6 @@ export const ratingAPI = {
   },
 };
 
-export const ratingAPI = {
-  create: async (data: { order_id: string; restaurant_rating: number; driver_rating?: number; comment?: string }) => {
-    const response = await api.post('/ratings', data);
-    return response.data;
-  },
-};
-
 // Restaurant Panel API
 export const restaurantPanelAPI = {
   getOrders: async () => {
