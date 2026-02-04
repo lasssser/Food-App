@@ -99,6 +99,7 @@ export default function RootLayout() {
         <Stack.Screen name="(main)" />
         <Stack.Screen name="(restaurant)" />
         <Stack.Screen name="(driver)" />
+        <Stack.Screen name="(admin)" />
         <Stack.Screen name="restaurant" />
       </Stack>
     </>
