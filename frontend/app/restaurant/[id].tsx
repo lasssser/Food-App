@@ -331,7 +331,72 @@ export default function RestaurantScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 120 }}
         >
-          {filteredItems.map((item) => (
+          {selectedCategory === 'التقييمات' ? (
+            // Ratings Section
+            <View style={styles.ratingsContainer}>
+              {/* Rating Summary */}
+              <View style={styles.ratingSummary}>
+                <View style={styles.ratingBigScore}>
+                  <Text style={styles.ratingBigNumber}>{restaurant?.rating.toFixed(1)}</Text>
+                  <View style={styles.ratingStarsRow}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Ionicons
+                        key={star}
+                        name={star <= Math.round(restaurant?.rating || 0) ? 'star' : 'star-outline'}
+                        size={18}
+                        color="#FFD700"
+                      />
+                    ))}
+                  </View>
+                  <Text style={styles.ratingCount}>{restaurant?.review_count} تقييم</Text>
+                </View>
+              </View>
+
+              {/* Ratings List */}
+              {ratings.length === 0 ? (
+                <View style={styles.noRatings}>
+                  <Ionicons name="chatbubble-ellipses-outline" size={50} color={COLORS.textLight} />
+                  <Text style={styles.noRatingsText}>لا توجد تقييمات بعد</Text>
+                  <Text style={styles.noRatingsSubtext}>كن أول من يقيّم هذا المطعم!</Text>
+                </View>
+              ) : (
+                ratings.map((rating) => (
+                  <View key={rating.id} style={styles.ratingCard}>
+                    <View style={styles.ratingHeader}>
+                      <View style={styles.ratingStars}>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Ionicons
+                            key={star}
+                            name={star <= rating.restaurant_rating ? 'star' : 'star-outline'}
+                            size={16}
+                            color="#FFD700"
+                          />
+                        ))}
+                      </View>
+                      <View style={styles.ratingUser}>
+                        <View style={styles.userAvatar}>
+                          <Ionicons name="person" size={16} color={COLORS.textWhite} />
+                        </View>
+                        <Text style={styles.userName}>{rating.user_name}</Text>
+                      </View>
+                    </View>
+                    {rating.comment && (
+                      <Text style={styles.ratingComment}>{rating.comment}</Text>
+                    )}
+                    <Text style={styles.ratingDate}>
+                      {new Date(rating.created_at).toLocaleDateString('ar-SY', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </Text>
+                  </View>
+                ))
+              )}
+            </View>
+          ) : (
+            // Menu Items
+            filteredItems.map((item) => (
             <View key={item.id} style={styles.menuItem}>
               <View style={styles.menuItemContent}>
                 <View style={styles.menuItemInfo}>
