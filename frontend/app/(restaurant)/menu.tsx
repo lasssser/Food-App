@@ -676,6 +676,49 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
+
+  // Image Picker Styles
+  imagePicker: {
+    width: '100%',
+    height: 150,
+    borderRadius: RADIUS.lg,
+    marginBottom: SPACING.lg,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  pickedImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  imagePickerPlaceholder: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: COLORS.divider,
+    borderStyle: 'dashed',
+    borderRadius: RADIUS.lg,
+  },
+  imagePickerText: {
+    fontSize: 14,
+    color: COLORS.textLight,
+    marginTop: SPACING.sm,
+  },
+  imagePickerBadge: {
+    position: 'absolute',
+    bottom: SPACING.sm,
+    right: SPACING.sm,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.small,
+  },
+
   modalForm: {
     padding: SPACING.lg,
   },
