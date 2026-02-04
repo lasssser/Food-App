@@ -51,6 +51,12 @@ export default function DriverLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="my-complaints"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
