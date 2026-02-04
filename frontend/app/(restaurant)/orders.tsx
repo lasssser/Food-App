@@ -344,7 +344,19 @@ export default function RestaurantOrders() {
             {/* Driver Info */}
             {hasDriver && (
               <View style={styles.driverSection}>
-                <Text style={styles.sectionTitle}>السائق المعيّن</Text>
+                <View style={styles.driverSectionHeader}>
+                  <Text style={styles.sectionTitle}>السائق المعيّن</Text>
+                  {/* Change Driver Button - only if not yet picked up */}
+                  {!['picked_up', 'out_for_delivery', 'delivered'].includes(order.order_status) && (
+                    <TouchableOpacity 
+                      style={styles.changeDriverBtn}
+                      onPress={() => handleChangeDriver(order.id)}
+                    >
+                      <Ionicons name="swap-horizontal" size={16} color={COLORS.warning} />
+                      <Text style={styles.changeDriverText}>تغيير</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
                 <View style={styles.driverCard2}>
                   <View style={styles.driverInfo}>
                     <View style={styles.driverAvatar}>
