@@ -60,7 +60,7 @@ export default function AdminUsers() {
   const [editName, setEditName] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [selectedRole, setSelectedNewRole] = useState('customer');
+  const [newUserRole, setNewUserRole] = useState('customer');
   const [actionLoading, setActionLoading] = useState(false);
 
   const fetchUsers = async () => {
