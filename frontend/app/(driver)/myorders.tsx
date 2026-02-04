@@ -213,6 +213,35 @@ export default function MyOrders() {
           </View>
         </View>
 
+        {/* Customer Info & Quick Actions */}
+        <View style={styles.customerSection}>
+          <View style={styles.customerInfo}>
+            <View style={styles.customerAvatar}>
+              <Ionicons name="person" size={20} color={COLORS.primary} />
+            </View>
+            <View style={styles.customerDetails}>
+              <Text style={styles.customerName}>{order.customer_name || 'العميل'}</Text>
+              <Text style={styles.customerPhone}>{order.customer_phone || 'لا يوجد رقم'}</Text>
+            </View>
+          </View>
+          <View style={styles.quickActions}>
+            {order.customer_phone && (
+              <TouchableOpacity
+                style={styles.quickActionBtn}
+                onPress={() => handleCallCustomer(order.customer_phone!)}
+              >
+                <Ionicons name="call" size={18} color={COLORS.success} />
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              style={styles.quickActionBtn}
+              onPress={() => handleOpenMap(order.address?.address_line || '')}
+            >
+              <Ionicons name="navigate" size={18} color={COLORS.info} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* Order Items Summary */}
         <View style={styles.itemsSection}>
           <Text style={styles.itemsTitle}>محتوى الطلب:</Text>
@@ -229,6 +258,14 @@ export default function MyOrders() {
             )}
           </View>
         </View>
+
+        {/* Order Notes */}
+        {order.notes && (
+          <View style={styles.notesSection}>
+            <Ionicons name="document-text" size={16} color={COLORS.warning} />
+            <Text style={styles.notesText}>{order.notes}</Text>
+          </View>
+        )}
 
         {/* Payment & Total */}
         <View style={styles.paymentSection}>
