@@ -13,10 +13,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
 import { restaurantPanelAPI } from '../../src/services/api';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 const { width } = Dimensions.get('window');
+const chartWidth = width - SPACING.lg * 2;
 
 interface ReportData {
   period: string;
