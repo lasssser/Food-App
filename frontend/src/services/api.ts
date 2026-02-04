@@ -415,6 +415,10 @@ export const adminAPI = {
     const response = await api.put(`/admin/users/${userId}/reset-password`, { new_password: newPassword });
     return response.data;
   },
+  changeUserRole: async (userId: string, role: string) => {
+    const response = await api.put(`/admin/users/${userId}/role`, { role });
+    return response.data;
+  },
   deleteUser: async (userId: string) => {
     const response = await api.delete(`/admin/users/${userId}`);
     return response.data;
