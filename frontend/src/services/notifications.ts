@@ -119,7 +119,8 @@ export function handleNotificationResponse(response: Notifications.NotificationR
 
   // Navigate based on notification type
   if (data.screen === 'OrderDetails' && data.orderId) {
-    router.push(`/order/${data.orderId}`);
+    // Use a generic path for orders
+    router.push('/(main)/orders');
   } else if (data.screen === 'AvailableOrders') {
     router.push('/(driver)/available');
   } else if (data.screen === 'MyOrders') {
@@ -135,7 +136,7 @@ export function handleNotificationResponse(response: Notifications.NotificationR
 export async function scheduleLocalNotification(
   title: string,
   body: string,
-  data?: object,
+  data?: Record<string, unknown>,
   seconds: number = 1
 ): Promise<string> {
   const id = await Notifications.scheduleNotificationAsync({
@@ -145,7 +146,7 @@ export async function scheduleLocalNotification(
       data,
       sound: true,
     },
-    trigger: { seconds },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds, repeats: false },
   });
   return id;
 }
