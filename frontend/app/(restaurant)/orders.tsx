@@ -96,10 +96,6 @@ export default function RestaurantOrders() {
     }
   };
 
-  // Filter orders
-  const activeOrders = orders.filter(o => !['delivered', 'cancelled'].includes(o.order_status));
-  const completedOrders = orders.filter(o => ['delivered', 'cancelled'].includes(o.order_status));
-
   const fetchDrivers = async () => {
     try {
       const [myDrivers, platformDriversData] = await Promise.all([
