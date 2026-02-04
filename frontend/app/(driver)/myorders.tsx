@@ -29,6 +29,12 @@ const STATUS_CONFIG: Record<string, {
     icon: 'person-add',
     bgColor: '#E3F2FD',
   },
+  driver_assigned: { 
+    label: 'معيّن لك', 
+    color: '#2196F3', 
+    icon: 'person-add',
+    bgColor: '#E3F2FD',
+  },
   picked_up: { 
     label: 'تم الاستلام', 
     color: '#FF9800', 
@@ -41,10 +47,17 @@ const STATUS_CONFIG: Record<string, {
     icon: 'bicycle',
     bgColor: '#F3E5F5',
   },
+  delivered: { 
+    label: 'تم التسليم', 
+    color: '#4CAF50', 
+    icon: 'checkmark-done-circle',
+    bgColor: '#E8F5E9',
+  },
 };
 
 const ACTION_CONFIG: Record<string, { next: string; label: string; icon: keyof typeof Ionicons.glyphMap }> = {
   assigned: { next: 'picked_up', label: 'استلمت الطلب', icon: 'bag-handle' },
+  driver_assigned: { next: 'picked_up', label: 'استلمت الطلب', icon: 'bag-handle' },
   picked_up: { next: 'out_for_delivery', label: 'بدأت التوصيل', icon: 'bicycle' },
   out_for_delivery: { next: 'delivered', label: 'تم التسليم', icon: 'checkmark-done' },
 };
