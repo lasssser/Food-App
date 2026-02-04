@@ -1129,4 +1129,47 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: 'System',
   },
+  roleModalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    maxWidth: 340,
+    alignItems: 'center',
+  },
+  roleIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#dbeafe',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  roleOptions: {
+    width: '100%',
+    gap: 12,
+    marginVertical: 20,
+  },
+  roleOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: '#dbeafe',
+    gap: 10,
+  },
+  roleOptionSelected: {
+    backgroundColor: '#3b82f6',
+  },
+  roleOptionText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#3b82f6',
+    fontFamily: 'System',
+  },
+  roleOptionTextSelected: {
+    color: '#fff',
+  },
 });
