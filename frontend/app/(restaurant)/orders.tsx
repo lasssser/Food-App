@@ -607,16 +607,56 @@ export default function RestaurantOrders() {
               <View style={styles.driverTypeSection}>
                 <View style={styles.driverTypeHeader}>
                   <Ionicons name="globe" size={20} color={COLORS.info} />
-                  <Text style={styles.driverTypeTitle}>سائقين المنصة</Text>
+                  <Text style={styles.driverTypeTitle}>سائقين المنصة المتاحين</Text>
                 </View>
                 
-                <TouchableOpacity
-                  style={styles.platformDriverOption}
-                  onPress={handleRequestPlatformDrivers}
-                  disabled={assigning}
-                >
-                  <View style={styles.platformDriverIcon}>
-                    <Ionicons name="bicycle" size={30} color={COLORS.info} />
+                {platformDrivers.length === 0 ? (
+                  <View style={styles.noDrivers}>
+                    <Ionicons name="bicycle-outline" size={40} color={COLORS.textLight} />
+                    <Text style={styles.noDriversText}>لا يوجد سائقين متاحين حالياً</Text>
+                    <Text style={styles.noDriversHint}>جرب لاحقاً أو استخدم سائقين مطعمك</Text>
+                  </View>
+                ) : (
+                  platformDrivers.map((driver) => (
+                    <TouchableOpacity
+                      key={driver.id}
+                      style={styles.platformDriverCard}
+                      onPress={() => handleAssignPlatformDriver(driver.id)}
+                      disabled={assigning}
+                    >
+                      <View style={styles.platformDriverInfo2}>
+                        <View style={styles.platformDriverAvatar}>
+                          <Ionicons name="bicycle" size={24} color={COLORS.info} />
+                          {driver.is_online && <View style={styles.onlineDot} />}
+                        </View>
+                        <View style={styles.platformDriverDetails}>
+                          <Text style={styles.platformDriverName}>{driver.name}</Text>
+                          <View style={styles.platformDriverStats}>
+                            <View style={styles.platformDriverStat}>
+                              <Ionicons name="star" size={12} color="#FFD700" />
+                              <Text style={styles.platformDriverStatText}>{driver.rating.toFixed(1)}</Text>
+                            </View>
+                            <View style={styles.platformDriverStat}>
+                              <Ionicons name="checkmark-done" size={12} color={COLORS.success} />
+                              <Text style={styles.platformDriverStatText}>{driver.total_deliveries} توصيلة</Text>
+                            </View>
+                            {driver.current_orders > 0 && (
+                              <View style={[styles.platformDriverStat, styles.busyStat]}>
+                                <Ionicons name="time" size={12} color={COLORS.warning} />
+                                <Text style={[styles.platformDriverStatText, { color: COLORS.warning }]}>
+                                  {driver.current_orders} طلب نشط
+                                </Text>
+                              </View>
+                            )}
+                          </View>
+                        </View>
+                      </View>
+                      <View style={styles.selectArrow}>
+                        <Ionicons name="chevron-back" size={20} color={COLORS.info} />
+                      </View>
+                    </TouchableOpacity>
+                  ))
+                )}
                   </View>
                   <View style={styles.platformDriverInfo}>
                     <Text style={styles.platformDriverTitle}>طلب سائق من المنصة</Text>
