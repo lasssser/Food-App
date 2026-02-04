@@ -956,4 +956,29 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.textWhite,
   },
+  modalInput: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
+    padding: SPACING.md,
+    fontSize: 15,
+    color: COLORS.textPrimary,
+    textAlign: 'right',
+    marginBottom: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  submitComplaintBtn: {
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
+    marginTop: SPACING.sm,
+  },
+  submitComplaintGradient: {
+    paddingVertical: SPACING.lg,
+    alignItems: 'center',
+  },
+  submitComplaintText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textWhite,
+  },
 });
