@@ -2724,6 +2724,352 @@ async def seed_database():
     
     return {"message": "تم إضافة البيانات التجريبية بنجاح", "restaurants": len(restaurants), "menu_items": len(menu_items), "addon_groups": len(addon_groups)}
 
+# ==================== Admin APIs ====================
+
+async def require_admin(current_user: dict = Depends(get_current_user)):
+    """Middleware to check if user is admin"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="يجب أن تكون مديراً للوصول لهذه الصفحة")
+    return current_user
+
+@api_router.get("/admin/stats")
+async def get_admin_stats(admin: dict = Depends(require_admin)):
+    """Get overall app statistics"""
+    # Users stats
+    total_customers = await db.users.count_documents({"role": "customer"})
+    total_restaurants = await db.restaurants.count_documents({})
+    total_drivers = await db.users.count_documents({"role": "driver"})
+    online_drivers = await db.users.count_documents({"role": "driver", "is_online": True})
+    
+    # Orders stats
+    total_orders = await db.orders.count_documents({})
+    pending_orders = await db.orders.count_documents({"order_status": "pending"})
+    delivered_orders = await db.orders.count_documents({"order_status": "delivered"})
+    cancelled_orders = await db.orders.count_documents({"order_status": "cancelled"})
+    
+    # Revenue
+    orders = await db.orders.find({"order_status": "delivered"}).to_list(10000)
+    total_revenue = sum(o.get("total", 0) for o in orders)
+    
+    # Today's stats
+    today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_orders = await db.orders.count_documents({"created_at": {"$gte": today}})
+    today_revenue_orders = await db.orders.find({
+        "created_at": {"$gte": today},
+        "order_status": "delivered"
+    }).to_list(1000)
+    today_revenue = sum(o.get("total", 0) for o in today_revenue_orders)
+    
+    # Complaints stats
+    open_complaints = await db.complaints.count_documents({"status": "open"})
+    total_complaints = await db.complaints.count_documents({})
+    
+    return {
+        "users": {
+            "customers": total_customers,
+            "restaurants": total_restaurants,
+            "drivers": total_drivers,
+            "online_drivers": online_drivers
+        },
+        "orders": {
+            "total": total_orders,
+            "pending": pending_orders,
+            "delivered": delivered_orders,
+            "cancelled": cancelled_orders,
+            "today": today_orders
+        },
+        "revenue": {
+            "total": total_revenue,
+            "today": today_revenue
+        },
+        "complaints": {
+            "open": open_complaints,
+            "total": total_complaints
+        }
+    }
+
+@api_router.get("/admin/users")
+async def get_all_users(
+    role: str = None,
+    status: str = None,
+    search: str = None,
+    skip: int = 0,
+    limit: int = 50,
+    admin: dict = Depends(require_admin)
+):
+    """Get all users with filtering"""
+    query = {}
+    if role:
+        query["role"] = role
+    if status == "active":
+        query["is_active"] = True
+    elif status == "inactive":
+        query["is_active"] = False
+    if search:
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"phone": {"$regex": search}}
+        ]
+    
+    users = await db.users.find(query).skip(skip).limit(limit).to_list(limit)
+    total = await db.users.count_documents(query)
+    
+    # Remove passwords
+    for user in users:
+        user.pop("password", None)
+        user.pop("_id", None)
+    
+    return {"users": users, "total": total}
+
+@api_router.get("/admin/users/{user_id}")
+async def get_user_details(user_id: str, admin: dict = Depends(require_admin)):
+    """Get detailed user info"""
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    user.pop("password", None)
+    user.pop("_id", None)
+    
+    # Get user orders
+    orders = await db.orders.find({"user_id": user_id}).sort("created_at", -1).limit(10).to_list(10)
+    
+    return {"user": user, "recent_orders": orders}
+
+@api_router.put("/admin/users/{user_id}/status")
+async def update_user_status(
+    user_id: str,
+    is_active: bool,
+    admin: dict = Depends(require_admin)
+):
+    """Activate or deactivate a user"""
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"is_active": is_active, "updated_at": datetime.utcnow()}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    return {"message": "تم تحديث حالة المستخدم بنجاح", "is_active": is_active}
+
+@api_router.get("/admin/restaurants")
+async def get_all_restaurants(
+    status: str = None,
+    search: str = None,
+    skip: int = 0,
+    limit: int = 50,
+    admin: dict = Depends(require_admin)
+):
+    """Get all restaurants"""
+    query = {}
+    if status == "pending":
+        query["is_approved"] = False
+    elif status == "approved":
+        query["is_approved"] = True
+    elif status == "open":
+        query["is_open"] = True
+    elif status == "closed":
+        query["is_open"] = False
+    if search:
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"phone": {"$regex": search}}
+        ]
+    
+    restaurants = await db.restaurants.find(query).skip(skip).limit(limit).to_list(limit)
+    total = await db.restaurants.count_documents(query)
+    
+    for r in restaurants:
+        r.pop("_id", None)
+    
+    return {"restaurants": restaurants, "total": total}
+
+@api_router.put("/admin/restaurants/{restaurant_id}/approve")
+async def approve_restaurant(
+    restaurant_id: str,
+    is_approved: bool,
+    admin: dict = Depends(require_admin)
+):
+    """Approve or reject a restaurant"""
+    result = await db.restaurants.update_one(
+        {"id": restaurant_id},
+        {"$set": {"is_approved": is_approved, "updated_at": datetime.utcnow()}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="المطعم غير موجود")
+    
+    return {"message": "تم تحديث حالة المطعم", "is_approved": is_approved}
+
+@api_router.get("/admin/drivers")
+async def get_all_drivers(
+    status: str = None,
+    skip: int = 0,
+    limit: int = 50,
+    admin: dict = Depends(require_admin)
+):
+    """Get all drivers"""
+    query = {"role": "driver"}
+    if status == "online":
+        query["is_online"] = True
+    elif status == "offline":
+        query["is_online"] = False
+    elif status == "pending":
+        query["is_approved"] = False
+    elif status == "approved":
+        query["is_approved"] = True
+    
+    drivers = await db.users.find(query).skip(skip).limit(limit).to_list(limit)
+    total = await db.users.count_documents(query)
+    
+    for d in drivers:
+        d.pop("password", None)
+        d.pop("_id", None)
+        # Get driver stats
+        d["total_deliveries"] = await db.orders.count_documents({
+            "driver_id": d["id"],
+            "order_status": "delivered"
+        })
+    
+    return {"drivers": drivers, "total": total}
+
+@api_router.put("/admin/drivers/{driver_id}/approve")
+async def approve_driver(
+    driver_id: str,
+    is_approved: bool,
+    admin: dict = Depends(require_admin)
+):
+    """Approve or reject a driver"""
+    result = await db.users.update_one(
+        {"id": driver_id, "role": "driver"},
+        {"$set": {"is_approved": is_approved, "updated_at": datetime.utcnow()}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    return {"message": "تم تحديث حالة السائق", "is_approved": is_approved}
+
+# ==================== Complaints APIs ====================
+
+@api_router.post("/complaints")
+async def create_complaint(
+    complaint_data: ComplaintCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create a new complaint"""
+    complaint = Complaint(
+        user_id=current_user["id"],
+        user_name=current_user.get("name", "مستخدم"),
+        user_phone=current_user.get("phone", ""),
+        type=complaint_data.type,
+        subject=complaint_data.subject,
+        message=complaint_data.message,
+        order_id=complaint_data.order_id,
+        restaurant_id=complaint_data.restaurant_id,
+        driver_id=complaint_data.driver_id
+    )
+    
+    await db.complaints.insert_one(complaint.dict())
+    
+    return {"message": "تم إرسال الشكوى بنجاح، سنتواصل معك قريباً", "complaint_id": complaint.id}
+
+@api_router.get("/complaints/my")
+async def get_my_complaints(current_user: dict = Depends(get_current_user)):
+    """Get user's complaints"""
+    complaints = await db.complaints.find({"user_id": current_user["id"]}).sort("created_at", -1).to_list(50)
+    
+    for c in complaints:
+        c.pop("_id", None)
+    
+    return complaints
+
+@api_router.get("/admin/complaints")
+async def get_all_complaints(
+    status: str = None,
+    type: str = None,
+    skip: int = 0,
+    limit: int = 50,
+    admin: dict = Depends(require_admin)
+):
+    """Get all complaints (admin)"""
+    query = {}
+    if status:
+        query["status"] = status
+    if type:
+        query["type"] = type
+    
+    complaints = await db.complaints.find(query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.complaints.count_documents(query)
+    
+    for c in complaints:
+        c.pop("_id", None)
+    
+    return {"complaints": complaints, "total": total}
+
+@api_router.get("/admin/complaints/{complaint_id}")
+async def get_complaint_details(complaint_id: str, admin: dict = Depends(require_admin)):
+    """Get complaint details"""
+    complaint = await db.complaints.find_one({"id": complaint_id})
+    if not complaint:
+        raise HTTPException(status_code=404, detail="الشكوى غير موجودة")
+    
+    complaint.pop("_id", None)
+    
+    # Get related order if exists
+    order = None
+    if complaint.get("order_id"):
+        order = await db.orders.find_one({"id": complaint["order_id"]})
+        if order:
+            order.pop("_id", None)
+    
+    return {"complaint": complaint, "order": order}
+
+@api_router.put("/admin/complaints/{complaint_id}/respond")
+async def respond_to_complaint(
+    complaint_id: str,
+    response_data: ComplaintResponse,
+    admin: dict = Depends(require_admin)
+):
+    """Respond to a complaint"""
+    result = await db.complaints.update_one(
+        {"id": complaint_id},
+        {"$set": {
+            "admin_response": response_data.response,
+            "status": response_data.status,
+            "admin_id": admin["id"],
+            "updated_at": datetime.utcnow()
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="الشكوى غير موجودة")
+    
+    # TODO: Send notification to user about response
+    
+    return {"message": "تم الرد على الشكوى بنجاح"}
+
+@api_router.get("/admin/orders")
+async def get_all_orders_admin(
+    status: str = None,
+    skip: int = 0,
+    limit: int = 50,
+    admin: dict = Depends(require_admin)
+):
+    """Get all orders (admin)"""
+    query = {}
+    if status:
+        query["order_status"] = status
+    
+    orders = await db.orders.find(query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.orders.count_documents(query)
+    
+    for o in orders:
+        o.pop("_id", None)
+    
+    return {"orders": orders, "total": total}
+
 # ==================== Health Check ====================
 
 @api_router.get("/")
