@@ -21,10 +21,10 @@ load_dotenv(ROOT_DIR / '.env')
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ.get('DB_NAME', 'yalla_nakol')]
+db = client[os.environ.get('DB_NAME', 'test_database')]
 
 # JWT Settings
-SECRET_KEY = os.environ.get('JWT_SECRET', 'yalla-nakol-secret-key-2025-extended')
+SECRET_KEY = os.environ.get('JWT_SECRET', os.urandom(32).hex())
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_DAYS = 7
 
