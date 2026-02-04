@@ -117,6 +117,18 @@ backend:
         agent: "main"
         comment: "JWT authentication working - register and login tested via curl"
 
+  - task: "Admin User Management System"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Admin login successful with credentials (0900000000/admin123). All admin APIs working: get users list, user details, update user status (activate/deactivate), update user info, reset password, admin stats, and delete protection. Fixed ObjectId serialization issue in get_user_details endpoint. All 8 backend tests passed successfully."
+
   - task: "Restaurants API"
     implemented: true
     working: true
