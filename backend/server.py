@@ -936,7 +936,14 @@ async def get_restaurant_drivers(current_user: dict = Depends(get_current_user))
         raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
     
     drivers = await db.restaurant_drivers.find({"restaurant_id": restaurant["id"]}).to_list(50)
-    return drivers
+    # Convert ObjectId to string and clean up
+    result = []
+    for driver in drivers:
+        driver_dict = dict(driver)
+        if "_id" in driver_dict:
+            driver_dict["_id"] = str(driver_dict["_id"])
+        result.append(driver_dict)
+    return result
 
 @api_router.post("/restaurant/drivers")
 async def add_restaurant_driver(
