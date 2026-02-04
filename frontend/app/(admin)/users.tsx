@@ -93,12 +93,20 @@ export default function AdminUsers() {
     try {
       const newStatus = user.is_active === false ? true : false;
       await adminAPI.updateUserStatus(user.id, newStatus);
-      Alert.alert('نجاح', newStatus ? 'تم تفعيل الحساب' : 'تم إيقاف الحساب');
+      if (Platform.OS === 'web') {
+        alert(newStatus ? 'تم تفعيل الحساب' : 'تم إيقاف الحساب');
+      } else {
+        Alert.alert('نجاح', newStatus ? 'تم تفعيل الحساب' : 'تم إيقاف الحساب');
+      }
       fetchUsers();
       setShowUserModal(false);
     } catch (error) {
       console.error('Error toggling user status:', error);
-      Alert.alert('خطأ', 'فشل في تحديث حالة المستخدم');
+      if (Platform.OS === 'web') {
+        alert('فشل في تحديث حالة المستخدم');
+      } else {
+        Alert.alert('خطأ', 'فشل في تحديث حالة المستخدم');
+      }
     } finally {
       setActionLoading(false);
     }
