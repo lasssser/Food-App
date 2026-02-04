@@ -651,6 +651,21 @@ export default function RestaurantOrders() {
                               </View>
                             )}
                           </View>
+                          {/* Distance and ETA */}
+                          {driver.distance_km !== undefined && (
+                            <View style={styles.platformDriverDistance}>
+                              <View style={styles.distanceBadge}>
+                                <Ionicons name="location" size={12} color={COLORS.info} />
+                                <Text style={styles.distanceText}>{driver.distance_km} كم</Text>
+                              </View>
+                              {driver.estimated_time && (
+                                <View style={styles.etaBadge}>
+                                  <Ionicons name="time-outline" size={12} color={COLORS.success} />
+                                  <Text style={styles.etaText}>{driver.estimated_time}</Text>
+                                </View>
+                              )}
+                            </View>
+                          )}
                         </View>
                       </View>
                       <View style={styles.selectArrow}>
