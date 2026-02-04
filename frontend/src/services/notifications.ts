@@ -3,7 +3,7 @@ import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import { router } from 'expo-router';
-import api from './api';
+import { notificationAPI } from './api';
 
 // Configure notification handler for foreground behavior
 Notifications.setNotificationHandler({
@@ -90,10 +90,7 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
 // Register push token with backend
 export async function registerPushToken(token: string): Promise<void> {
   try {
-    await api.post('/notifications/register-push-token', {
-      push_token: token,
-      platform: Platform.OS,
-    });
+    await notificationAPI.registerPushToken(token, Platform.OS);
     console.log('Push token registered with backend');
   } catch (error) {
     console.error('Error registering push token:', error);
@@ -103,7 +100,7 @@ export async function registerPushToken(token: string): Promise<void> {
 // Unregister push token (when logging out)
 export async function unregisterPushToken(): Promise<void> {
   try {
-    await api.delete('/notifications/push-token');
+    await notificationAPI.unregisterPushToken();
     console.log('Push token unregistered');
   } catch (error) {
     console.error('Error unregistering push token:', error);
