@@ -76,6 +76,8 @@ export default function RestaurantInfoEdit() {
   const [closingTime, setClosingTime] = useState('');
   const [workingDays, setWorkingDays] = useState<string[]>([]);
   const [showCuisineDropdown, setShowCuisineDropdown] = useState(false);
+  const [restaurantImage, setRestaurantImage] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     fetchInfo();
@@ -98,6 +100,7 @@ export default function RestaurantInfoEdit() {
       setDeliveryTime(data.delivery_time || '30-45 دقيقة');
       setOpeningTime(data.opening_time || '09:00');
       setClosingTime(data.closing_time || '23:00');
+      setRestaurantImage(data.image || null);
       setWorkingDays(data.working_days || DAYS);
     } catch (error) {
       console.error('Error fetching info:', error);
