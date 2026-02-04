@@ -143,6 +143,20 @@ export default function DriverProfile() {
 
           <TouchableOpacity 
             style={styles.menuItem} 
+            onPress={() => router.push('/(driver)/my-complaints')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+            <View style={styles.menuItemContent}>
+              <Text style={styles.menuItemText}>شكاواي</Text>
+              <View style={[styles.menuIcon, { backgroundColor: `${COLORS.info}15` }]}>
+                <Ionicons name="chatbubbles" size={20} color={COLORS.info} />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.menuItem} 
             onPress={() => setShowHelpModal(true)}
             activeOpacity={0.7}
           >
