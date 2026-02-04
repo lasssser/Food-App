@@ -354,11 +354,41 @@ export default function MyOrders() {
             <Ionicons name="bag-handle" size={24} color={COLORS.primary} />
           </View>
         </View>
+
+        {/* Tabs */}
+        <View style={styles.tabsContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'active' && styles.tabActive]}
+            onPress={() => setActiveTab('active')}
+          >
+            <Ionicons 
+              name="time" 
+              size={18} 
+              color={activeTab === 'active' ? COLORS.primary : 'rgba(255,255,255,0.7)'} 
+            />
+            <Text style={[styles.tabText, activeTab === 'active' && styles.tabTextActive]}>
+              نشطة ({orders.length})
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'history' && styles.tabActive]}
+            onPress={() => setActiveTab('history')}
+          >
+            <Ionicons 
+              name="checkmark-done" 
+              size={18} 
+              color={activeTab === 'history' ? COLORS.success : 'rgba(255,255,255,0.7)'} 
+            />
+            <Text style={[styles.tabText, activeTab === 'history' && styles.tabTextActive]}>
+              السجل ({historyOrders.length})
+            </Text>
+          </TouchableOpacity>
+        </View>
       </LinearGradient>
 
       {/* Orders List */}
       <FlatList
-        data={orders}
+        data={activeTab === 'active' ? orders : historyOrders}
         keyExtractor={(item) => item.id}
         renderItem={renderOrder}
         contentContainerStyle={styles.listContent}
@@ -368,11 +398,19 @@ export default function MyOrders() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIconContainer}>
-              <Ionicons name="bicycle-outline" size={50} color={COLORS.textLight} />
+              <Ionicons 
+                name={activeTab === 'active' ? "bicycle-outline" : "archive-outline"} 
+                size={50} 
+                color={COLORS.textLight} 
+              />
             </View>
-            <Text style={styles.emptyTitle}>لا توجد توصيلات حالياً</Text>
+            <Text style={styles.emptyTitle}>
+              {activeTab === 'active' ? 'لا توجد توصيلات حالياً' : 'لا يوجد سجل بعد'}
+            </Text>
             <Text style={styles.emptySubtitle}>
-              اذهب لصفحة "طلبات متاحة" لقبول طلبات جديدة
+              {activeTab === 'active' 
+                ? 'اذهب لصفحة "طلبات متاحة" لقبول طلبات جديدة'
+                : 'ستظهر هنا الطلبات المكتملة والملغاة'}
             </Text>
             <TouchableOpacity style={styles.refreshButton} onPress={onRefresh}>
               <Ionicons name="refresh" size={20} color={COLORS.primary} />
