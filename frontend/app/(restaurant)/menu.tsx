@@ -18,8 +18,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { restaurantPanelAPI } from '../../src/services/api';
 import { MenuItem } from '../../src/types';
+import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 export default function RestaurantMenu() {
   const [items, setItems] = useState<MenuItem[]>([]);
@@ -27,6 +29,8 @@ export default function RestaurantMenu() {
   const [refreshing, setRefreshing] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   
   // Form state
   const [formName, setFormName] = useState('');
@@ -79,7 +83,7 @@ export default function RestaurantMenu() {
   };
 
   const handleSave = async () => {
-    if (!formName || !formPrice || !formCategory) {
+    if (!formName || !formPrice || (!editingItem && !formCategory)) {
       Alert.alert('خطأ', 'يرجى ملء جميع الحقول المطلوبة');
       return;
     }
@@ -107,22 +111,22 @@ export default function RestaurantMenu() {
     }
   };
 
-  const handleDelete = (itemId: string) => {
-    Alert.alert('تأكيد الحذف', 'هل تريد حذف هذا الصنف؟', [
-      { text: 'إلغاء', style: 'cancel' },
-      {
-        text: 'حذف',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await restaurantPanelAPI.deleteMenuItem(itemId);
-            fetchMenu();
-          } catch (error: any) {
-            Alert.alert('خطأ', error.response?.data?.detail || 'فشل الحذف');
-          }
-        },
-      },
-    ]);
+  const confirmDelete = (itemId: string) => {
+    setItemToDelete(itemId);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!itemToDelete) return;
+    
+    try {
+      await restaurantPanelAPI.deleteMenuItem(itemToDelete);
+      setShowDeleteModal(false);
+      setItemToDelete(null);
+      fetchMenu();
+    } catch (error: any) {
+      Alert.alert('خطأ', error.response?.data?.detail || 'فشل الحذف');
+    }
   };
 
   const handleToggleAvailability = async (item: MenuItem) => {
@@ -150,11 +154,15 @@ export default function RestaurantMenu() {
     data,
   }));
 
+  const totalItems = items.length;
+  const availableItems = items.filter(i => i.is_available).length;
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B35" />
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingText}>جاري تحميل القائمة...</Text>
         </View>
       </SafeAreaView>
     );
@@ -162,50 +170,91 @@ export default function RestaurantMenu() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={openAddModal}>
-          <Ionicons name="add-circle" size={28} color="#FF6B35" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>إدارة القائمة</Text>
-        <View style={{ width: 28 }} />
-      </View>
+      {/* Header */}
+      <LinearGradient colors={[COLORS.primary, COLORS.primaryDark]} style={styles.header}>
+        <View style={styles.headerContent}>
+          <TouchableOpacity onPress={openAddModal} activeOpacity={0.7}>
+            <View style={styles.addButton}>
+              <Ionicons name="add" size={24} color={COLORS.primary} />
+            </View>
+          </TouchableOpacity>
+          <View style={styles.headerInfo}>
+            <Text style={styles.headerTitle}>إدارة القائمة</Text>
+            <Text style={styles.headerSubtitle}>
+              {availableItems} متوفر من أصل {totalItems} صنف
+            </Text>
+          </View>
+        </View>
+      </LinearGradient>
 
+      {/* Menu List */}
       <FlatList
         data={sections}
         keyExtractor={(item) => item.title}
         renderItem={({ item: section }) => (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>{section.title}</Text>
+              <View style={styles.sectionBadge}>
+                <Text style={styles.sectionCount}>{section.data.length}</Text>
+              </View>
+            </View>
+            
             {section.data.map((item) => (
-              <View key={item.id} style={[styles.menuItem, !item.is_available && styles.unavailable]}>
-                <View style={styles.itemInfo}>
-                  <Text style={styles.itemName}>{item.name}</Text>
-                  {item.description && (
-                    <Text style={styles.itemDescription} numberOfLines={1}>
-                      {item.description}
-                    </Text>
-                  )}
-                  <Text style={styles.itemPrice}>{item.price.toLocaleString()} ل.س</Text>
+              <View 
+                key={item.id} 
+                style={[styles.menuItem, !item.is_available && styles.unavailable]}
+              >
+                <View style={styles.itemHeader}>
+                  <View style={styles.itemActions}>
+                    <Switch
+                      value={item.is_available}
+                      onValueChange={() => handleToggleAvailability(item)}
+                      trackColor={{ false: COLORS.border, true: `${COLORS.success}80` }}
+                      thumbColor={item.is_available ? COLORS.success : COLORS.textLight}
+                    />
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => openEditModal(item)}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="create" size={20} color={COLORS.info} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => confirmDelete(item.id)}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="trash" size={20} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.itemInfo}>
+                    <Text style={styles.itemName}>{item.name}</Text>
+                    {item.description && (
+                      <Text style={styles.itemDescription} numberOfLines={2}>
+                        {item.description}
+                      </Text>
+                    )}
+                  </View>
                 </View>
                 
-                <View style={styles.itemActions}>
-                  <Switch
-                    value={item.is_available}
-                    onValueChange={() => handleToggleAvailability(item)}
-                    trackColor={{ false: '#ccc', true: '#66BB6A' }}
-                  />
-                  <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={() => openEditModal(item)}
-                  >
-                    <Ionicons name="create" size={20} color="#2196F3" />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => handleDelete(item.id)}
-                  >
-                    <Ionicons name="trash" size={20} color="#EF5350" />
-                  </TouchableOpacity>
+                <View style={styles.itemFooter}>
+                  <View style={[
+                    styles.statusBadge,
+                    { backgroundColor: item.is_available ? `${COLORS.success}15` : `${COLORS.error}15` }
+                  ]}>
+                    <View style={[
+                      styles.statusDot,
+                      { backgroundColor: item.is_available ? COLORS.success : COLORS.error }
+                    ]} />
+                    <Text style={[
+                      styles.statusText,
+                      { color: item.is_available ? COLORS.success : COLORS.error }
+                    ]}>
+                      {item.is_available ? 'متوفر' : 'غير متوفر'}
+                    </Text>
+                  </View>
+                  <Text style={styles.itemPrice}>{item.price.toLocaleString()} ل.س</Text>
                 </View>
               </View>
             ))}
@@ -213,14 +262,23 @@ export default function RestaurantMenu() {
         )}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF6B35']} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="restaurant-outline" size={60} color="#ccc" />
-            <Text style={styles.emptyText}>لا توجد أصناف</Text>
-            <TouchableOpacity style={styles.addButton} onPress={openAddModal}>
-              <Text style={styles.addButtonText}>إضافة صنف</Text>
+            <View style={styles.emptyIconContainer}>
+              <Ionicons name="restaurant-outline" size={50} color={COLORS.textLight} />
+            </View>
+            <Text style={styles.emptyTitle}>لا توجد أصناف</Text>
+            <Text style={styles.emptySubtitle}>ابدأ بإضافة أصناف إلى قائمتك</Text>
+            <TouchableOpacity style={styles.emptyButton} onPress={openAddModal} activeOpacity={0.8}>
+              <LinearGradient
+                colors={[COLORS.primary, COLORS.primaryDark]}
+                style={styles.emptyButtonGradient}
+              >
+                <Ionicons name="add" size={20} color={COLORS.textWhite} />
+                <Text style={styles.emptyButtonText}>إضافة صنف</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         }
@@ -234,22 +292,23 @@ export default function RestaurantMenu() {
         >
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={() => setShowModal(false)}>
-                <Ionicons name="close" size={24} color="#333" />
+              <TouchableOpacity onPress={() => setShowModal(false)} activeOpacity={0.7}>
+                <Ionicons name="close" size={24} color={COLORS.textPrimary} />
               </TouchableOpacity>
               <Text style={styles.modalTitle}>
-                {editingItem ? 'تعديل صنف' : 'إضافة صنف'}
+                {editingItem ? 'تعديل صنف' : 'إضافة صنف جديد'}
               </Text>
               <View style={{ width: 24 }} />
             </View>
 
-            <ScrollView style={styles.modalForm}>
+            <ScrollView style={styles.modalForm} showsVerticalScrollIndicator={false}>
               <Text style={styles.inputLabel}>اسم الصنف *</Text>
               <TextInput
                 style={styles.input}
                 value={formName}
                 onChangeText={setFormName}
                 placeholder="مثال: شاورما لحمة"
+                placeholderTextColor={COLORS.textLight}
                 textAlign="right"
               />
 
@@ -258,7 +317,8 @@ export default function RestaurantMenu() {
                 style={[styles.input, styles.textArea]}
                 value={formDescription}
                 onChangeText={setFormDescription}
-                placeholder="وصف الصنف"
+                placeholder="وصف الصنف (اختياري)"
+                placeholderTextColor={COLORS.textLight}
                 multiline
                 textAlign="right"
               />
@@ -269,6 +329,7 @@ export default function RestaurantMenu() {
                 value={formPrice}
                 onChangeText={setFormPrice}
                 placeholder="8000"
+                placeholderTextColor={COLORS.textLight}
                 keyboardType="numeric"
                 textAlign="right"
               />
@@ -280,7 +341,8 @@ export default function RestaurantMenu() {
                     style={styles.input}
                     value={formCategory}
                     onChangeText={setFormCategory}
-                    placeholder="مثال: شاورما"
+                    placeholder="مثال: شاورما، برجر، مشروبات"
+                    placeholderTextColor={COLORS.textLight}
                     textAlign="right"
                   />
                 </>
@@ -291,18 +353,59 @@ export default function RestaurantMenu() {
                   <Switch
                     value={formAvailable}
                     onValueChange={setFormAvailable}
-                    trackColor={{ false: '#ccc', true: '#66BB6A' }}
+                    trackColor={{ false: COLORS.border, true: `${COLORS.success}80` }}
+                    thumbColor={formAvailable ? COLORS.success : COLORS.textLight}
                   />
                   <Text style={styles.availabilityLabel}>متوفر</Text>
                 </View>
               )}
             </ScrollView>
 
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>حفظ</Text>
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave} activeOpacity={0.8}>
+              <LinearGradient
+                colors={[COLORS.primary, COLORS.primaryDark]}
+                style={styles.saveButtonGradient}
+              >
+                <Ionicons name={editingItem ? 'checkmark' : 'add'} size={22} color={COLORS.textWhite} />
+                <Text style={styles.saveButtonText}>{editingItem ? 'حفظ التعديلات' : 'إضافة الصنف'}</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal visible={showDeleteModal} animationType="fade" transparent>
+        <View style={styles.confirmModalOverlay}>
+          <View style={styles.confirmModal}>
+            <View style={styles.confirmIconContainer}>
+              <Ionicons name="trash" size={40} color={COLORS.error} />
+            </View>
+            <Text style={styles.confirmTitle}>حذف الصنف</Text>
+            <Text style={styles.confirmMessage}>هل تريد حذف هذا الصنف من القائمة؟</Text>
+            
+            <View style={styles.confirmButtons}>
+              <TouchableOpacity 
+                style={styles.cancelButton} 
+                onPress={() => {
+                  setShowDeleteModal(false);
+                  setItemToDelete(null);
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cancelButtonText}>إلغاء</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.deleteConfirmButton} 
+                onPress={handleDelete}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.deleteConfirmButtonText}>حذف</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
       </Modal>
     </SafeAreaView>
   );
@@ -311,145 +414,239 @@ export default function RestaurantMenu() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: COLORS.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingText: {
+    marginTop: SPACING.md,
+    fontSize: 16,
+    color: COLORS.textSecondary,
+  },
   header: {
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.xl,
+    paddingTop: SPACING.xxl,
+  },
+  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+  },
+  headerInfo: {
+    alignItems: 'flex-end',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textWhite,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+    marginTop: 4,
+  },
+  addButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: COLORS.textWhite,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.medium,
   },
   listContent: {
-    padding: 16,
+    padding: SPACING.lg,
+    paddingBottom: SPACING.xxxl,
   },
   section: {
-    marginBottom: 16,
+    marginBottom: SPACING.xl,
+  },
+  sectionHeader: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+    gap: SPACING.sm,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'right',
-    marginBottom: 8,
+    color: COLORS.textPrimary,
+  },
+  sectionBadge: {
+    backgroundColor: `${COLORS.primary}15`,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+    borderRadius: RADIUS.sm,
+  },
+  sectionCount: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.primary,
   },
   menuItem: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 8,
+    backgroundColor: COLORS.surface,
+    padding: SPACING.md,
+    borderRadius: RADIUS.lg,
+    marginBottom: SPACING.md,
+    ...SHADOWS.small,
   },
   unavailable: {
-    opacity: 0.6,
+    opacity: 0.7,
+  },
+  itemHeader: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   itemInfo: {
     flex: 1,
     alignItems: 'flex-end',
+    marginLeft: SPACING.md,
   },
   itemName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: COLORS.textPrimary,
   },
   itemDescription: {
     fontSize: 13,
-    color: '#666',
-    marginTop: 2,
-  },
-  itemPrice: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#FF6B35',
+    color: COLORS.textSecondary,
     marginTop: 4,
+    textAlign: 'right',
+    lineHeight: 18,
   },
   itemActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 4,
   },
-  editButton: {
-    padding: 8,
+  actionButton: {
+    padding: SPACING.sm,
   },
-  deleteButton: {
-    padding: 8,
+  itemFooter: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: SPACING.md,
+    paddingTop: SPACING.md,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.divider,
   },
+  itemPrice: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+  },
+  statusBadge: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.full,
+    gap: 6,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+
+  // Empty State
   emptyContainer: {
     alignItems: 'center',
     paddingTop: 60,
   },
-  emptyText: {
+  emptyIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: COLORS.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+    ...SHADOWS.small,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.sm,
+  },
+  emptyButton: {
+    marginTop: SPACING.xl,
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
+  },
+  emptyButtonGradient: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
+    gap: SPACING.sm,
+  },
+  emptyButtonText: {
+    color: COLORS.textWhite,
     fontSize: 16,
-    color: '#999',
-    marginTop: 12,
+    fontWeight: 'bold',
   },
-  addButton: {
-    marginTop: 16,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    backgroundColor: '#FF6B35',
-    borderRadius: 8,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+
+  // Modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: COLORS.overlay,
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '80%',
+    backgroundColor: COLORS.surface,
+    borderTopLeftRadius: RADIUS.xl,
+    borderTopRightRadius: RADIUS.xl,
+    maxHeight: '85%',
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: COLORS.divider,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textPrimary,
   },
   modalForm: {
-    padding: 16,
+    padding: SPACING.lg,
   },
   inputLabel: {
     fontSize: 14,
-    color: '#666',
+    fontWeight: '500',
+    color: COLORS.textSecondary,
     textAlign: 'right',
-    marginBottom: 8,
+    marginBottom: SPACING.sm,
   },
   input: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.md,
+    padding: SPACING.md,
     fontSize: 16,
-    color: '#333',
-    marginBottom: 16,
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    textAlign: 'right',
   },
   textArea: {
     minHeight: 80,
@@ -458,23 +655,95 @@ const styles = StyleSheet.create({
   availabilityRow: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
+    gap: SPACING.md,
+    marginBottom: SPACING.lg,
   },
   availabilityLabel: {
     fontSize: 16,
-    color: '#333',
+    color: COLORS.textPrimary,
+    fontWeight: '500',
   },
   saveButton: {
-    backgroundColor: '#FF6B35',
-    margin: 16,
-    padding: 16,
-    borderRadius: 12,
+    margin: SPACING.lg,
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
+  },
+  saveButtonGradient: {
+    flexDirection: 'row-reverse',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.lg,
+    gap: SPACING.sm,
   },
   saveButtonText: {
-    color: '#fff',
+    color: COLORS.textWhite,
     fontSize: 18,
     fontWeight: 'bold',
+  },
+
+  // Confirm Modal
+  confirmModalOverlay: {
+    flex: 1,
+    backgroundColor: COLORS.overlay,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.xl,
+  },
+  confirmModal: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.xl,
+    width: '100%',
+    alignItems: 'center',
+  },
+  confirmIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: `${COLORS.error}15`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+  },
+  confirmTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
+  },
+  confirmMessage: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginBottom: SPACING.xl,
+  },
+  confirmButtons: {
+    flexDirection: 'row',
+    gap: SPACING.md,
+    width: '100%',
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  deleteConfirmButton: {
+    flex: 1,
+    backgroundColor: COLORS.error,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    alignItems: 'center',
+  },
+  deleteConfirmButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textWhite,
   },
 });
