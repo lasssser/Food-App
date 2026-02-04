@@ -290,6 +290,19 @@ export const restaurantPanelAPI = {
     const response = await api.get(`/restaurant/reports?period=${period}`);
     return response.data;
   },
+  // Restaurant Info
+  getRestaurantInfo: async () => {
+    const response = await api.get('/restaurant/info');
+    return response.data;
+  },
+  updateRestaurantInfo: async (data: any) => {
+    const response = await api.put('/restaurant/info', data);
+    return response.data;
+  },
+  toggleRestaurantStatus: async () => {
+    const response = await api.put('/restaurant/toggle-status');
+    return response.data;
+  },
 };
 
 // Driver API
