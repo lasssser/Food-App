@@ -282,6 +282,23 @@ class DriverOffer(BaseModel):
     status: str = "offered"  # offered, accepted, rejected, expired
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Restaurant Update Model
+class RestaurantUpdate(BaseModel):
+    name: Optional[str] = None
+    name_en: Optional[str] = None
+    description: Optional[str] = None
+    address: Optional[str] = None
+    area: Optional[str] = None
+    cuisine_type: Optional[str] = None
+    is_open: Optional[bool] = None
+    delivery_fee: Optional[float] = None
+    min_order: Optional[float] = None
+    delivery_time: Optional[str] = None
+    # Working hours
+    opening_time: Optional[str] = None  # e.g., "09:00"
+    closing_time: Optional[str] = None  # e.g., "23:00"
+    working_days: Optional[List[str]] = None  # e.g., ["السبت", "الأحد", ...]
+
 # Order Assignment
 class AssignDriverRequest(BaseModel):
     driver_type: str  # restaurant_driver or platform_driver
