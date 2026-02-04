@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.xl,
+    paddingVertical: SPACING.lg,
     paddingTop: SPACING.xxl,
   },
   headerContent: {
@@ -488,6 +488,37 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     ...SHADOWS.medium,
+  },
+
+  // Tabs
+  tabsContainer: {
+    flexDirection: 'row-reverse',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: RADIUS.lg,
+    padding: 4,
+    marginTop: SPACING.lg,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.md,
+    gap: SPACING.sm,
+  },
+  tabActive: {
+    backgroundColor: COLORS.surface,
+  },
+  tabText: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.7)',
+    fontWeight: '500',
+  },
+  tabTextActive: {
+    color: COLORS.textPrimary,
+    fontWeight: '600',
+  },
   },
   listContent: {
     padding: SPACING.lg,
