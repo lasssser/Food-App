@@ -339,6 +339,14 @@ export default function ProfileScreen() {
             </View>
           </TouchableOpacity>
 
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/(main)/my-complaints')} activeOpacity={0.7}>
+            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+            <View style={styles.menuItemContent}>
+              <Text style={styles.menuItemText}>شكاواي</Text>
+              <Ionicons name="chatbubbles-outline" size={22} color={COLORS.textSecondary} />
+            </View>
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.menuItem} onPress={() => setShowHelpModal(true)} activeOpacity={0.7}>
             <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
             <View style={styles.menuItemContent}>
