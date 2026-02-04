@@ -112,6 +112,7 @@ export default function MyOrders() {
       fetchOrders();
     } catch (error: any) {
       console.error('Error updating status:', error);
+      Alert.alert('خطأ', 'فشل في تحديث حالة الطلب');
     } finally {
       setUpdating(null);
     }
@@ -119,6 +120,31 @@ export default function MyOrders() {
 
   const getActiveOrdersCount = () => {
     return orders.filter(o => o.order_status !== 'delivered').length;
+  };
+
+  const handleCallCustomer = (phone: string) => {
+    if (Platform.OS === 'web') {
+      Alert.alert('اتصال', `رقم العميل: ${phone}`);
+    } else {
+      Linking.openURL(`tel:${phone}`);
+    }
+  };
+
+  const handleCallRestaurant = (phone: string) => {
+    if (Platform.OS === 'web') {
+      Alert.alert('اتصال', `رقم المطعم: ${phone}`);
+    } else {
+      Linking.openURL(`tel:${phone}`);
+    }
+  };
+
+  const handleOpenMap = (address: string) => {
+    const encodedAddress = encodeURIComponent(address);
+    if (Platform.OS === 'web') {
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
+    } else {
+      Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`);
+    }
   };
 
   const renderOrder = ({ item: order }: { item: Order }) => {
