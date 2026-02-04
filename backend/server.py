@@ -923,6 +923,147 @@ async def get_restaurant_stats(current_user: dict = Depends(get_current_user)):
         "today_revenue": today_revenue
     }
 
+@api_router.get("/restaurant/reports")
+async def get_restaurant_reports(
+    period: str = "week",  # today, week, month, year
+    current_user: dict = Depends(get_current_user)
+):
+    """Get detailed reports and statistics for the restaurant"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    # Calculate date range
+    now = datetime.utcnow()
+    if period == "today":
+        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif period == "week":
+        start_date = now - timedelta(days=7)
+    elif period == "month":
+        start_date = now - timedelta(days=30)
+    elif period == "year":
+        start_date = now - timedelta(days=365)
+    else:
+        start_date = now - timedelta(days=7)
+    
+    # Get all orders in period
+    orders = await db.orders.find({
+        "restaurant_id": restaurant["id"],
+        "created_at": {"$gte": start_date}
+    }).to_list(1000)
+    
+    # Calculate statistics
+    total_orders = len(orders)
+    completed_orders = len([o for o in orders if o.get("order_status") == "delivered"])
+    cancelled_orders = len([o for o in orders if o.get("order_status") == "cancelled"])
+    pending_orders = len([o for o in orders if o.get("order_status") in ["pending", "accepted", "preparing"]])
+    
+    # Revenue calculations
+    total_revenue = sum(o.get("total", 0) for o in orders if o.get("order_status") != "cancelled")
+    avg_order_value = total_revenue / completed_orders if completed_orders > 0 else 0
+    
+    # Best selling items
+    item_sales = {}
+    for order in orders:
+        if order.get("order_status") == "cancelled":
+            continue
+        for item in order.get("items", []):
+            item_name = item.get("name", "Unknown")
+            if item_name not in item_sales:
+                item_sales[item_name] = {"quantity": 0, "revenue": 0}
+            item_sales[item_name]["quantity"] += item.get("quantity", 1)
+            item_sales[item_name]["revenue"] += item.get("subtotal", 0)
+    
+    top_items = sorted(item_sales.items(), key=lambda x: x[1]["quantity"], reverse=True)[:5]
+    
+    # Daily breakdown for charts
+    daily_data = {}
+    for order in orders:
+        if order.get("order_status") == "cancelled":
+            continue
+        date_key = order.get("created_at").strftime("%Y-%m-%d") if order.get("created_at") else "unknown"
+        if date_key not in daily_data:
+            daily_data[date_key] = {"orders": 0, "revenue": 0}
+        daily_data[date_key]["orders"] += 1
+        daily_data[date_key]["revenue"] += order.get("total", 0)
+    
+    # Sort by date
+    chart_data = [
+        {"date": k, "orders": v["orders"], "revenue": v["revenue"]}
+        for k, v in sorted(daily_data.items())
+    ]
+    
+    # Payment methods breakdown
+    payment_methods = {}
+    for order in orders:
+        if order.get("order_status") == "cancelled":
+            continue
+        method = order.get("payment_method", "COD")
+        if method not in payment_methods:
+            payment_methods[method] = {"count": 0, "total": 0}
+        payment_methods[method]["count"] += 1
+        payment_methods[method]["total"] += order.get("total", 0)
+    
+    # Delivery mode breakdown
+    delivery_modes = {}
+    for order in orders:
+        if order.get("order_status") == "cancelled":
+            continue
+        mode = order.get("delivery_mode", "restaurant_driver")
+        if mode not in delivery_modes:
+            delivery_modes[mode] = 0
+        delivery_modes[mode] += 1
+    
+    # Get restaurant rating
+    ratings = await db.ratings.find({"restaurant_id": restaurant["id"]}).to_list(100)
+    avg_rating = sum(r.get("rating", 5) for r in ratings) / len(ratings) if ratings else 0
+    
+    # Peak hours analysis
+    hour_data = {}
+    for order in orders:
+        if order.get("created_at"):
+            hour = order["created_at"].hour
+            if hour not in hour_data:
+                hour_data[hour] = 0
+            hour_data[hour] += 1
+    
+    peak_hours = sorted(hour_data.items(), key=lambda x: x[1], reverse=True)[:3]
+    
+    return {
+        "period": period,
+        "summary": {
+            "total_orders": total_orders,
+            "completed_orders": completed_orders,
+            "cancelled_orders": cancelled_orders,
+            "pending_orders": pending_orders,
+            "completion_rate": round((completed_orders / total_orders * 100) if total_orders > 0 else 0, 1),
+            "total_revenue": total_revenue,
+            "avg_order_value": round(avg_order_value, 0),
+            "avg_rating": round(avg_rating, 1),
+            "total_reviews": len(ratings)
+        },
+        "top_items": [
+            {"name": name, "quantity": data["quantity"], "revenue": data["revenue"]}
+            for name, data in top_items
+        ],
+        "chart_data": chart_data,
+        "payment_methods": [
+            {"method": k, "count": v["count"], "total": v["total"]}
+            for k, v in payment_methods.items()
+        ],
+        "delivery_modes": [
+            {"mode": k, "count": v}
+            for k, v in delivery_modes.items()
+        ],
+        "peak_hours": [
+            {"hour": h, "orders": c}
+            for h, c in peak_hours
+        ]
+    }
+
 # ==================== Restaurant Drivers Management ====================
 
 def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
