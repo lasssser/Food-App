@@ -109,6 +109,27 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleSubmitComplaint = async () => {
+    if (!complaintSubject.trim() || !complaintMessage.trim()) {
+      return;
+    }
+    setSubmittingComplaint(true);
+    try {
+      await complaintsAPI.submit(complaintSubject.trim(), complaintMessage.trim(), 'customer');
+      setShowComplaintModal(false);
+      setComplaintSubject('');
+      setComplaintMessage('');
+      // Show success alert
+      if (Platform.OS === 'web') {
+        alert('تم إرسال الشكوى بنجاح، سنتواصل معك قريباً');
+      }
+    } catch (error) {
+      console.error('Error submitting complaint:', error);
+    } finally {
+      setSubmittingComplaint(false);
+    }
+  };
+
   // Guest View
   if (isGuest) {
     return (
