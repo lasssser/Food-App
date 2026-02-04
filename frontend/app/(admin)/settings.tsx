@@ -396,6 +396,47 @@ export default function AdminSettings() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* Clear Test Data Modal */}
+      <Modal visible={showClearDataModal} animationType="fade" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.confirmModal}>
+            <View style={[styles.confirmIconContainer, { backgroundColor: '#fef3c7' }]}>
+              <Ionicons name="warning" size={40} color="#f59e0b" />
+            </View>
+            <Text style={styles.confirmTitle}>حذف البيانات التجريبية</Text>
+            <Text style={styles.confirmMessage}>
+              سيتم حذف جميع البيانات التجريبية بما في ذلك:{'\n'}
+              • المطاعم التجريبية{'\n'}
+              • المستخدمين التجريبيين{'\n'}
+              • الطلبات التجريبية
+            </Text>
+            <Text style={[styles.confirmMessage, { color: '#ef4444', fontWeight: '600' }]}>
+              هذا الإجراء لا يمكن التراجع عنه!
+            </Text>
+            <View style={styles.confirmButtons}>
+              <TouchableOpacity
+                style={[styles.confirmBtn, styles.cancelBtn]}
+                onPress={() => setShowClearDataModal(false)}
+                disabled={clearingData}
+              >
+                <Text style={styles.cancelBtnText}>إلغاء</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.confirmBtn, styles.dangerBtn]}
+                onPress={handleClearTestData}
+                disabled={clearingData}
+              >
+                {clearingData ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.dangerBtnText}>حذف</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
