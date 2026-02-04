@@ -144,32 +144,51 @@ export default function AdminUsers() {
     }
   };
 
-  const handleDeleteUser = (user: User) => {
-    Alert.alert(
-      'تأكيد الحذف',
-      `هل أنت متأكد من حذف حساب "${user.name}"؟\nهذا الإجراء لا يمكن التراجع عنه.`,
-      [
-        { text: 'إلغاء', style: 'cancel' },
-        {
-          text: 'حذف',
-          style: 'destructive',
-          onPress: async () => {
-            setActionLoading(true);
-            try {
-              await adminAPI.deleteUser(user.id);
-              Alert.alert('نجاح', 'تم حذف الحساب بنجاح');
-              setShowUserModal(false);
-              fetchUsers();
-            } catch (error: any) {
-              console.error('Error deleting user:', error);
-              Alert.alert('خطأ', error.response?.data?.detail || 'فشل في حذف الحساب');
-            } finally {
-              setActionLoading(false);
-            }
+  const handleDeleteUser = async (user: User) => {
+    // For web, use window.confirm instead of Alert.alert
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(`هل أنت متأكد من حذف حساب "${user.name}"؟\nهذا الإجراء لا يمكن التراجع عنه.`);
+      if (!confirmed) return;
+      
+      setActionLoading(true);
+      try {
+        await adminAPI.deleteUser(user.id);
+        alert('تم حذف الحساب بنجاح');
+        setShowUserModal(false);
+        fetchUsers();
+      } catch (error: any) {
+        console.error('Error deleting user:', error);
+        alert(error.response?.data?.detail || 'فشل في حذف الحساب');
+      } finally {
+        setActionLoading(false);
+      }
+    } else {
+      Alert.alert(
+        'تأكيد الحذف',
+        `هل أنت متأكد من حذف حساب "${user.name}"؟\nهذا الإجراء لا يمكن التراجع عنه.`,
+        [
+          { text: 'إلغاء', style: 'cancel' },
+          {
+            text: 'حذف',
+            style: 'destructive',
+            onPress: async () => {
+              setActionLoading(true);
+              try {
+                await adminAPI.deleteUser(user.id);
+                Alert.alert('نجاح', 'تم حذف الحساب بنجاح');
+                setShowUserModal(false);
+                fetchUsers();
+              } catch (error: any) {
+                console.error('Error deleting user:', error);
+                Alert.alert('خطأ', error.response?.data?.detail || 'فشل في حذف الحساب');
+              } finally {
+                setActionLoading(false);
+              }
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
   const getRoleLabel = (role?: string) => ROLE_LABELS[role || 'customer'] || 'زبون';
