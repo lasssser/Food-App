@@ -5,6 +5,7 @@ import { View, ActivityIndicator, StyleSheet, I18nManager } from 'react-native';
 import { useAuthStore } from '../src/store/authStore';
 import { seedAPI } from '../src/services/api';
 import { COLORS } from '../src/constants/theme';
+import { usePushNotifications } from '../src/hooks/usePushNotifications';
 
 // Force RTL for Arabic
 I18nManager.allowRTL(true);
@@ -15,6 +16,18 @@ export default function RootLayout() {
   const router = useRouter();
   const segments = useSegments();
   const [isReady, setIsReady] = useState(false);
+  
+  // Initialize push notifications
+  const { expoPushToken, notification, loading: pushLoading, error: pushError } = usePushNotifications();
+  
+  useEffect(() => {
+    if (expoPushToken) {
+      console.log('📱 Push notifications enabled with token:', expoPushToken.slice(0, 30) + '...');
+    }
+    if (pushError) {
+      console.log('⚠️ Push notification setup error:', pushError);
+    }
+  }, [expoPushToken, pushError]);
 
   useEffect(() => {
     const init = async () => {
