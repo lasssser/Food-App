@@ -319,6 +319,22 @@ export const notificationAPI = {
     const response = await api.put('/notifications/mark-all-read');
     return response.data;
   },
+  // Push token management
+  registerPushToken: async (pushToken: string, platform: string) => {
+    const response = await api.post('/notifications/register-push-token', {
+      push_token: pushToken,
+      platform,
+    });
+    return response.data;
+  },
+  unregisterPushToken: async () => {
+    const response = await api.delete('/notifications/push-token');
+    return response.data;
+  },
+  testPushNotification: async () => {
+    const response = await api.post('/notifications/test-push');
+    return response.data;
+  },
 };
 
 export const seedAPI = {
