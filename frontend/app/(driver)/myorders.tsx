@@ -559,6 +559,75 @@ const styles = StyleSheet.create({
     height: 16,
     backgroundColor: COLORS.border,
   },
+
+  // Customer Section
+  customerSection: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: COLORS.background,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+    marginBottom: SPACING.md,
+  },
+  customerInfo: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: SPACING.md,
+  },
+  customerAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: `${COLORS.primary}15`,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  customerDetails: {
+    alignItems: 'flex-end',
+  },
+  customerName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  customerPhone: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  quickActions: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+  },
+  quickActionBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.small,
+  },
+
+  // Notes Section
+  notesSection: {
+    flexDirection: 'row-reverse',
+    alignItems: 'flex-start',
+    backgroundColor: `${COLORS.warning}10`,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+    marginBottom: SPACING.md,
+    gap: SPACING.sm,
+  },
+  notesText: {
+    flex: 1,
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    textAlign: 'right',
+    lineHeight: 20,
+  },
+
   itemsSection: {
     marginBottom: SPACING.md,
   },
