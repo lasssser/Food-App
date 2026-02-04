@@ -50,11 +50,32 @@ export default function OrdersScreen() {
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [confirmCancelVisible, setConfirmCancelVisible] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
+  
+  // Rating state
+  const [ratingModalVisible, setRatingModalVisible] = useState(false);
+  const [orderToRate, setOrderToRate] = useState<Order | null>(null);
+  const [ratedOrders, setRatedOrders] = useState<Set<string>>(new Set());
 
   const fetchOrders = async () => {
     try {
       const data = await orderAPI.getAll();
       setOrders(data);
+      
+      // Check which orders have been rated
+      const ratedSet = new Set<string>();
+      for (const order of data) {
+        if (order.order_status === 'delivered') {
+          try {
+            const ratingResult = await ratingAPI.getOrderRating(order.id);
+            if (ratingResult.rated) {
+              ratedSet.add(order.id);
+            }
+          } catch {
+            // Ignore errors
+          }
+        }
+      }
+      setRatedOrders(ratedSet);
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
