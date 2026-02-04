@@ -2834,6 +2834,10 @@ async def get_user_details(user_id: str, admin: dict = Depends(require_admin)):
     # Get user orders
     orders = await db.orders.find({"user_id": user_id}).sort("created_at", -1).limit(10).to_list(10)
     
+    # Clean orders from MongoDB ObjectIds
+    for order in orders:
+        order.pop("_id", None)
+    
     return {"user": user, "recent_orders": orders}
 
 class UpdateUserStatusRequest(BaseModel):
