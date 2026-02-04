@@ -10,12 +10,14 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useAuthStore } from '../../src/store/authStore';
+import api from '../../src/services/api';
 
 export default function AdminSettings() {
   const { user, logout } = useAuthStore();
