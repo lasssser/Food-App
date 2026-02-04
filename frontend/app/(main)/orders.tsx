@@ -369,6 +369,24 @@ export default function OrdersScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Rating Modal */}
+      {orderToRate && (
+        <RatingModal
+          visible={ratingModalVisible}
+          onClose={() => {
+            setRatingModalVisible(false);
+            setOrderToRate(null);
+          }}
+          orderId={orderToRate.id}
+          restaurantName={orderToRate.restaurant_name}
+          hasDriver={!!orderToRate.driver_name}
+          driverName={orderToRate.driver_name}
+          onSuccess={() => {
+            setRatedOrders(prev => new Set([...prev, orderToRate.id]));
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 }
