@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,28 +9,23 @@ import {
   Modal,
   Linking,
   Platform,
+  Switch,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../src/store/authStore';
+import { restaurantPanelAPI } from '../../src/services/api';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
-// Custom alert function that works on web and mobile
-const showAlert = (title: string, message: string, buttons: Array<{text: string, onPress?: () => void, style?: string}>) => {
-  if (Platform.OS === 'web') {
-    const confirmed = window.confirm(`${title}\n\n${message}`);
-    if (confirmed && buttons.length > 0) {
-      const confirmButton = buttons.find(b => b.style === 'destructive') || buttons[buttons.length - 1];
-      if (confirmButton?.onPress) {
-        confirmButton.onPress();
-      }
-    }
-  } else {
-    Alert.alert(title, message, buttons);
-  }
-};
+interface RestaurantStats {
+  total_orders: number;
+  pending_orders: number;
+  completed_orders: number;
+  total_revenue: number;
+}
 
 export default function RestaurantSettings() {
   const router = useRouter();
@@ -38,6 +33,34 @@ export default function RestaurantSettings() {
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [stats, setStats] = useState<RestaurantStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const orders = await restaurantPanelAPI.getOrders();
+      const completed = orders.filter((o: any) => o.order_status === 'delivered');
+      const pending = orders.filter((o: any) => o.order_status === 'pending');
+      const revenue = completed.reduce((sum: number, o: any) => sum + o.total, 0);
+      
+      setStats({
+        total_orders: orders.length,
+        pending_orders: pending.length,
+        completed_orders: completed.length,
+        total_revenue: revenue,
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -60,105 +83,207 @@ export default function RestaurantSettings() {
     }
   };
 
+  const menuItems = [
+    {
+      id: 'restaurant-info',
+      title: 'معلومات المطعم',
+      subtitle: 'الاسم، الوصف، أوقات العمل',
+      icon: 'business' as const,
+      color: COLORS.primary,
+      onPress: () => Alert.alert('قريباً', 'هذه الميزة قيد التطوير'),
+    },
+    {
+      id: 'orders',
+      title: 'سجل الطلبات',
+      subtitle: 'عرض جميع الطلبات السابقة',
+      icon: 'document-text' as const,
+      color: COLORS.info,
+      onPress: () => router.push('/(restaurant)/orders'),
+    },
+    {
+      id: 'menu',
+      title: 'إدارة القائمة',
+      subtitle: 'إضافة وتعديل الأصناف',
+      icon: 'restaurant' as const,
+      color: COLORS.accent,
+      onPress: () => router.push('/(restaurant)/menu'),
+    },
+    {
+      id: 'drivers',
+      title: 'إدارة السائقين',
+      subtitle: 'إضافة وتعديل سائقين المطعم',
+      icon: 'bicycle' as const,
+      color: COLORS.success,
+      onPress: () => router.push('/(restaurant)/drivers'),
+    },
+    {
+      id: 'reports',
+      title: 'التقارير والإحصائيات',
+      subtitle: 'المبيعات والأداء',
+      icon: 'bar-chart' as const,
+      color: '#9C27B0',
+      onPress: () => Alert.alert('قريباً', 'التقارير المتقدمة قيد التطوير'),
+    },
+  ];
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>الإعدادات</Text>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Profile Card */}
-        <View style={styles.profileCard}>
-          <View style={styles.avatarContainer}>
-            <Text style={styles.avatarEmoji}>🏪</Text>
-          </View>
-          <View style={styles.userInfo}>
-            <Text style={styles.userName}>{user?.name}</Text>
-            <Text style={styles.userPhone}>{user?.phone}</Text>
-            <View style={styles.roleTag}>
-              <Text style={styles.roleText}>صاحب مطعم</Text>
+      {/* Header with Gradient */}
+      <LinearGradient colors={[COLORS.primary, COLORS.primaryDark]} style={styles.header}>
+        <View style={styles.headerContent}>
+          <View style={styles.profileSection}>
+            <View style={styles.avatarContainer}>
+              <Text style={styles.avatarEmoji}>🏪</Text>
+            </View>
+            <View style={styles.profileInfo}>
+              <Text style={styles.profileName}>{user?.name || 'صاحب المطعم'}</Text>
+              <Text style={styles.profilePhone}>{user?.phone}</Text>
+              <View style={styles.profileBadge}>
+                <Ionicons name="star" size={12} color="#FFD700" />
+                <Text style={styles.badgeText}>مطعم مميز</Text>
+              </View>
             </View>
           </View>
         </View>
 
+        {/* Quick Stats */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>
+              {loading ? '...' : stats?.total_orders || 0}
+            </Text>
+            <Text style={styles.statLabel}>إجمالي الطلبات</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>
+              {loading ? '...' : stats?.completed_orders || 0}
+            </Text>
+            <Text style={styles.statLabel}>مكتمل</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>
+              {loading ? '...' : `${((stats?.total_revenue || 0) / 1000).toFixed(0)}K`}
+            </Text>
+            <Text style={styles.statLabel}>الإيرادات</Text>
+          </View>
+        </View>
+      </LinearGradient>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Menu Items */}
-        <View style={styles.menuSection}>
-          <TouchableOpacity 
-            style={styles.menuItem} 
-            activeOpacity={0.7}
-            onPress={() => Alert.alert('قريباً', 'هذه الميزة قيد التطوير')}
-          >
-            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
-            <View style={styles.menuItemContent}>
-              <Text style={styles.menuItemText}>تعديل بيانات المطعم</Text>
-              <View style={[styles.menuIcon, { backgroundColor: `${COLORS.primary}15` }]}>
-                <Ionicons name="business" size={20} color={COLORS.primary} />
-              </View>
-            </View>
-          </TouchableOpacity>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>إدارة المطعم</Text>
+          <View style={styles.menuCard}>
+            {menuItems.map((item, index) => (
+              <TouchableOpacity
+                key={item.id}
+                style={[
+                  styles.menuItem,
+                  index < menuItems.length - 1 && styles.menuItemBorder,
+                ]}
+                onPress={item.onPress}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+                <View style={styles.menuItemContent}>
+                  <View style={styles.menuItemText}>
+                    <Text style={styles.menuItemTitle}>{item.title}</Text>
+                    <Text style={styles.menuItemSubtitle}>{item.subtitle}</Text>
+                  </View>
+                  <View style={[styles.menuItemIcon, { backgroundColor: `${item.color}15` }]}>
+                    <Ionicons name={item.icon} size={22} color={item.color} />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
 
-          <TouchableOpacity 
-            style={styles.menuItem} 
-            activeOpacity={0.7}
-            onPress={() => router.push('/(restaurant)/orders')}
-          >
-            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
-            <View style={styles.menuItemContent}>
-              <Text style={styles.menuItemText}>سجل الطلبات</Text>
-              <View style={[styles.menuIcon, { backgroundColor: `${COLORS.info}15` }]}>
-                <Ionicons name="document-text" size={20} color={COLORS.info} />
+        {/* Notifications Settings */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>الإشعارات</Text>
+          <View style={styles.menuCard}>
+            <View style={styles.toggleItem}>
+              <Switch
+                value={notificationsEnabled}
+                onValueChange={setNotificationsEnabled}
+                trackColor={{ false: COLORS.divider, true: `${COLORS.success}50` }}
+                thumbColor={notificationsEnabled ? COLORS.success : '#f4f3f4'}
+              />
+              <View style={styles.toggleContent}>
+                <Text style={styles.toggleTitle}>إشعارات الطلبات</Text>
+                <Text style={styles.toggleSubtitle}>استلام إشعارات للطلبات الجديدة</Text>
+              </View>
+              <View style={[styles.menuItemIcon, { backgroundColor: `${COLORS.warning}15` }]}>
+                <Ionicons name="notifications" size={22} color={COLORS.warning} />
               </View>
             </View>
-          </TouchableOpacity>
+            
+            <View style={[styles.toggleItem, styles.menuItemBorder, { borderTopWidth: 1 }]}>
+              <Switch
+                value={soundEnabled}
+                onValueChange={setSoundEnabled}
+                trackColor={{ false: COLORS.divider, true: `${COLORS.success}50` }}
+                thumbColor={soundEnabled ? COLORS.success : '#f4f3f4'}
+              />
+              <View style={styles.toggleContent}>
+                <Text style={styles.toggleTitle}>صوت التنبيه</Text>
+                <Text style={styles.toggleSubtitle}>تشغيل صوت عند وصول طلب جديد</Text>
+              </View>
+              <View style={[styles.menuItemIcon, { backgroundColor: `${COLORS.info}15` }]}>
+                <Ionicons name="volume-high" size={22} color={COLORS.info} />
+              </View>
+            </View>
+          </View>
+        </View>
 
-          <TouchableOpacity 
-            style={styles.menuItem} 
-            activeOpacity={0.7}
-            onPress={() => Alert.alert('قريباً', 'التقارير والإحصائيات قيد التطوير')}
-          >
-            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
-            <View style={styles.menuItemContent}>
-              <Text style={styles.menuItemText}>التقارير والإحصائيات</Text>
-              <View style={[styles.menuIcon, { backgroundColor: `${COLORS.success}15` }]}>
-                <Ionicons name="bar-chart" size={20} color={COLORS.success} />
+        {/* Support & About */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>الدعم والمساعدة</Text>
+          <View style={styles.menuCard}>
+            <TouchableOpacity
+              style={[styles.menuItem, styles.menuItemBorder]}
+              onPress={() => setShowHelpModal(true)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+              <View style={styles.menuItemContent}>
+                <View style={styles.menuItemText}>
+                  <Text style={styles.menuItemTitle}>المساعدة والدعم</Text>
+                  <Text style={styles.menuItemSubtitle}>تواصل معنا</Text>
+                </View>
+                <View style={[styles.menuItemIcon, { backgroundColor: `${COLORS.success}15` }]}>
+                  <Ionicons name="help-buoy" size={22} color={COLORS.success} />
+                </View>
               </View>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.menuItem} 
-            activeOpacity={0.7}
-            onPress={() => setShowHelpModal(true)}
-          >
-            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
-            <View style={styles.menuItemContent}>
-              <Text style={styles.menuItemText}>المساعدة والدعم</Text>
-              <View style={[styles.menuIcon, { backgroundColor: `${COLORS.warning}15` }]}>
-                <Ionicons name="help-circle" size={20} color={COLORS.warning} />
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => setShowAboutModal(true)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+              <View style={styles.menuItemContent}>
+                <View style={styles.menuItemText}>
+                  <Text style={styles.menuItemTitle}>عن التطبيق</Text>
+                  <Text style={styles.menuItemSubtitle}>الإصدار والمعلومات</Text>
+                </View>
+                <View style={[styles.menuItemIcon, { backgroundColor: `${COLORS.accent}15` }]}>
+                  <Ionicons name="information-circle" size={22} color={COLORS.accent} />
+                </View>
               </View>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.menuItem} 
-            activeOpacity={0.7}
-            onPress={() => setShowAboutModal(true)}
-          >
-            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
-            <View style={styles.menuItemContent}>
-              <Text style={styles.menuItemText}>عن التطبيق</Text>
-              <View style={[styles.menuIcon, { backgroundColor: `${COLORS.accent}15` }]}>
-                <Ionicons name="information-circle" size={20} color={COLORS.accent} />
-              </View>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Logout Button */}
-        <TouchableOpacity 
-          style={styles.logoutButton} 
+        <TouchableOpacity
+          style={styles.logoutButton}
           onPress={() => setShowLogoutModal(true)}
-          activeOpacity={0.7}
+          activeOpacity={0.8}
         >
           <View style={styles.logoutContent}>
             <Ionicons name="log-out-outline" size={22} color={COLORS.error} />
@@ -173,33 +298,64 @@ export default function RestaurantSettings() {
       <Modal visible={showHelpModal} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
+            <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
               <TouchableOpacity onPress={() => setShowHelpModal(false)} activeOpacity={0.7}>
-                <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+                <Ionicons name="close-circle" size={28} color={COLORS.textLight} />
               </TouchableOpacity>
               <Text style={styles.modalTitle}>المساعدة والدعم</Text>
-              <View style={{ width: 24 }} />
+              <View style={{ width: 28 }} />
             </View>
 
             <View style={styles.helpContent}>
-              <TouchableOpacity style={styles.helpItem} onPress={handleContactSupport} activeOpacity={0.7}>
-                <View style={[styles.helpIcon, { backgroundColor: `${COLORS.success}15` }]}>
-                  <Ionicons name="call" size={24} color={COLORS.success} />
+              <TouchableOpacity style={styles.helpCard} onPress={handleContactSupport} activeOpacity={0.7}>
+                <LinearGradient
+                  colors={['#25D366', '#128C7E']}
+                  style={styles.helpCardGradient}
+                >
+                  <Ionicons name="logo-whatsapp" size={32} color="#FFF" />
+                </LinearGradient>
+                <View style={styles.helpCardInfo}>
+                  <Text style={styles.helpCardTitle}>واتساب</Text>
+                  <Text style={styles.helpCardDesc}>راسلنا مباشرة</Text>
                 </View>
-                <View style={styles.helpInfo}>
-                  <Text style={styles.helpTitle}>تواصل معنا</Text>
-                  <Text style={styles.helpDesc}>اتصل أو راسلنا عبر واتساب</Text>
-                </View>
+                <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.helpItem} activeOpacity={0.7}>
-                <View style={[styles.helpIcon, { backgroundColor: `${COLORS.info}15` }]}>
-                  <Ionicons name="chatbubbles" size={24} color={COLORS.info} />
+              <TouchableOpacity 
+                style={styles.helpCard} 
+                onPress={() => {
+                  if (Platform.OS !== 'web') {
+                    Linking.openURL('tel:+963999999999');
+                  }
+                }}
+                activeOpacity={0.7}
+              >
+                <LinearGradient
+                  colors={[COLORS.info, '#1976D2']}
+                  style={styles.helpCardGradient}
+                >
+                  <Ionicons name="call" size={32} color="#FFF" />
+                </LinearGradient>
+                <View style={styles.helpCardInfo}>
+                  <Text style={styles.helpCardTitle}>اتصل بنا</Text>
+                  <Text style={styles.helpCardDesc}>+963 999 999 999</Text>
                 </View>
-                <View style={styles.helpInfo}>
-                  <Text style={styles.helpTitle}>الأسئلة الشائعة</Text>
-                  <Text style={styles.helpDesc}>إجابات على أكثر الأسئلة شيوعاً</Text>
+                <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.helpCard} activeOpacity={0.7}>
+                <LinearGradient
+                  colors={[COLORS.warning, '#F57C00']}
+                  style={styles.helpCardGradient}
+                >
+                  <Ionicons name="chatbubbles" size={32} color="#FFF" />
+                </LinearGradient>
+                <View style={styles.helpCardInfo}>
+                  <Text style={styles.helpCardTitle}>الأسئلة الشائعة</Text>
+                  <Text style={styles.helpCardDesc}>إجابات سريعة</Text>
                 </View>
+                <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
               </TouchableOpacity>
             </View>
           </View>
@@ -210,23 +366,48 @@ export default function RestaurantSettings() {
       <Modal visible={showAboutModal} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
+            <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
               <TouchableOpacity onPress={() => setShowAboutModal(false)} activeOpacity={0.7}>
-                <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+                <Ionicons name="close-circle" size={28} color={COLORS.textLight} />
               </TouchableOpacity>
               <Text style={styles.modalTitle}>عن التطبيق</Text>
-              <View style={{ width: 24 }} />
+              <View style={{ width: 28 }} />
             </View>
 
             <View style={styles.aboutContent}>
-              <View style={styles.aboutLogo}>
+              <LinearGradient
+                colors={[COLORS.primary, COLORS.primaryDark]}
+                style={styles.aboutLogo}
+              >
                 <Text style={styles.aboutEmoji}>🍔</Text>
-              </View>
+              </LinearGradient>
               <Text style={styles.aboutName}>يلا ناكل؟</Text>
-              <Text style={styles.aboutVersion}>لوحة المطعم - الإصدار 1.0.0</Text>
+              <Text style={styles.aboutTagline}>اطلب أشهى المأكولات بضغطة زر</Text>
+              
+              <View style={styles.versionBadge}>
+                <Text style={styles.versionBadgeText}>لوحة المطعم - v1.0.0</Text>
+              </View>
+
               <Text style={styles.aboutDesc}>
-                لوحة تحكم خاصة بأصحاب المطاعم لإدارة الطلبات والقوائم والإحصائيات.
+                لوحة تحكم متكاملة لأصحاب المطاعم لإدارة الطلبات والقوائم والسائقين وتتبع الإحصائيات.
               </Text>
+
+              <View style={styles.featuresList}>
+                <View style={styles.featureItem}>
+                  <Ionicons name="checkmark-circle" size={18} color={COLORS.success} />
+                  <Text style={styles.featureText}>إدارة الطلبات في الوقت الحقيقي</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <Ionicons name="checkmark-circle" size={18} color={COLORS.success} />
+                  <Text style={styles.featureText}>تعيين السائقين بسهولة</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <Ionicons name="checkmark-circle" size={18} color={COLORS.success} />
+                  <Text style={styles.featureText}>إشعارات فورية للطلبات</Text>
+                </View>
+              </View>
+
               <Text style={styles.aboutCopyright}>© 2025 يلا ناكل؟ - جميع الحقوق محفوظة</Text>
             </View>
           </View>
@@ -235,29 +416,34 @@ export default function RestaurantSettings() {
 
       {/* Logout Confirmation Modal */}
       <Modal visible={showLogoutModal} animationType="fade" transparent>
-        <View style={styles.modalOverlay}>
+        <View style={styles.confirmOverlay}>
           <View style={styles.confirmModal}>
             <View style={styles.confirmIconContainer}>
               <Ionicons name="log-out-outline" size={40} color={COLORS.error} />
             </View>
             <Text style={styles.confirmTitle}>تسجيل الخروج</Text>
             <Text style={styles.confirmMessage}>هل تريد تسجيل الخروج من حسابك؟</Text>
-            
+
             <View style={styles.confirmButtons}>
-              <TouchableOpacity 
-                style={styles.cancelButton} 
+              <TouchableOpacity
+                style={styles.cancelBtn}
                 onPress={() => setShowLogoutModal(false)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.cancelButtonText}>إلغاء</Text>
+                <Text style={styles.cancelBtnText}>إلغاء</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.confirmButton} 
+
+              <TouchableOpacity
+                style={styles.confirmBtn}
                 onPress={handleLogout}
                 activeOpacity={0.7}
               >
-                <Text style={styles.confirmButtonText}>خروج</Text>
+                <LinearGradient
+                  colors={[COLORS.error, '#C62828']}
+                  style={styles.confirmBtnGradient}
+                >
+                  <Text style={styles.confirmBtnText}>خروج</Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           </View>
@@ -272,75 +458,110 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  
+  // Header
   header: {
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.divider,
+    paddingTop: SPACING.lg,
+    paddingBottom: SPACING.xl,
   },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.textPrimary,
-    textAlign: 'center',
+  headerContent: {
+    marginBottom: SPACING.lg,
   },
-  content: {
-    flex: 1,
-  },
-
-  // Profile Card
-  profileCard: {
+  profileSection: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
-    padding: SPACING.xl,
-    marginBottom: SPACING.md,
-    ...SHADOWS.small,
   },
   avatarContainer: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: `${COLORS.primary}15`,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
   avatarEmoji: {
     fontSize: 35,
   },
-  userInfo: {
+  profileInfo: {
     flex: 1,
     marginRight: SPACING.lg,
     alignItems: 'flex-end',
   },
-  userName: {
-    fontSize: 20,
+  profileName: {
+    fontSize: 22,
     fontWeight: 'bold',
-    color: COLORS.textPrimary,
+    color: COLORS.textWhite,
   },
-  userPhone: {
+  profilePhone: {
     fontSize: 14,
-    color: COLORS.textSecondary,
-    marginTop: 4,
+    color: 'rgba(255,255,255,0.8)',
+    marginTop: 2,
   },
-  roleTag: {
-    backgroundColor: `${COLORS.primary}15`,
+  profileBadge: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
     paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
+    paddingVertical: 4,
     borderRadius: RADIUS.full,
     marginTop: SPACING.sm,
+    gap: 4,
   },
-  roleText: {
+  badgeText: {
     fontSize: 12,
-    color: COLORS.primary,
+    color: COLORS.textWhite,
     fontWeight: '600',
   },
 
-  // Menu Section
-  menuSection: {
-    backgroundColor: COLORS.surface,
+  // Stats
+  statsContainer: {
+    flexDirection: 'row-reverse',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: RADIUS.lg,
+    paddingVertical: SPACING.lg,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: COLORS.textWhite,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
+    marginTop: 2,
+  },
+  statDivider: {
+    width: 1,
+    height: '100%',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+
+  // Content
+  content: {
+    flex: 1,
+  },
+  sectionContainer: {
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.lg,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
     marginBottom: SPACING.md,
+    textAlign: 'right',
+  },
+  menuCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
     ...SHADOWS.small,
   },
   menuItem: {
@@ -348,6 +569,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: SPACING.lg,
     paddingHorizontal: SPACING.lg,
+  },
+  menuItemBorder: {
     borderBottomWidth: 1,
     borderBottomColor: COLORS.divider,
   },
@@ -357,26 +580,59 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: SPACING.md,
   },
-  menuIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  menuItemIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
   },
   menuItemText: {
     flex: 1,
+    alignItems: 'flex-end',
+  },
+  menuItemTitle: {
     fontSize: 15,
+    fontWeight: '600',
     color: COLORS.textPrimary,
-    textAlign: 'right',
+  },
+  menuItemSubtitle: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    marginTop: 2,
   },
 
-  // Logout Button
+  // Toggle Items
+  toggleItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.lg,
+  },
+  toggleContent: {
+    flex: 1,
+    alignItems: 'flex-end',
+    marginHorizontal: SPACING.md,
+  },
+  toggleTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  toggleSubtitle: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    marginTop: 2,
+  },
+
+  // Logout
   logoutButton: {
-    backgroundColor: COLORS.surface,
     marginHorizontal: SPACING.lg,
-    marginBottom: SPACING.md,
+    marginTop: SPACING.xl,
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: `${COLORS.error}30`,
     ...SHADOWS.small,
   },
   logoutContent: {
@@ -395,10 +651,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textLight,
     textAlign: 'center',
-    paddingBottom: 30,
+    paddingVertical: SPACING.xl,
   },
 
-  // Modal
+  // Modal Common
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -406,15 +662,25 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: COLORS.surface,
-    borderTopLeftRadius: RADIUS.xl,
-    borderTopRightRadius: RADIUS.xl,
-    padding: SPACING.xl,
+    borderTopLeftRadius: RADIUS.xxl,
+    borderTopRightRadius: RADIUS.xxl,
+    paddingBottom: SPACING.xl,
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: COLORS.divider,
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginTop: SPACING.md,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.xl,
+    padding: SPACING.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.divider,
   },
   modalTitle: {
     fontSize: 18,
@@ -422,87 +688,122 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
 
-  // Help Content
+  // Help Modal
   helpContent: {
+    padding: SPACING.lg,
     gap: SPACING.md,
   },
-  helpItem: {
+  helpCard: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: COLORS.background,
     padding: SPACING.lg,
     borderRadius: RADIUS.lg,
   },
-  helpIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  helpCardGradient: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  helpInfo: {
+  helpCardInfo: {
     flex: 1,
     marginRight: SPACING.md,
     alignItems: 'flex-end',
   },
-  helpTitle: {
+  helpCardTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
-  helpDesc: {
+  helpCardDesc: {
     fontSize: 13,
     color: COLORS.textSecondary,
     marginTop: 2,
   },
 
-  // About Content
+  // About Modal
   aboutContent: {
     alignItems: 'center',
-    paddingVertical: SPACING.lg,
+    padding: SPACING.xl,
   },
   aboutLogo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: `${COLORS.primary}15`,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.lg,
   },
   aboutEmoji: {
-    fontSize: 40,
+    fontSize: 45,
   },
   aboutName: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: COLORS.primary,
-    marginBottom: SPACING.xs,
   },
-  aboutVersion: {
+  aboutTagline: {
     fontSize: 14,
-    color: COLORS.textLight,
-    marginBottom: SPACING.lg,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+  },
+  versionBadge: {
+    backgroundColor: COLORS.background,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.full,
+    marginTop: SPACING.lg,
+  },
+  versionBadgeText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    fontWeight: '500',
   },
   aboutDesc: {
     fontSize: 14,
     color: COLORS.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
-    marginBottom: SPACING.xl,
+    marginTop: SPACING.lg,
+    paddingHorizontal: SPACING.lg,
+  },
+  featuresList: {
+    marginTop: SPACING.xl,
+    gap: SPACING.md,
+  },
+  featureItem: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  featureText: {
+    fontSize: 14,
+    color: COLORS.textPrimary,
   },
   aboutCopyright: {
     fontSize: 12,
     color: COLORS.textLight,
+    marginTop: SPACING.xl,
   },
 
   // Confirm Modal
+  confirmOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.xl,
+  },
   confirmModal: {
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.xl,
     padding: SPACING.xl,
-    margin: SPACING.xl,
     alignItems: 'center',
+    width: '100%',
+    maxWidth: 320,
+    ...SHADOWS.large,
   },
   confirmIconContainer: {
     width: 80,
@@ -530,26 +831,28 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
     width: '100%',
   },
-  cancelButton: {
+  cancelBtn: {
     flex: 1,
     backgroundColor: COLORS.background,
     paddingVertical: SPACING.lg,
     borderRadius: RADIUS.md,
     alignItems: 'center',
   },
-  cancelButtonText: {
+  cancelBtnText: {
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
-  confirmButton: {
+  confirmBtn: {
     flex: 1,
-    backgroundColor: COLORS.error,
-    paddingVertical: SPACING.lg,
     borderRadius: RADIUS.md,
+    overflow: 'hidden',
+  },
+  confirmBtnGradient: {
+    paddingVertical: SPACING.lg,
     alignItems: 'center',
   },
-  confirmButtonText: {
+  confirmBtnText: {
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.textWhite,
