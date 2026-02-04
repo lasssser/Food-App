@@ -298,6 +298,20 @@ class Notification(BaseModel):
     is_read: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Push Token Models
+class PushTokenRegister(BaseModel):
+    push_token: str
+    platform: str  # android, ios, web
+
+class PushToken(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    token: str
+    platform: str
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    last_used: Optional[datetime] = None
+
 # ==================== Helper Functions ====================
 
 def hash_password(password: str) -> str:
