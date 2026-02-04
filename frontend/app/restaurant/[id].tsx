@@ -54,12 +54,14 @@ export default function RestaurantScreen() {
     useCallback(() => {
       const fetchData = async () => {
         try {
-          const [restaurantData, menuData] = await Promise.all([
+          const [restaurantData, menuData, ratingsData] = await Promise.all([
             restaurantAPI.getById(id!),
             restaurantAPI.getMenu(id!),
+            ratingAPI.getRestaurantRatings(id!, 10),
           ]);
           setRestaurant(restaurantData);
           setMenuItems(menuData);
+          setRatings(ratingsData);
         } catch (error) {
           console.error('Error fetching restaurant:', error);
         } finally {
@@ -70,7 +72,7 @@ export default function RestaurantScreen() {
     }, [id])
   );
 
-  const categories = ['الأكثر طلباً', ...new Set(menuItems.map((item) => item.category))];
+  const categories = ['الأكثر طلباً', ...new Set(menuItems.map((item) => item.category)), 'التقييمات'];
 
   const filteredItems = selectedCategory === 'الأكثر طلباً'
     ? menuItems.slice(0, 6)
