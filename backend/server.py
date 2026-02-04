@@ -2922,6 +2922,73 @@ async def reset_user_password(
     
     return {"message": "تم إعادة تعيين كلمة المرور بنجاح"}
 
+class ChangeRoleRequest(BaseModel):
+    role: str
+
+@api_router.put("/admin/users/{user_id}/role")
+async def change_user_role(
+    user_id: str,
+    request: ChangeRoleRequest,
+    admin: dict = Depends(require_admin)
+):
+    """Change user role (admin)"""
+    # Validate role
+    valid_roles = ["customer", "restaurant", "driver"]
+    if request.role not in valid_roles:
+        raise HTTPException(status_code=400, detail="الدور غير صالح. الأدوار المتاحة: زبون، مطعم، سائق")
+    
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    # Don't allow changing admin role
+    if user.get("role") == "admin":
+        raise HTTPException(status_code=403, detail="لا يمكن تغيير دور المدير")
+    
+    # Update user role
+    update_data = {
+        "role": request.role,
+        "updated_at": datetime.utcnow()
+    }
+    
+    # If changing to restaurant, create a restaurant entry
+    if request.role == "restaurant":
+        existing_restaurant = await db.restaurants.find_one({"owner_id": user_id})
+        if not existing_restaurant:
+            restaurant_id = f"rest-{uuid.uuid4().hex[:8]}"
+            restaurant_data = {
+                "id": restaurant_id,
+                "owner_id": user_id,
+                "name": f"مطعم {user.get('name', 'جديد')}",
+                "description": "مطعم جديد",
+                "cuisine": "متنوع",
+                "address": "",
+                "city_id": "damascus",
+                "phone": user.get("phone", ""),
+                "rating": 0,
+                "review_count": 0,
+                "is_open": False,
+                "is_approved": False,
+                "delivery_fee": 5000,
+                "min_order": 10000,
+                "delivery_time": "30-45 دقيقة",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            await db.restaurants.insert_one(restaurant_data)
+            update_data["restaurant_id"] = restaurant_id
+    
+    # If changing to driver, set driver-specific fields
+    if request.role == "driver":
+        update_data["is_available"] = False
+        update_data["is_approved"] = False
+        update_data["vehicle_type"] = "دراجة نارية"
+    
+    await db.users.update_one({"id": user_id}, {"$set": update_data})
+    
+    role_names = {"customer": "زبون", "restaurant": "صاحب مطعم", "driver": "سائق"}
+    return {"message": f"تم تغيير دور المستخدم إلى {role_names.get(request.role, request.role)} بنجاح"}
+
 @api_router.delete("/admin/users/{user_id}")
 async def delete_user(user_id: str, admin: dict = Depends(require_admin)):
     """Delete a user (admin)"""
