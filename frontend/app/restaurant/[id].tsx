@@ -38,6 +38,7 @@ export default function RestaurantScreen() {
   
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [ratings, setRatings] = useState<Rating[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('الأكثر طلباً');
   const [addedItems, setAddedItems] = useState<Set<string>>(new Set());
