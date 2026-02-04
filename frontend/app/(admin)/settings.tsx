@@ -173,6 +173,20 @@ export default function AdminSettings() {
           </View>
         </View>
 
+        {/* Developer Tools Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>أدوات المطور</Text>
+          <View style={styles.menuCard}>
+            <MenuItem
+              icon="trash-outline"
+              title="حذف البيانات التجريبية"
+              subtitle="حذف جميع المطاعم والمستخدمين التجريبيين"
+              onPress={() => setShowClearDataModal(true)}
+              danger
+            />
+          </View>
+        </View>
+
         <View style={styles.footer}>
           <Text style={styles.footerText}>يلا ناكل؟ © 2025</Text>
           <Text style={styles.footerSubtext}>جميع الحقوق محفوظة</Text>
