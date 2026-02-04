@@ -1599,7 +1599,7 @@ async def get_driver_orders(current_user: dict = Depends(get_current_user)):
     
     orders = await db.orders.find({
         "driver_id": current_user["id"],
-        "order_status": {"$in": ["assigned", "picked_up", "out_for_delivery"]}
+        "order_status": {"$in": ["assigned", "driver_assigned", "picked_up", "out_for_delivery"]}
     }).sort("created_at", -1).to_list(20)
     
     return [Order(**order) for order in orders]
