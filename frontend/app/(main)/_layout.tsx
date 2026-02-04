@@ -105,6 +105,12 @@ export default function MainLayout() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="my-complaints"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
