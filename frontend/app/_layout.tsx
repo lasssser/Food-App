@@ -50,6 +50,7 @@ export default function RootLayout() {
     const inMainGroup = segments[0] === '(main)';
     const inRestaurantGroup = segments[0] === '(restaurant)';
     const inDriverGroup = segments[0] === '(driver)';
+    const inAdminGroup = segments[0] === '(admin)';
 
     // Guest mode - allow browsing main screens
     if (isGuest && inAuthGroup) {
@@ -64,7 +65,9 @@ export default function RootLayout() {
     // Authenticated user in auth group - redirect based on role
     else if (isAuthenticated && inAuthGroup) {
       const role = user?.role || 'customer';
-      if (role === 'restaurant') {
+      if (role === 'admin') {
+        router.replace('/(admin)/dashboard');
+      } else if (role === 'restaurant') {
         router.replace('/(restaurant)/dashboard');
       } else if (role === 'driver') {
         router.replace('/(driver)/dashboard');
