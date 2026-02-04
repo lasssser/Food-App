@@ -241,6 +241,29 @@ export default function RestaurantInfoEdit() {
         </LinearGradient>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Restaurant Image Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>صورة المطعم</Text>
+            <TouchableOpacity style={styles.imageContainer} onPress={pickImage} disabled={uploadingImage}>
+              {restaurantImage ? (
+                <Image source={{ uri: restaurantImage }} style={styles.restaurantImage} />
+              ) : (
+                <View style={styles.imagePlaceholder}>
+                  <Ionicons name="camera-outline" size={48} color={COLORS.textLight} />
+                  <Text style={styles.imagePlaceholderText}>اضغط لإضافة صورة</Text>
+                </View>
+              )}
+              {uploadingImage && (
+                <View style={styles.imageOverlay}>
+                  <ActivityIndicator color={COLORS.textWhite} size="large" />
+                </View>
+              )}
+              <View style={styles.editImageBadge}>
+                <Ionicons name="camera" size={16} color={COLORS.textWhite} />
+              </View>
+            </TouchableOpacity>
+          </View>
+
           {/* Basic Info Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>المعلومات الأساسية</Text>
