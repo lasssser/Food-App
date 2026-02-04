@@ -11,10 +11,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { useAuth } from '../../src/context/AuthContext';
+import { useAuthStore } from '../../src/store/authStore';
 
 export default function AdminSettings() {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthStore();
 
   const handleLogout = () => {
     Alert.alert(
