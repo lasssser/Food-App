@@ -77,6 +77,7 @@ export default function RestaurantReports() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('week');
   const [activeChartTab, setActiveChartTab] = useState<'orders' | 'revenue'>('orders');
+  const [exporting, setExporting] = useState(false);
 
   const fetchReport = async () => {
     try {
@@ -99,6 +100,222 @@ export default function RestaurantReports() {
   const onRefresh = () => {
     setRefreshing(true);
     fetchReport();
+  };
+
+  const getPeriodLabel = (period: string) => {
+    switch (period) {
+      case 'today': return 'اليوم';
+      case 'week': return 'الأسبوع';
+      case 'month': return 'الشهر';
+      case 'year': return 'السنة';
+      default: return period;
+    }
+  };
+
+  const exportToPDF = async () => {
+    if (!report) return;
+
+    setExporting(true);
+    try {
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html dir="rtl" lang="ar">
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body {
+              font-family: 'Arial', sans-serif;
+              padding: 20px;
+              direction: rtl;
+              background: #fff;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+              padding-bottom: 20px;
+              border-bottom: 2px solid #009688;
+            }
+            .header h1 {
+              color: #009688;
+              margin-bottom: 5px;
+            }
+            .header p {
+              color: #666;
+            }
+            .section {
+              margin-bottom: 25px;
+            }
+            .section-title {
+              font-size: 18px;
+              color: #333;
+              margin-bottom: 15px;
+              padding-bottom: 5px;
+              border-bottom: 1px solid #eee;
+            }
+            .summary-grid {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 15px;
+              margin-bottom: 20px;
+            }
+            .summary-card {
+              flex: 1;
+              min-width: 120px;
+              background: #f5f5f5;
+              padding: 15px;
+              border-radius: 8px;
+              text-align: center;
+            }
+            .summary-value {
+              font-size: 24px;
+              font-weight: bold;
+              color: #009688;
+            }
+            .summary-label {
+              font-size: 12px;
+              color: #666;
+              margin-top: 5px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 10px;
+            }
+            th, td {
+              padding: 12px;
+              text-align: right;
+              border-bottom: 1px solid #eee;
+            }
+            th {
+              background: #f5f5f5;
+              font-weight: bold;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 30px;
+              padding-top: 20px;
+              border-top: 1px solid #eee;
+              color: #999;
+              font-size: 12px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>🍔 يلا ناكل؟</h1>
+            <p>تقرير ${getPeriodLabel(selectedPeriod)} - ${new Date().toLocaleDateString('ar-SA')}</p>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">ملخص الأداء</h2>
+            <div class="summary-grid">
+              <div class="summary-card">
+                <div class="summary-value">${report.summary.total_orders}</div>
+                <div class="summary-label">إجمالي الطلبات</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-value">${report.summary.completed_orders}</div>
+                <div class="summary-label">طلبات مكتملة</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-value">${report.summary.completion_rate}%</div>
+                <div class="summary-label">نسبة الإكمال</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-value">${report.summary.total_revenue.toLocaleString()}</div>
+                <div class="summary-label">الإيرادات (ل.س)</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-value">${report.summary.avg_order_value.toLocaleString()}</div>
+                <div class="summary-label">متوسط الطلب (ل.س)</div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-value">${report.summary.avg_rating}</div>
+                <div class="summary-label">التقييم</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">الأصناف الأكثر مبيعاً</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>الصنف</th>
+                  <th>الكمية</th>
+                  <th>الإيرادات</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${report.top_items.map((item, index) => `
+                  <tr>
+                    <td>${index + 1}</td>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.revenue.toLocaleString()} ل.س</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">طرق الدفع</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>الطريقة</th>
+                  <th>عدد الطلبات</th>
+                  <th>المجموع</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${report.payment_methods.map(method => `
+                  <tr>
+                    <td>${method.method === 'COD' ? 'كاش عند التسليم' : 'ShamCash'}</td>
+                    <td>${method.count}</td>
+                    <td>${method.total.toLocaleString()} ل.س</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="footer">
+            تم إنشاء التقرير بواسطة تطبيق يلا ناكل؟ - ${new Date().toLocaleString('ar-SA')}
+          </div>
+        </body>
+        </html>
+      `;
+
+      const { uri } = await Print.printToFileAsync({
+        html: htmlContent,
+        base64: false,
+      });
+
+      if (Platform.OS === 'web') {
+        // For web, open in new tab
+        window.open(uri, '_blank');
+      } else {
+        // For mobile, share the PDF
+        const canShare = await Sharing.isAvailableAsync();
+        if (canShare) {
+          await Sharing.shareAsync(uri, {
+            mimeType: 'application/pdf',
+            dialogTitle: `تقرير ${getPeriodLabel(selectedPeriod)}`,
+            UTI: 'com.adobe.pdf',
+          });
+        } else {
+          Alert.alert('تم', 'تم حفظ التقرير بنجاح');
+        }
+      }
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      Alert.alert('خطأ', 'فشل في تصدير التقرير');
+    } finally {
+      setExporting(false);
+    }
   };
 
   const formatCurrency = (amount: number) => {
