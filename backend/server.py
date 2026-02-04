@@ -3110,7 +3110,7 @@ async def startup_event():
             "id": "admin-1",
             "name": "مدير التطبيق",
             "phone": admin_phone,
-            "password": hash_password("admin123"),
+            "password_hash": hash_password("admin123"),
             "role": "admin",
             "is_active": True,
             "created_at": datetime.utcnow(),
