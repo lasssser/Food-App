@@ -67,27 +67,19 @@ export default function RestaurantMenu() {
   };
 
   const pickImage = async () => {
+    setUploadingImage(true);
     try {
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (!permissionResult.granted) {
-        Alert.alert('تنبيه', 'يجب السماح بالوصول للصور');
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.7,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        setFormImage(result.assets[0].uri);
+      const compressedImageUri = await pickMenuItemImage();
+      if (compressedImageUri) {
+        setFormImage(compressedImageUri);
+        // Show compression success message
+        Alert.alert('تم', 'تم ضغط الصورة وتحسينها بنجاح ✓');
       }
     } catch (error) {
       console.error('Error picking image:', error);
       Alert.alert('خطأ', 'فشل في اختيار الصورة');
+    } finally {
+      setUploadingImage(false);
     }
   };
 
