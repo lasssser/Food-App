@@ -331,6 +331,14 @@ export default function ProfileScreen() {
             </View>
           </TouchableOpacity>
 
+          <TouchableOpacity style={styles.menuItem} onPress={() => setShowComplaintModal(true)} activeOpacity={0.7}>
+            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+            <View style={styles.menuItemContent}>
+              <Text style={styles.menuItemText}>إرسال شكوى</Text>
+              <Ionicons name="chatbubble-ellipses-outline" size={22} color={COLORS.textSecondary} />
+            </View>
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.menuItem} onPress={() => setShowHelpModal(true)} activeOpacity={0.7}>
             <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
             <View style={styles.menuItemContent}>
