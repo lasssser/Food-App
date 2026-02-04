@@ -10,6 +10,9 @@ import {
   TextInput,
   Alert,
   Modal,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,7 +32,7 @@ interface User {
 }
 
 const ROLE_LABELS: Record<string, string> = {
-  customer: 'عميل',
+  customer: 'زبون',
   restaurant: 'مطعم',
   driver: 'سائق',
   admin: 'مدير',
@@ -50,12 +53,18 @@ export default function AdminUsers() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showUserModal, setShowUserModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
 
   const fetchUsers = async () => {
     try {
       const role = selectedRole === 'all' ? undefined : selectedRole;
       const data = await adminAPI.getUsers(role, searchQuery || undefined);
-      setUsers(data.users || []);
+      setUsers(data.users?.filter((u: User) => u.role !== 'admin') || []);
     } catch (error) {
       console.error('Error fetching users:', error);
       Alert.alert('خطأ', 'فشل في جلب قائمة المستخدمين');
@@ -80,8 +89,9 @@ export default function AdminUsers() {
   };
 
   const toggleUserStatus = async (user: User) => {
+    setActionLoading(true);
     try {
-      const newStatus = !user.is_active;
+      const newStatus = user.is_active === false ? true : false;
       await adminAPI.updateUserStatus(user.id, newStatus);
       Alert.alert('نجاح', newStatus ? 'تم تفعيل الحساب' : 'تم إيقاف الحساب');
       fetchUsers();
@@ -89,15 +99,98 @@ export default function AdminUsers() {
     } catch (error) {
       console.error('Error toggling user status:', error);
       Alert.alert('خطأ', 'فشل في تحديث حالة المستخدم');
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  const getRoleLabel = (role?: string) => ROLE_LABELS[role || 'customer'] || 'عميل';
+  const handleEditUser = async () => {
+    if (!selectedUser) return;
+    if (!editName.trim()) {
+      Alert.alert('خطأ', 'يرجى إدخال الاسم');
+      return;
+    }
+    setActionLoading(true);
+    try {
+      await adminAPI.updateUser(selectedUser.id, editName.trim(), editPhone.trim() || undefined);
+      Alert.alert('نجاح', 'تم تحديث بيانات المستخدم');
+      setShowEditModal(false);
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Error updating user:', error);
+      Alert.alert('خطأ', error.response?.data?.detail || 'فشل في تحديث البيانات');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!selectedUser) return;
+    if (newPassword.length < 6) {
+      Alert.alert('خطأ', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      return;
+    }
+    setActionLoading(true);
+    try {
+      await adminAPI.resetUserPassword(selectedUser.id, newPassword);
+      Alert.alert('نجاح', 'تم إعادة تعيين كلمة المرور');
+      setShowPasswordModal(false);
+      setNewPassword('');
+    } catch (error: any) {
+      console.error('Error resetting password:', error);
+      Alert.alert('خطأ', error.response?.data?.detail || 'فشل في إعادة تعيين كلمة المرور');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteUser = (user: User) => {
+    Alert.alert(
+      'تأكيد الحذف',
+      `هل أنت متأكد من حذف حساب "${user.name}"؟\nهذا الإجراء لا يمكن التراجع عنه.`,
+      [
+        { text: 'إلغاء', style: 'cancel' },
+        {
+          text: 'حذف',
+          style: 'destructive',
+          onPress: async () => {
+            setActionLoading(true);
+            try {
+              await adminAPI.deleteUser(user.id);
+              Alert.alert('نجاح', 'تم حذف الحساب بنجاح');
+              setShowUserModal(false);
+              fetchUsers();
+            } catch (error: any) {
+              console.error('Error deleting user:', error);
+              Alert.alert('خطأ', error.response?.data?.detail || 'فشل في حذف الحساب');
+            } finally {
+              setActionLoading(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const getRoleLabel = (role?: string) => ROLE_LABELS[role || 'customer'] || 'زبون';
   const getRoleColor = (role?: string) => ROLE_COLORS[role || 'customer'] || '#3b82f6';
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ar-SY');
+  };
+
+  const openEditModal = (user: User) => {
+    setEditName(user.name);
+    setEditPhone(user.phone);
+    setShowUserModal(false);
+    setShowEditModal(true);
+  };
+
+  const openPasswordModal = (user: User) => {
+    setNewPassword('');
+    setShowUserModal(false);
+    setShowPasswordModal(true);
   };
 
   const renderUser = ({ item }: { item: User }) => (
@@ -123,8 +216,10 @@ export default function AdminUsers() {
             {getRoleLabel(item.role)}
           </Text>
         </View>
-        {item.is_online !== undefined && (
-          <View style={[styles.statusDot, { backgroundColor: item.is_online ? '#22c55e' : '#9ca3af' }]} />
+        {item.is_active === false && (
+          <View style={styles.inactiveBadge}>
+            <Text style={styles.inactiveText}>موقوف</Text>
+          </View>
         )}
       </View>
     </TouchableOpacity>
@@ -217,7 +312,7 @@ export default function AdminUsers() {
         />
       )}
 
-      {/* User Details Modal */}
+      {/* User Actions Modal */}
       <Modal
         visible={showUserModal}
         animationType="slide"
@@ -230,55 +325,199 @@ export default function AdminUsers() {
               <TouchableOpacity onPress={() => setShowUserModal(false)}>
                 <Ionicons name="close" size={24} color="#6b7280" />
               </TouchableOpacity>
-              <Text style={styles.modalTitle}>تفاصيل المستخدم</Text>
+              <Text style={styles.modalTitle}>إدارة المستخدم</Text>
               <View style={{ width: 24 }} />
             </View>
 
             {selectedUser && (
-              <View style={styles.modalBody}>
-                <View style={[styles.modalAvatar, { backgroundColor: getRoleColor(selectedUser.role) }]}>
-                  <Text style={styles.modalAvatarText}>{selectedUser.name.charAt(0)}</Text>
-                </View>
-                <Text style={styles.modalUserName}>{selectedUser.name}</Text>
-                <View style={[styles.roleBadge, { backgroundColor: getRoleColor(selectedUser.role) + '20', alignSelf: 'center', marginBottom: 20 }]}>
-                  <Text style={[styles.roleText, { color: getRoleColor(selectedUser.role) }]}>
-                    {getRoleLabel(selectedUser.role)}
-                  </Text>
+              <ScrollView style={styles.modalBody}>
+                <View style={styles.userProfileSection}>
+                  <View style={[styles.modalAvatar, { backgroundColor: getRoleColor(selectedUser.role) }]}>
+                    <Text style={styles.modalAvatarText}>{selectedUser.name.charAt(0)}</Text>
+                  </View>
+                  <Text style={styles.modalUserName}>{selectedUser.name}</Text>
+                  <View style={[styles.roleBadge, { backgroundColor: getRoleColor(selectedUser.role) + '20', alignSelf: 'center' }]}>
+                    <Text style={[styles.roleText, { color: getRoleColor(selectedUser.role) }]}>
+                      {getRoleLabel(selectedUser.role)}
+                    </Text>
+                  </View>
                 </View>
 
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailValue}>{selectedUser.phone}</Text>
-                  <Text style={styles.detailLabel}>رقم الهاتف</Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailValue}>{formatDate(selectedUser.created_at)}</Text>
-                  <Text style={styles.detailLabel}>تاريخ التسجيل</Text>
-                </View>
-                {selectedUser.is_active !== undefined && (
-                  <View style={styles.detailRow}>
-                    <View style={[styles.statusBadge, { backgroundColor: selectedUser.is_active ? '#dcfce7' : '#fee2e2' }]}>
-                      <Text style={{ color: selectedUser.is_active ? '#22c55e' : '#ef4444', fontSize: 13, fontWeight: '600' }}>
-                        {selectedUser.is_active ? 'نشط' : 'موقوف'}
+                <View style={styles.infoSection}>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoValue}>{selectedUser.phone}</Text>
+                    <Text style={styles.infoLabel}>رقم الهاتف</Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoValue}>{formatDate(selectedUser.created_at)}</Text>
+                    <Text style={styles.infoLabel}>تاريخ التسجيل</Text>
+                  </View>
+                  <View style={styles.infoRow}>
+                    <View style={[styles.statusBadge, { backgroundColor: selectedUser.is_active !== false ? '#dcfce7' : '#fee2e2' }]}>
+                      <Text style={{ color: selectedUser.is_active !== false ? '#22c55e' : '#ef4444', fontSize: 13, fontWeight: '600' }}>
+                        {selectedUser.is_active !== false ? 'نشط' : 'موقوف'}
                       </Text>
                     </View>
-                    <Text style={styles.detailLabel}>الحالة</Text>
+                    <Text style={styles.infoLabel}>الحالة</Text>
                   </View>
-                )}
+                </View>
 
-                {selectedUser.role !== 'admin' && (
+                <View style={styles.actionsSection}>
                   <TouchableOpacity
-                    style={[styles.actionButton, { backgroundColor: selectedUser.is_active !== false ? '#fee2e2' : '#dcfce7' }]}
-                    onPress={() => toggleUserStatus(selectedUser)}
+                    style={[styles.actionBtn, { backgroundColor: '#e0e7ff' }]}
+                    onPress={() => openEditModal(selectedUser)}
+                    disabled={actionLoading}
                   >
-                    <Text style={[styles.actionButtonText, { color: selectedUser.is_active !== false ? '#ef4444' : '#22c55e' }]}>
-                      {selectedUser.is_active !== false ? 'إيقاف الحساب' : 'تفعيل الحساب'}
-                    </Text>
+                    <Ionicons name="create-outline" size={20} color="#6366f1" />
+                    <Text style={[styles.actionBtnText, { color: '#6366f1' }]}>تعديل البيانات</Text>
                   </TouchableOpacity>
-                )}
-              </View>
+
+                  <TouchableOpacity
+                    style={[styles.actionBtn, { backgroundColor: '#fef3c7' }]}
+                    onPress={() => openPasswordModal(selectedUser)}
+                    disabled={actionLoading}
+                  >
+                    <Ionicons name="key-outline" size={20} color="#f59e0b" />
+                    <Text style={[styles.actionBtnText, { color: '#f59e0b' }]}>إعادة تعيين كلمة المرور</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.actionBtn, { backgroundColor: selectedUser.is_active !== false ? '#fee2e2' : '#dcfce7' }]}
+                    onPress={() => toggleUserStatus(selectedUser)}
+                    disabled={actionLoading}
+                  >
+                    {actionLoading ? (
+                      <ActivityIndicator size="small" color={selectedUser.is_active !== false ? '#ef4444' : '#22c55e'} />
+                    ) : (
+                      <>
+                        <Ionicons
+                          name={selectedUser.is_active !== false ? 'ban' : 'checkmark-circle-outline'}
+                          size={20}
+                          color={selectedUser.is_active !== false ? '#ef4444' : '#22c55e'}
+                        />
+                        <Text style={[styles.actionBtnText, { color: selectedUser.is_active !== false ? '#ef4444' : '#22c55e' }]}>
+                          {selectedUser.is_active !== false ? 'إيقاف الحساب' : 'تفعيل الحساب'}
+                        </Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.actionBtn, { backgroundColor: '#fee2e2', borderColor: '#ef4444', borderWidth: 1 }]}
+                    onPress={() => handleDeleteUser(selectedUser)}
+                    disabled={actionLoading}
+                  >
+                    <Ionicons name="trash-outline" size={20} color="#ef4444" />
+                    <Text style={[styles.actionBtnText, { color: '#ef4444' }]}>حذف الحساب نهائياً</Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
             )}
           </View>
         </View>
+      </Modal>
+
+      {/* Edit User Modal */}
+      <Modal
+        visible={showEditModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowEditModal(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setShowEditModal(false)}>
+                <Ionicons name="close" size={24} color="#6b7280" />
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>تعديل البيانات</Text>
+              <View style={{ width: 24 }} />
+            </View>
+
+            <View style={styles.formSection}>
+              <Text style={styles.inputLabel}>الاسم</Text>
+              <TextInput
+                style={styles.textInput}
+                value={editName}
+                onChangeText={setEditName}
+                placeholder="اسم المستخدم"
+                placeholderTextColor="#9ca3af"
+              />
+
+              <Text style={styles.inputLabel}>رقم الهاتف</Text>
+              <TextInput
+                style={styles.textInput}
+                value={editPhone}
+                onChangeText={setEditPhone}
+                placeholder="رقم الهاتف"
+                placeholderTextColor="#9ca3af"
+                keyboardType="phone-pad"
+              />
+
+              <TouchableOpacity
+                style={styles.submitBtn}
+                onPress={handleEditUser}
+                disabled={actionLoading}
+              >
+                {actionLoading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.submitBtnText}>حفظ التغييرات</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Reset Password Modal */}
+      <Modal
+        visible={showPasswordModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowPasswordModal(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setShowPasswordModal(false)}>
+                <Ionicons name="close" size={24} color="#6b7280" />
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>إعادة تعيين كلمة المرور</Text>
+              <View style={{ width: 24 }} />
+            </View>
+
+            <View style={styles.formSection}>
+              <Text style={styles.inputLabel}>كلمة المرور الجديدة</Text>
+              <TextInput
+                style={styles.textInput}
+                value={newPassword}
+                onChangeText={setNewPassword}
+                placeholder="أدخل كلمة المرور الجديدة (6 أحرف على الأقل)"
+                placeholderTextColor="#9ca3af"
+                secureTextEntry
+              />
+
+              <TouchableOpacity
+                style={[styles.submitBtn, { backgroundColor: '#f59e0b' }]}
+                onPress={handleResetPassword}
+                disabled={actionLoading}
+              >
+                {actionLoading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.submitBtnText}>إعادة تعيين</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );
@@ -432,11 +671,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontFamily: 'System',
   },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginTop: 8,
+  inactiveBadge: {
+    backgroundColor: '#fee2e2',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginTop: 6,
+  },
+  inactiveText: {
+    fontSize: 10,
+    color: '#ef4444',
+    fontWeight: '600',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -459,7 +704,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingBottom: 40,
-    maxHeight: '80%',
+    maxHeight: '85%',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -477,7 +722,10 @@ const styles = StyleSheet.create({
   },
   modalBody: {
     padding: 20,
+  },
+  userProfileSection: {
     alignItems: 'center',
+    marginBottom: 24,
   },
   modalAvatar: {
     width: 80,
@@ -485,7 +733,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   modalAvatarText: {
     fontSize: 32,
@@ -500,21 +748,26 @@ const styles = StyleSheet.create({
     fontFamily: 'System',
     marginBottom: 8,
   },
-  detailRow: {
+  infoSection: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+  infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: '100%',
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
+    borderBottomColor: '#e5e7eb',
   },
-  detailLabel: {
+  infoLabel: {
     fontSize: 14,
     color: '#6b7280',
     fontFamily: 'System',
   },
-  detailValue: {
+  infoValue: {
     fontSize: 14,
     fontWeight: '600',
     color: '#1f2937',
@@ -525,17 +778,56 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
   },
-  actionButton: {
-    marginTop: 24,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    width: '100%',
-    alignItems: 'center',
+  actionsSection: {
+    gap: 12,
   },
-  actionButtonText: {
+  actionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 14,
+    borderRadius: 12,
+    gap: 8,
+  },
+  actionBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+    fontFamily: 'System',
+  },
+  formSection: {
+    padding: 20,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    fontFamily: 'System',
+    textAlign: 'right',
+    marginBottom: 8,
+  },
+  textInput: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 15,
+    color: '#1f2937',
+    fontFamily: 'System',
+    textAlign: 'right',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+  },
+  submitBtn: {
+    backgroundColor: '#6366f1',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  submitBtnText: {
     fontSize: 16,
     fontWeight: '600',
+    color: '#fff',
     fontFamily: 'System',
   },
 });

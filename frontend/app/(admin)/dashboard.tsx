@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
   Dimensions,
@@ -22,17 +21,6 @@ interface AdminStats {
     restaurants: number;
     drivers: number;
     online_drivers: number;
-  };
-  orders: {
-    total: number;
-    pending: number;
-    delivered: number;
-    cancelled: number;
-    today: number;
-  };
-  revenue: {
-    total: number;
-    today: number;
   };
   complaints: {
     open: number;
@@ -66,10 +54,6 @@ export default function AdminDashboard() {
     fetchStats();
   }, []);
 
-  const formatCurrency = (amount: number) => {
-    return amount.toLocaleString('ar-SY') + ' ل.س';
-  };
-
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
@@ -80,6 +64,8 @@ export default function AdminDashboard() {
       </SafeAreaView>
     );
   }
+
+  const totalUsers = (stats?.users.customers || 0) + (stats?.users.restaurants || 0) + (stats?.users.drivers || 0);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -109,44 +95,36 @@ export default function AdminDashboard() {
         }
         showsVerticalScrollIndicator={false}
       >
-        {/* Revenue Cards */}
-        <View style={styles.revenueSection}>
-          <LinearGradient
-            colors={['#10b981', '#059669']}
-            style={styles.revenueCard}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.revenueIcon}>
-              <Ionicons name="wallet" size={24} color="#fff" />
+        {/* Main Stats Card */}
+        <View style={styles.mainStatsCard}>
+          <View style={styles.mainStatItem}>
+            <View style={[styles.mainStatIcon, { backgroundColor: '#6366f1' }]}>
+              <Ionicons name="people" size={28} color="#fff" />
             </View>
-            <Text style={styles.revenueLabel}>إجمالي الإيرادات</Text>
-            <Text style={styles.revenueValue}>{formatCurrency(stats?.revenue.total || 0)}</Text>
-          </LinearGradient>
-
-          <LinearGradient
-            colors={['#3b82f6', '#2563eb']}
-            style={styles.revenueCard}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.revenueIcon}>
-              <Ionicons name="today" size={24} color="#fff" />
+            <Text style={styles.mainStatValue}>{totalUsers}</Text>
+            <Text style={styles.mainStatLabel}>إجمالي المستخدمين</Text>
+          </View>
+          <View style={styles.mainStatDivider} />
+          <View style={styles.mainStatItem}>
+            <View style={[styles.mainStatIcon, { backgroundColor: stats?.complaints.open ? '#ef4444' : '#22c55e' }]}>
+              <Ionicons name="chatbubbles" size={28} color="#fff" />
             </View>
-            <Text style={styles.revenueLabel}>إيرادات اليوم</Text>
-            <Text style={styles.revenueValue}>{formatCurrency(stats?.revenue.today || 0)}</Text>
-          </LinearGradient>
+            <Text style={[styles.mainStatValue, stats?.complaints.open ? { color: '#ef4444' } : {}]}>
+              {stats?.complaints.open || 0}
+            </Text>
+            <Text style={styles.mainStatLabel}>شكاوى مفتوحة</Text>
+          </View>
         </View>
 
-        {/* Stats Grid */}
-        <Text style={styles.sectionTitle}>الإحصائيات السريعة</Text>
+        {/* Users Breakdown */}
+        <Text style={styles.sectionTitle}>تفاصيل المستخدمين</Text>
         <View style={styles.statsGrid}>
-          <View style={[styles.statCard, { backgroundColor: '#fef3c7' }]}>
-            <View style={[styles.statIcon, { backgroundColor: '#f59e0b' }]}>
-              <Ionicons name="people" size={20} color="#fff" />
+          <View style={[styles.statCard, { backgroundColor: '#dbeafe' }]}>
+            <View style={[styles.statIcon, { backgroundColor: '#3b82f6' }]}>
+              <Ionicons name="person" size={20} color="#fff" />
             </View>
             <Text style={styles.statValue}>{stats?.users.customers || 0}</Text>
-            <Text style={styles.statLabel}>العملاء</Text>
+            <Text style={styles.statLabel}>الزبائن</Text>
           </View>
 
           <View style={[styles.statCard, { backgroundColor: '#dcfce7' }]}>
@@ -157,16 +135,16 @@ export default function AdminDashboard() {
             <Text style={styles.statLabel}>المطاعم</Text>
           </View>
 
-          <View style={[styles.statCard, { backgroundColor: '#e0e7ff' }]}>
-            <View style={[styles.statIcon, { backgroundColor: '#6366f1' }]}>
+          <View style={[styles.statCard, { backgroundColor: '#fef3c7' }]}>
+            <View style={[styles.statIcon, { backgroundColor: '#f59e0b' }]}>
               <Ionicons name="bicycle" size={20} color="#fff" />
             </View>
             <Text style={styles.statValue}>{stats?.users.drivers || 0}</Text>
             <Text style={styles.statLabel}>السائقين</Text>
           </View>
 
-          <View style={[styles.statCard, { backgroundColor: '#fce7f3' }]}>
-            <View style={[styles.statIcon, { backgroundColor: '#ec4899' }]}>
+          <View style={[styles.statCard, { backgroundColor: '#e0e7ff' }]}>
+            <View style={[styles.statIcon, { backgroundColor: '#6366f1' }]}>
               <Ionicons name="radio-button-on" size={20} color="#fff" />
             </View>
             <Text style={styles.statValue}>{stats?.users.online_drivers || 0}</Text>
@@ -174,48 +152,18 @@ export default function AdminDashboard() {
           </View>
         </View>
 
-        {/* Orders Section */}
-        <Text style={styles.sectionTitle}>الطلبات</Text>
-        <View style={styles.ordersSection}>
-          <View style={styles.orderStat}>
-            <View style={[styles.orderDot, { backgroundColor: '#6366f1' }]} />
-            <Text style={styles.orderStatLabel}>إجمالي الطلبات</Text>
-            <Text style={styles.orderStatValue}>{stats?.orders.total || 0}</Text>
-          </View>
-          <View style={styles.orderStat}>
-            <View style={[styles.orderDot, { backgroundColor: '#f59e0b' }]} />
-            <Text style={styles.orderStatLabel}>قيد الانتظار</Text>
-            <Text style={styles.orderStatValue}>{stats?.orders.pending || 0}</Text>
-          </View>
-          <View style={styles.orderStat}>
-            <View style={[styles.orderDot, { backgroundColor: '#22c55e' }]} />
-            <Text style={styles.orderStatLabel}>تم التسليم</Text>
-            <Text style={styles.orderStatValue}>{stats?.orders.delivered || 0}</Text>
-          </View>
-          <View style={styles.orderStat}>
-            <View style={[styles.orderDot, { backgroundColor: '#ef4444' }]} />
-            <Text style={styles.orderStatLabel}>ملغية</Text>
-            <Text style={styles.orderStatValue}>{stats?.orders.cancelled || 0}</Text>
-          </View>
-          <View style={styles.orderStat}>
-            <View style={[styles.orderDot, { backgroundColor: '#3b82f6' }]} />
-            <Text style={styles.orderStatLabel}>طلبات اليوم</Text>
-            <Text style={styles.orderStatValue}>{stats?.orders.today || 0}</Text>
-          </View>
-        </View>
-
-        {/* Complaints Section */}
-        <Text style={styles.sectionTitle}>الشكاوى</Text>
-        <View style={styles.complaintsSection}>
-          <View style={[styles.complaintCard, { backgroundColor: '#fef2f2' }]}>
-            <Ionicons name="alert-circle" size={32} color="#ef4444" />
-            <Text style={styles.complaintValue}>{stats?.complaints.open || 0}</Text>
+        {/* Complaints Summary */}
+        <Text style={styles.sectionTitle}>ملخص الشكاوى</Text>
+        <View style={styles.complaintsCard}>
+          <View style={styles.complaintItem}>
+            <View style={[styles.complaintDot, { backgroundColor: '#ef4444' }]} />
             <Text style={styles.complaintLabel}>شكاوى مفتوحة</Text>
+            <Text style={[styles.complaintValue, { color: '#ef4444' }]}>{stats?.complaints.open || 0}</Text>
           </View>
-          <View style={[styles.complaintCard, { backgroundColor: '#f0fdf4' }]}>
-            <Ionicons name="checkmark-circle" size={32} color="#22c55e" />
-            <Text style={styles.complaintValue}>{stats?.complaints.total || 0}</Text>
+          <View style={styles.complaintItem}>
+            <View style={[styles.complaintDot, { backgroundColor: '#22c55e' }]} />
             <Text style={styles.complaintLabel}>إجمالي الشكاوى</Text>
+            <Text style={styles.complaintValue}>{stats?.complaints.total || 0}</Text>
           </View>
         </View>
 
@@ -278,38 +226,46 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
   },
-  revenueSection: {
+  mainStatsCard: {
     flexDirection: 'row',
-    gap: 12,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
     marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
-  revenueCard: {
+  mainStatItem: {
     flex: 1,
-    padding: 16,
-    borderRadius: 16,
+    alignItems: 'center',
   },
-  revenueIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  mainStatDivider: {
+    width: 1,
+    backgroundColor: '#e5e7eb',
+    marginHorizontal: 16,
+  },
+  mainStatIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
   },
-  revenueLabel: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontFamily: 'System',
-    textAlign: 'right',
-  },
-  revenueValue: {
-    fontSize: 18,
+  mainStatValue: {
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1f2937',
+    fontFamily: 'System',
+  },
+  mainStatLabel: {
+    fontSize: 13,
+    color: '#6b7280',
     fontFamily: 'System',
     marginTop: 4,
-    textAlign: 'right',
   },
   sectionTitle: {
     fontSize: 18,
@@ -351,66 +307,41 @@ const styles = StyleSheet.create({
     fontFamily: 'System',
     marginTop: 4,
   },
-  ordersSection: {
+  complaintsCard: {
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 16,
-    marginBottom: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
   },
-  orderStat: {
+  complaintItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#f3f4f6',
   },
-  orderDot: {
+  complaintDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
     marginLeft: 12,
   },
-  orderStatLabel: {
+  complaintLabel: {
     flex: 1,
     fontSize: 14,
     color: '#374151',
     fontFamily: 'System',
     textAlign: 'right',
   },
-  orderStatValue: {
+  complaintValue: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#1f2937',
     fontFamily: 'System',
-  },
-  complaintsSection: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
-  },
-  complaintCard: {
-    flex: 1,
-    padding: 20,
-    borderRadius: 16,
-    alignItems: 'center',
-  },
-  complaintValue: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    fontFamily: 'System',
-    marginTop: 8,
-  },
-  complaintLabel: {
-    fontSize: 13,
-    color: '#6b7280',
-    fontFamily: 'System',
-    marginTop: 4,
   },
   bottomSpacer: {
     height: 20,
