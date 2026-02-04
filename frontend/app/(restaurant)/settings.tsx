@@ -89,6 +89,26 @@ export default function RestaurantSettings() {
     }
   };
 
+  const handleSubmitComplaint = async () => {
+    if (!complaintSubject.trim() || !complaintMessage.trim()) {
+      Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
+      return;
+    }
+    setSubmittingComplaint(true);
+    try {
+      await complaintsAPI.submit(complaintSubject.trim(), complaintMessage.trim(), 'restaurant');
+      setShowComplaintModal(false);
+      setComplaintSubject('');
+      setComplaintMessage('');
+      Alert.alert('نجاح', 'تم إرسال الشكوى بنجاح، سنتواصل معك قريباً');
+    } catch (error) {
+      console.error('Error submitting complaint:', error);
+      Alert.alert('خطأ', 'فشل في إرسال الشكوى');
+    } finally {
+      setSubmittingComplaint(false);
+    }
+  };
+
   const menuItems = [
     {
       id: 'restaurant-info',
