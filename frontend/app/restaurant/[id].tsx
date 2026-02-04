@@ -14,10 +14,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { restaurantAPI } from '../../src/services/api';
+import { restaurantAPI, ratingAPI } from '../../src/services/api';
 import { useCartStore } from '../../src/store/cartStore';
 import { Restaurant, MenuItem, AddOnGroup, SelectedAddOn } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+
+interface Rating {
+  id: string;
+  user_name: string;
+  restaurant_rating: number;
+  driver_rating?: number;
+  comment?: string;
+  created_at: string;
+}
 
 const { height, width } = Dimensions.get('window');
 const HERO_HEIGHT = height * 0.35;
