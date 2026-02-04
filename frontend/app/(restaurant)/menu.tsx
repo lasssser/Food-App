@@ -66,6 +66,31 @@ export default function RestaurantMenu() {
     fetchMenu();
   };
 
+  const pickImage = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (!permissionResult.granted) {
+        Alert.alert('تنبيه', 'يجب السماح بالوصول للصور');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.7,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setFormImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert('خطأ', 'فشل في اختيار الصورة');
+    }
+  };
+
   const openAddModal = () => {
     setEditingItem(null);
     setFormName('');
@@ -73,6 +98,7 @@ export default function RestaurantMenu() {
     setFormPrice('');
     setFormCategory('');
     setFormAvailable(true);
+    setFormImage(null);
     setShowModal(true);
   };
 
@@ -83,6 +109,7 @@ export default function RestaurantMenu() {
     setFormPrice(item.price.toString());
     setFormCategory(item.category);
     setFormAvailable(item.is_available);
+    setFormImage(item.image || null);
     setShowModal(true);
   };
 
@@ -99,6 +126,7 @@ export default function RestaurantMenu() {
           description: formDescription,
           price: parseFloat(formPrice),
           is_available: formAvailable,
+          image: formImage || undefined,
         });
       } else {
         await restaurantPanelAPI.addMenuItem({
@@ -106,6 +134,7 @@ export default function RestaurantMenu() {
           description: formDescription,
           price: parseFloat(formPrice),
           category: formCategory,
+          image: formImage || undefined,
         });
       }
       setShowModal(false);
