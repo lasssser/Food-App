@@ -519,7 +519,6 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     fontWeight: '600',
   },
-  },
   listContent: {
     padding: SPACING.lg,
     paddingBottom: SPACING.xxxl,
