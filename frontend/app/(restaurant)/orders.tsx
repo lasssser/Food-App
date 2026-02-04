@@ -162,11 +162,53 @@ export default function RestaurantOrders() {
       }
       
       setSelectedOrder(null);
+      setSelectedDriverId(null);
       fetchOrders();
     } catch (error: any) {
       console.error('Error assigning driver:', error);
     } finally {
       setAssigning(false);
+    }
+  };
+
+  const handleAssignPlatformDriver = async (driverId: string) => {
+    if (!selectedOrder) return;
+    
+    setAssigning(true);
+    try {
+      await restaurantPanelAPI.assignDriver(selectedOrder.id, {
+        driver_type: 'platform_driver',
+        driver_id: driverId,
+      });
+      
+      // Get platform driver info
+      const driver = platformDrivers.find(d => d.id === driverId);
+      setShowAssignModal(false);
+      setSelectedOrder(null);
+      setSelectedDriverId(null);
+      fetchOrders();
+      
+      // Optional: Send notification or show success
+    } catch (error: any) {
+      console.error('Error assigning platform driver:', error);
+    } finally {
+      setAssigning(false);
+    }
+  };
+
+  const handleChangeDriver = async (orderId: string) => {
+    try {
+      await restaurantPanelAPI.changeDriver(orderId);
+      fetchOrders();
+      // Re-open assign modal for this order
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        setSelectedOrder({...order, driver_id: undefined, driver_name: undefined});
+        setSelectedDriverId(null);
+        setShowAssignModal(true);
+      }
+    } catch (error: any) {
+      console.error('Error changing driver:', error);
     }
   };
 
@@ -180,6 +222,7 @@ export default function RestaurantOrders() {
       });
       setShowAssignModal(false);
       setSelectedOrder(null);
+      setSelectedDriverId(null);
       fetchOrders();
     } catch (error: any) {
       console.error('Error requesting drivers:', error);
