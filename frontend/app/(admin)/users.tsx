@@ -212,6 +212,37 @@ export default function AdminUsers() {
     setShowDeleteModal(true);
   };
 
+  const openRoleModal = (user: User) => {
+    setSelectedNewRole(user.role || 'customer');
+    setShowUserModal(false);
+    setShowRoleModal(true);
+  };
+
+  const handleChangeRole = async () => {
+    if (!selectedUser) return;
+    setActionLoading(true);
+    try {
+      await adminAPI.changeUserRole(selectedUser.id, selectedNewRole);
+      if (Platform.OS === 'web') {
+        alert('تم تغيير دور المستخدم بنجاح');
+      } else {
+        Alert.alert('نجاح', 'تم تغيير دور المستخدم بنجاح');
+      }
+      setShowRoleModal(false);
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Error changing role:', error);
+      const errorMsg = error.response?.data?.detail || 'فشل في تغيير دور المستخدم';
+      if (Platform.OS === 'web') {
+        alert(errorMsg);
+      } else {
+        Alert.alert('خطأ', errorMsg);
+      }
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const getRoleLabel = (role?: string) => ROLE_LABELS[role || 'customer'] || 'زبون';
   const getRoleColor = (role?: string) => ROLE_COLORS[role || 'customer'] || '#3b82f6';
 
