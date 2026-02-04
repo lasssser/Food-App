@@ -330,6 +330,36 @@ class PushToken(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     last_used: Optional[datetime] = None
 
+# Complaint Models
+class ComplaintCreate(BaseModel):
+    type: str  # order, driver, restaurant, app, suggestion
+    subject: str
+    message: str
+    order_id: Optional[str] = None
+    restaurant_id: Optional[str] = None
+    driver_id: Optional[str] = None
+
+class Complaint(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    user_name: str
+    user_phone: str
+    type: str
+    subject: str
+    message: str
+    order_id: Optional[str] = None
+    restaurant_id: Optional[str] = None
+    driver_id: Optional[str] = None
+    status: str = "open"  # open, in_progress, resolved, closed
+    admin_response: Optional[str] = None
+    admin_id: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class ComplaintResponse(BaseModel):
+    response: str
+    status: str = "resolved"  # in_progress, resolved, closed
+
 # ==================== Helper Functions ====================
 
 def hash_password(password: str) -> str:
