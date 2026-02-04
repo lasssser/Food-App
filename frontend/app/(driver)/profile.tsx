@@ -8,12 +8,17 @@ import {
   Modal,
   Platform,
   Linking,
+  TextInput,
+  KeyboardAvoidingView,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../src/store/authStore';
+import { complaintsAPI } from '../../src/services/api';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 export default function DriverProfile() {
@@ -21,6 +26,10 @@ export default function DriverProfile() {
   const { user, logout } = useAuthStore();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showComplaintModal, setShowComplaintModal] = useState(false);
+  const [complaintSubject, setComplaintSubject] = useState('');
+  const [complaintMessage, setComplaintMessage] = useState('');
+  const [submittingComplaint, setSubmittingComplaint] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -32,6 +41,26 @@ export default function DriverProfile() {
       window.open('https://wa.me/963999999999', '_blank');
     } else {
       Linking.openURL('https://wa.me/963999999999');
+    }
+  };
+
+  const handleSubmitComplaint = async () => {
+    if (!complaintSubject.trim() || !complaintMessage.trim()) {
+      Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
+      return;
+    }
+    setSubmittingComplaint(true);
+    try {
+      await complaintsAPI.submit(complaintSubject.trim(), complaintMessage.trim(), 'driver');
+      setShowComplaintModal(false);
+      setComplaintSubject('');
+      setComplaintMessage('');
+      Alert.alert('نجاح', 'تم إرسال الشكوى بنجاح، سنتواصل معك قريباً');
+    } catch (error) {
+      console.error('Error submitting complaint:', error);
+      Alert.alert('خطأ', 'فشل في إرسال الشكوى');
+    } finally {
+      setSubmittingComplaint(false);
     }
   };
 
