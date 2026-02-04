@@ -851,6 +851,37 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: 'rgba(255,255,255,0.2)',
   },
+
+  // Tabs
+  tabsContainer: {
+    flexDirection: 'row-reverse',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: RADIUS.lg,
+    padding: 4,
+    marginTop: SPACING.md,
+  },
+  orderTab: {
+    flex: 1,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.md,
+    gap: SPACING.sm,
+  },
+  orderTabActive: {
+    backgroundColor: COLORS.surface,
+  },
+  orderTabText: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.7)',
+    fontWeight: '500',
+  },
+  orderTabTextActive: {
+    color: COLORS.textPrimary,
+    fontWeight: '600',
+  },
+
   listContent: {
     padding: SPACING.lg,
     paddingBottom: SPACING.xxxl,
