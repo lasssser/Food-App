@@ -1304,6 +1304,9 @@ async def update_order_status_driver(
         {"order_id": order_id, "status": status_update.status}
     )
     
+    # Send push notification to customer
+    await notify_customer_order_status(order, status_update.status)
+    
     return {"message": "تم تحديث حالة الطلب"}
 
 @api_router.get("/driver/stats")
