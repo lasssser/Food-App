@@ -3162,6 +3162,54 @@ async def get_all_orders_admin(
     
     return {"orders": orders, "total": total}
 
+@api_router.delete("/admin/test-data")
+async def clear_test_data(admin: dict = Depends(require_admin)):
+    """Clear all test/seed data from the database (admin only)"""
+    try:
+        # Delete seeded restaurants (those with id starting with 'rest-')
+        restaurants_result = await db.restaurants.delete_many({"id": {"$regex": "^rest-"}})
+        
+        # Delete seeded menu items
+        menu_result = await db.menu_items.delete_many({"id": {"$regex": "^menu-"}})
+        
+        # Delete test users (except admin)
+        users_result = await db.users.delete_many({
+            "$and": [
+                {"role": {"$ne": "admin"}},
+                {"$or": [
+                    {"id": {"$regex": "^(owner|driver|customer)-"}},
+                    {"phone": {"$regex": "^09000000"}}
+                ]}
+            ]
+        })
+        
+        # Delete all orders
+        orders_result = await db.orders.delete_many({})
+        
+        # Delete all complaints
+        complaints_result = await db.complaints.delete_many({})
+        
+        # Delete all notifications
+        notifications_result = await db.notifications.delete_many({})
+        
+        # Delete all reviews
+        reviews_result = await db.reviews.delete_many({})
+        
+        return {
+            "message": "تم حذف البيانات التجريبية بنجاح",
+            "deleted": {
+                "restaurants": restaurants_result.deleted_count,
+                "menu_items": menu_result.deleted_count,
+                "users": users_result.deleted_count,
+                "orders": orders_result.deleted_count,
+                "complaints": complaints_result.deleted_count,
+                "notifications": notifications_result.deleted_count,
+                "reviews": reviews_result.deleted_count
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"فشل في حذف البيانات: {str(e)}")
+
 # ==================== Health Check ====================
 
 @api_router.get("/")
