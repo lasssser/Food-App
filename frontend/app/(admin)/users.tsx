@@ -222,7 +222,7 @@ export default function AdminUsers() {
     if (!selectedUser) return;
     setActionLoading(true);
     try {
-      await adminAPI.changeUserRole(selectedUser.id, selectedNewRole);
+      await adminAPI.changeUserRole(selectedUser.id, newUserRole);
       if (Platform.OS === 'web') {
         alert('تم تغيير دور المستخدم بنجاح');
       } else {
@@ -664,56 +664,56 @@ export default function AdminUsers() {
               <TouchableOpacity
                 style={[
                   styles.roleOption,
-                  selectedNewRole === 'customer' && styles.roleOptionSelected,
+                  newUserRole === 'customer' && styles.roleOptionSelected,
                 ]}
-                onPress={() => setSelectedNewRole('customer')}
+                onPress={() => setNewUserRole('customer')}
               >
                 <Ionicons 
                   name="person" 
                   size={24} 
-                  color={selectedNewRole === 'customer' ? '#fff' : '#3b82f6'} 
+                  color={newUserRole === 'customer' ? '#fff' : '#3b82f6'} 
                 />
                 <Text style={[
                   styles.roleOptionText,
-                  selectedNewRole === 'customer' && styles.roleOptionTextSelected,
+                  newUserRole === 'customer' && styles.roleOptionTextSelected,
                 ]}>زبون</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[
                   styles.roleOption,
-                  selectedNewRole === 'restaurant' && styles.roleOptionSelected,
-                  { backgroundColor: selectedNewRole === 'restaurant' ? '#22c55e' : '#dcfce7' }
+                  newUserRole === 'restaurant' && styles.roleOptionSelected,
+                  { backgroundColor: newUserRole === 'restaurant' ? '#22c55e' : '#dcfce7' }
                 ]}
-                onPress={() => setSelectedNewRole('restaurant')}
+                onPress={() => setNewUserRole('restaurant')}
               >
                 <Ionicons 
                   name="restaurant" 
                   size={24} 
-                  color={selectedNewRole === 'restaurant' ? '#fff' : '#22c55e'} 
+                  color={newUserRole === 'restaurant' ? '#fff' : '#22c55e'} 
                 />
                 <Text style={[
                   styles.roleOptionText,
-                  { color: selectedNewRole === 'restaurant' ? '#fff' : '#22c55e' },
+                  { color: newUserRole === 'restaurant' ? '#fff' : '#22c55e' },
                 ]}>صاحب مطعم</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[
                   styles.roleOption,
-                  selectedNewRole === 'driver' && styles.roleOptionSelected,
-                  { backgroundColor: selectedNewRole === 'driver' ? '#f59e0b' : '#fef3c7' }
+                  newUserRole === 'driver' && styles.roleOptionSelected,
+                  { backgroundColor: newUserRole === 'driver' ? '#f59e0b' : '#fef3c7' }
                 ]}
-                onPress={() => setSelectedNewRole('driver')}
+                onPress={() => setNewUserRole('driver')}
               >
                 <Ionicons 
                   name="bicycle" 
                   size={24} 
-                  color={selectedNewRole === 'driver' ? '#fff' : '#f59e0b'} 
+                  color={newUserRole === 'driver' ? '#fff' : '#f59e0b'} 
                 />
                 <Text style={[
                   styles.roleOptionText,
-                  { color: selectedNewRole === 'driver' ? '#fff' : '#f59e0b' },
+                  { color: newUserRole === 'driver' ? '#fff' : '#f59e0b' },
                 ]}>سائق</Text>
               </TouchableOpacity>
             </View>
