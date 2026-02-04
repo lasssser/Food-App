@@ -36,6 +36,8 @@ interface PlatformDriver {
   total_deliveries: number;
   rating: number;
   current_orders: number;
+  distance_km?: number;
+  estimated_time?: string;
 }
 
 const STATUS_ACTIONS: Record<string, { next: string; label: string; icon: keyof typeof Ionicons.glyphMap }> = {
