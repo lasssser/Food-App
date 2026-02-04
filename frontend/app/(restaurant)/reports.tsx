@@ -8,12 +8,16 @@ import {
   RefreshControl,
   ActivityIndicator,
   Dimensions,
+  Alert,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import { restaurantPanelAPI } from '../../src/services/api';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
