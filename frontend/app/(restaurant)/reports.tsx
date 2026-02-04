@@ -239,9 +239,130 @@ export default function RestaurantReports() {
           </View>
         </View>
 
+        {/* Charts Section */}
+        {report?.chart_data && report.chart_data.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>الرسم البياني</Text>
+            
+            {/* Chart Tabs */}
+            <View style={styles.chartTabs}>
+              <TouchableOpacity
+                style={[styles.chartTab, activeChartTab === 'orders' && styles.chartTabActive]}
+                onPress={() => setActiveChartTab('orders')}
+              >
+                <Ionicons 
+                  name="receipt-outline" 
+                  size={18} 
+                  color={activeChartTab === 'orders' ? COLORS.primary : COLORS.textSecondary} 
+                />
+                <Text style={[styles.chartTabText, activeChartTab === 'orders' && styles.chartTabTextActive]}>
+                  الطلبات
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.chartTab, activeChartTab === 'revenue' && styles.chartTabActive]}
+                onPress={() => setActiveChartTab('revenue')}
+              >
+                <Ionicons 
+                  name="cash-outline" 
+                  size={18} 
+                  color={activeChartTab === 'revenue' ? COLORS.success : COLORS.textSecondary} 
+                />
+                <Text style={[styles.chartTabText, activeChartTab === 'revenue' && styles.chartTabTextActive]}>
+                  الإيرادات
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.chartCard}>
+              {activeChartTab === 'orders' ? (
+                <LineChart
+                  data={{
+                    labels: report.chart_data.slice(-7).map(d => d.date.slice(5)),
+                    datasets: [{
+                      data: report.chart_data.slice(-7).map(d => d.orders || 0),
+                      color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`,
+                      strokeWidth: 2,
+                    }],
+                  }}
+                  width={chartWidth}
+                  height={200}
+                  chartConfig={{
+                    ...chartConfig,
+                    color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`,
+                  }}
+                  bezier
+                  style={styles.chart}
+                  withInnerLines={false}
+                  withOuterLines={false}
+                />
+              ) : (
+                <BarChart
+                  data={{
+                    labels: report.chart_data.slice(-7).map(d => d.date.slice(5)),
+                    datasets: [{
+                      data: report.chart_data.slice(-7).map(d => (d.revenue || 0) / 1000),
+                    }],
+                  }}
+                  width={chartWidth}
+                  height={200}
+                  chartConfig={{
+                    ...chartConfig,
+                    color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`,
+                  }}
+                  style={styles.chart}
+                  showValuesOnTopOfBars
+                  withInnerLines={false}
+                  yAxisLabel=""
+                  yAxisSuffix="K"
+                />
+              )}
+            </View>
+          </View>
+        )}
+
         {/* Orders Status */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>حالة الطلبات</Text>
+          
+          {/* Pie Chart for Order Status */}
+          {report?.summary && (report.summary.completed_orders > 0 || report.summary.pending_orders > 0 || report.summary.cancelled_orders > 0) && (
+            <View style={styles.pieChartContainer}>
+              <PieChart
+                data={[
+                  {
+                    name: 'مكتمل',
+                    population: report.summary.completed_orders || 0,
+                    color: COLORS.success,
+                    legendFontColor: COLORS.textSecondary,
+                    legendFontSize: 12,
+                  },
+                  {
+                    name: 'قيد التنفيذ',
+                    population: report.summary.pending_orders || 0,
+                    color: COLORS.warning,
+                    legendFontColor: COLORS.textSecondary,
+                    legendFontSize: 12,
+                  },
+                  {
+                    name: 'ملغي',
+                    population: report.summary.cancelled_orders || 0,
+                    color: COLORS.error,
+                    legendFontColor: COLORS.textSecondary,
+                    legendFontSize: 12,
+                  },
+                ]}
+                width={chartWidth}
+                height={160}
+                chartConfig={chartConfig}
+                accessor="population"
+                backgroundColor="transparent"
+                paddingLeft="15"
+                absolute
+              />
+            </View>
+          )}
+          
           <View style={styles.statusCard}>
             <View style={styles.statusRow}>
               <View style={styles.statusItem}>
