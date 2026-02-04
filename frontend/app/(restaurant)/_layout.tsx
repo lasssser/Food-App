@@ -69,6 +69,18 @@ export default function RestaurantLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="reports"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="restaurant-info"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
