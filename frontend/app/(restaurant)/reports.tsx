@@ -47,11 +47,32 @@ const PERIODS = [
   { id: 'year', label: 'سنة' },
 ];
 
+const chartConfig = {
+  backgroundGradientFrom: COLORS.surface,
+  backgroundGradientTo: COLORS.surface,
+  decimalPlaces: 0,
+  color: (opacity = 1) => `rgba(0, 150, 136, ${opacity})`,
+  labelColor: (opacity = 1) => `rgba(107, 114, 128, ${opacity})`,
+  style: {
+    borderRadius: 16,
+  },
+  propsForDots: {
+    r: '5',
+    strokeWidth: '2',
+    stroke: COLORS.primary,
+  },
+  propsForBackgroundLines: {
+    strokeDasharray: '',
+    stroke: COLORS.divider,
+  },
+};
+
 export default function RestaurantReports() {
   const [report, setReport] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('week');
+  const [activeChartTab, setActiveChartTab] = useState<'orders' | 'revenue'>('orders');
 
   const fetchReport = async () => {
     try {
