@@ -365,7 +365,23 @@ export default function RestaurantReports() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <LinearGradient colors={[COLORS.primary, COLORS.primaryDark]} style={styles.header}>
-        <Text style={styles.headerTitle}>التقارير والإحصائيات</Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.headerTitle}>التقارير والإحصائيات</Text>
+          <TouchableOpacity
+            style={styles.exportButton}
+            onPress={exportToPDF}
+            disabled={exporting || !report}
+          >
+            {exporting ? (
+              <ActivityIndicator size="small" color={COLORS.textWhite} />
+            ) : (
+              <>
+                <Ionicons name="download-outline" size={18} color={COLORS.textWhite} />
+                <Text style={styles.exportButtonText}>PDF</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
         <Text style={styles.headerSubtitle}>تحليل أداء مطعمك</Text>
 
         {/* Period Selector */}
