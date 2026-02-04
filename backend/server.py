@@ -2836,28 +2836,34 @@ async def get_user_details(user_id: str, admin: dict = Depends(require_admin)):
     
     return {"user": user, "recent_orders": orders}
 
+class UpdateUserStatusRequest(BaseModel):
+    is_active: bool
+
 @api_router.put("/admin/users/{user_id}/status")
 async def update_user_status(
     user_id: str,
-    is_active: bool,
+    request: UpdateUserStatusRequest,
     admin: dict = Depends(require_admin)
 ):
     """Activate or deactivate a user"""
     result = await db.users.update_one(
         {"id": user_id},
-        {"$set": {"is_active": is_active, "updated_at": datetime.utcnow()}}
+        {"$set": {"is_active": request.is_active, "updated_at": datetime.utcnow()}}
     )
     
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="المستخدم غير موجود")
     
-    return {"message": "تم تحديث حالة المستخدم بنجاح", "is_active": is_active}
+    return {"message": "تم تحديث حالة المستخدم بنجاح", "is_active": request.is_active}
+
+class UpdateUserInfoRequest(BaseModel):
+    name: Optional[str] = None
+    phone: Optional[str] = None
 
 @api_router.put("/admin/users/{user_id}")
 async def update_user_info(
     user_id: str,
-    name: str = None,
-    phone: str = None,
+    request: UpdateUserInfoRequest,
     admin: dict = Depends(require_admin)
 ):
     """Update user information (admin)"""
@@ -2870,9 +2876,9 @@ async def update_user_info(
         raise HTTPException(status_code=403, detail="لا يمكن تعديل حساب المدير")
     
     update_data = {"updated_at": datetime.utcnow()}
-    if name:
-        update_data["name"] = name
-    if phone:
+    if request.name:
+        update_data["name"] = request.name
+    if request.phone:
         # Check if phone already exists for another user
         existing = await db.users.find_one({"phone": phone, "id": {"$ne": user_id}})
         if existing:
