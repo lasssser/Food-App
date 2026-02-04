@@ -442,7 +442,7 @@ export default function AdminUsers() {
 
                   <TouchableOpacity
                     style={[styles.actionBtn, { backgroundColor: '#fee2e2', borderColor: '#ef4444', borderWidth: 1 }]}
-                    onPress={() => handleDeleteUser(selectedUser)}
+                    onPress={openDeleteModal}
                     disabled={actionLoading}
                   >
                     <Ionicons name="trash-outline" size={20} color="#ef4444" />
