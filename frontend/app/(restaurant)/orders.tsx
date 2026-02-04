@@ -28,6 +28,16 @@ interface RestaurantDriver {
   is_active?: boolean;
 }
 
+interface PlatformDriver {
+  id: string;
+  name: string;
+  phone: string;
+  is_online: boolean;
+  total_deliveries: number;
+  rating: number;
+  current_orders: number;
+}
+
 const STATUS_ACTIONS: Record<string, { next: string; label: string; icon: keyof typeof Ionicons.glyphMap }> = {
   pending: { next: 'accepted', label: 'قبول الطلب', icon: 'checkmark-circle' },
   accepted: { next: 'preparing', label: 'بدء التحضير', icon: 'flame' },
