@@ -154,34 +154,14 @@ export default function RestaurantInfoEdit() {
   };
 
   const pickImage = async () => {
+    setUploadingImage(true);
     try {
-      // Request permission
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (!permissionResult.granted) {
-        Alert.alert('تنبيه', 'يجب السماح بالوصول للصور لتتمكن من رفع صورة');
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [16, 9],
-        quality: 0.8,
-        base64: true,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        setUploadingImage(true);
-        // In a real app, you would upload this to a server
-        // For now, we'll use the base64 or URI
-        const imageUri = result.assets[0].uri;
-        setRestaurantImage(imageUri);
+      const compressedImageUri = await pickRestaurantImage();
+      if (compressedImageUri) {
+        setRestaurantImage(compressedImageUri);
         setHasChanges(true);
-        setUploadingImage(false);
-        
-        // Note: In production, you would upload to a server here
-        // and get back a URL to save
+        // Show compression success message
+        Alert.alert('تم', 'تم ضغط الصورة وتحسينها بنجاح ✓');
       }
     } catch (error) {
       console.error('Error picking image:', error);
