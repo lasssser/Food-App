@@ -542,6 +542,60 @@ export default function ProfileScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Complaint Modal */}
+      <Modal visible={showComplaintModal} animationType="slide" transparent>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setShowComplaintModal(false)} activeOpacity={0.7}>
+                <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>إرسال شكوى</Text>
+              <View style={{ width: 24 }} />
+            </View>
+
+            <TextInput
+              style={styles.modalInput}
+              placeholder="موضوع الشكوى"
+              placeholderTextColor={COLORS.textLight}
+              value={complaintSubject}
+              onChangeText={setComplaintSubject}
+              textAlign="right"
+            />
+
+            <TextInput
+              style={[styles.modalInput, { height: 120, textAlignVertical: 'top' }]}
+              placeholder="اكتب تفاصيل الشكوى هنا..."
+              placeholderTextColor={COLORS.textLight}
+              value={complaintMessage}
+              onChangeText={setComplaintMessage}
+              textAlign="right"
+              multiline
+              numberOfLines={5}
+            />
+
+            <TouchableOpacity 
+              style={[styles.saveButton, submittingComplaint && { opacity: 0.7 }]} 
+              onPress={handleSubmitComplaint} 
+              activeOpacity={0.7}
+              disabled={submittingComplaint}
+            >
+              <LinearGradient
+                colors={[COLORS.primary, COLORS.primaryDark]}
+                style={styles.saveButtonGradient}
+              >
+                <Text style={styles.saveButtonText}>
+                  {submittingComplaint ? 'جاري الإرسال...' : 'إرسال الشكوى'}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 }
