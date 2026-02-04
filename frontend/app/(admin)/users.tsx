@@ -642,6 +642,105 @@ export default function AdminUsers() {
           </View>
         </View>
       </Modal>
+
+      {/* Change Role Modal */}
+      <Modal
+        visible={showRoleModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowRoleModal(false)}
+      >
+        <View style={styles.deleteModalOverlay}>
+          <View style={styles.roleModalContent}>
+            <View style={styles.roleIconContainer}>
+              <Ionicons name="people" size={40} color="#3b82f6" />
+            </View>
+            <Text style={styles.deleteModalTitle}>تغيير دور المستخدم</Text>
+            <Text style={styles.deleteModalText}>
+              اختر الدور الجديد لـ "{selectedUser?.name}"
+            </Text>
+            
+            <View style={styles.roleOptions}>
+              <TouchableOpacity
+                style={[
+                  styles.roleOption,
+                  selectedNewRole === 'customer' && styles.roleOptionSelected,
+                ]}
+                onPress={() => setSelectedNewRole('customer')}
+              >
+                <Ionicons 
+                  name="person" 
+                  size={24} 
+                  color={selectedNewRole === 'customer' ? '#fff' : '#3b82f6'} 
+                />
+                <Text style={[
+                  styles.roleOptionText,
+                  selectedNewRole === 'customer' && styles.roleOptionTextSelected,
+                ]}>زبون</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.roleOption,
+                  selectedNewRole === 'restaurant' && styles.roleOptionSelected,
+                  { backgroundColor: selectedNewRole === 'restaurant' ? '#22c55e' : '#dcfce7' }
+                ]}
+                onPress={() => setSelectedNewRole('restaurant')}
+              >
+                <Ionicons 
+                  name="restaurant" 
+                  size={24} 
+                  color={selectedNewRole === 'restaurant' ? '#fff' : '#22c55e'} 
+                />
+                <Text style={[
+                  styles.roleOptionText,
+                  { color: selectedNewRole === 'restaurant' ? '#fff' : '#22c55e' },
+                ]}>صاحب مطعم</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.roleOption,
+                  selectedNewRole === 'driver' && styles.roleOptionSelected,
+                  { backgroundColor: selectedNewRole === 'driver' ? '#f59e0b' : '#fef3c7' }
+                ]}
+                onPress={() => setSelectedNewRole('driver')}
+              >
+                <Ionicons 
+                  name="bicycle" 
+                  size={24} 
+                  color={selectedNewRole === 'driver' ? '#fff' : '#f59e0b'} 
+                />
+                <Text style={[
+                  styles.roleOptionText,
+                  { color: selectedNewRole === 'driver' ? '#fff' : '#f59e0b' },
+                ]}>سائق</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.deleteModalButtons}>
+              <TouchableOpacity
+                style={styles.cancelDeleteBtn}
+                onPress={() => setShowRoleModal(false)}
+                disabled={actionLoading}
+              >
+                <Text style={styles.cancelDeleteBtnText}>إلغاء</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.confirmDeleteBtn, { backgroundColor: '#3b82f6' }]}
+                onPress={handleChangeRole}
+                disabled={actionLoading}
+              >
+                {actionLoading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.confirmDeleteBtnText}>تغيير</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
