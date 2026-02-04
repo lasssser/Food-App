@@ -59,6 +59,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: keyof 
 export default function RestaurantOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [drivers, setDrivers] = useState<RestaurantDriver[]>([]);
+  const [platformDrivers, setPlatformDrivers] = useState<PlatformDriver[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
