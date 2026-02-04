@@ -512,11 +512,41 @@ export default function RestaurantOrders() {
             <Text style={styles.statLabel}>مكتمل</Text>
           </View>
         </View>
+
+        {/* Tabs */}
+        <View style={styles.tabsContainer}>
+          <TouchableOpacity
+            style={[styles.orderTab, activeTab === 'active' && styles.orderTabActive]}
+            onPress={() => setActiveTab('active')}
+          >
+            <Ionicons 
+              name="time" 
+              size={18} 
+              color={activeTab === 'active' ? COLORS.primary : 'rgba(255,255,255,0.7)'} 
+            />
+            <Text style={[styles.orderTabText, activeTab === 'active' && styles.orderTabTextActive]}>
+              نشطة ({activeOrders.length})
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.orderTab, activeTab === 'completed' && styles.orderTabActive]}
+            onPress={() => setActiveTab('completed')}
+          >
+            <Ionicons 
+              name="checkmark-done" 
+              size={18} 
+              color={activeTab === 'completed' ? COLORS.success : 'rgba(255,255,255,0.7)'} 
+            />
+            <Text style={[styles.orderTabText, activeTab === 'completed' && styles.orderTabTextActive]}>
+              مكتملة ({completedOrders.length})
+            </Text>
+          </TouchableOpacity>
+        </View>
       </LinearGradient>
 
       {/* Orders List */}
       <FlatList
-        data={orders}
+        data={activeTab === 'active' ? activeOrders : completedOrders}
         keyExtractor={(item) => item.id}
         renderItem={renderOrder}
         contentContainerStyle={styles.listContent}
@@ -526,10 +556,18 @@ export default function RestaurantOrders() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIcon}>
-              <Ionicons name="receipt-outline" size={60} color={COLORS.textLight} />
+              <Ionicons 
+                name={activeTab === 'active' ? "receipt-outline" : "archive-outline"} 
+                size={60} 
+                color={COLORS.textLight} 
+              />
             </View>
-            <Text style={styles.emptyTitle}>لا توجد طلبات</Text>
-            <Text style={styles.emptySubtitle}>ستظهر الطلبات الجديدة هنا</Text>
+            <Text style={styles.emptyTitle}>
+              {activeTab === 'active' ? 'لا توجد طلبات نشطة' : 'لا توجد طلبات مكتملة'}
+            </Text>
+            <Text style={styles.emptySubtitle}>
+              {activeTab === 'active' ? 'ستظهر الطلبات الجديدة هنا' : 'ستظهر هنا الطلبات المكتملة والملغاة'}
+            </Text>
           </View>
         }
       />
