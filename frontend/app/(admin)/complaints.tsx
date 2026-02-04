@@ -262,7 +262,7 @@ export default function AdminComplaints() {
 
                     <View style={styles.descriptionSection}>
                       <Text style={styles.descriptionLabel}>وصف الشكوى:</Text>
-                      <Text style={styles.descriptionText}>{selectedComplaint.description}</Text>
+                      <Text style={styles.descriptionText}>{selectedComplaint.message}</Text>
                     </View>
 
                     {selectedComplaint.status !== 'resolved' && (
