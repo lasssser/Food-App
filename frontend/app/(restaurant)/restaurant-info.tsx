@@ -16,8 +16,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as ImagePicker from 'expo-image-picker';
 import { restaurantPanelAPI } from '../../src/services/api';
+import { pickRestaurantImage } from '../../src/utils/imageUtils';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 interface RestaurantInfo {
