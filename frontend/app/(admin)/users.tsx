@@ -56,9 +56,11 @@ export default function AdminUsers() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
   const [editName, setEditName] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [selectedRole, setSelectedNewRole] = useState('customer');
   const [actionLoading, setActionLoading] = useState(false);
 
   const fetchUsers = async () => {
