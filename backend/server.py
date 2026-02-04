@@ -2853,6 +2853,85 @@ async def update_user_status(
     
     return {"message": "تم تحديث حالة المستخدم بنجاح", "is_active": is_active}
 
+@api_router.put("/admin/users/{user_id}")
+async def update_user_info(
+    user_id: str,
+    name: str = None,
+    phone: str = None,
+    admin: dict = Depends(require_admin)
+):
+    """Update user information (admin)"""
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    # Don't allow editing admin accounts
+    if user.get("role") == "admin":
+        raise HTTPException(status_code=403, detail="لا يمكن تعديل حساب المدير")
+    
+    update_data = {"updated_at": datetime.utcnow()}
+    if name:
+        update_data["name"] = name
+    if phone:
+        # Check if phone already exists for another user
+        existing = await db.users.find_one({"phone": phone, "id": {"$ne": user_id}})
+        if existing:
+            raise HTTPException(status_code=400, detail="رقم الهاتف مستخدم من قبل حساب آخر")
+        update_data["phone"] = phone
+    
+    await db.users.update_one({"id": user_id}, {"$set": update_data})
+    
+    return {"message": "تم تحديث بيانات المستخدم بنجاح"}
+
+@api_router.put("/admin/users/{user_id}/reset-password")
+async def reset_user_password(
+    user_id: str,
+    new_password: str,
+    admin: dict = Depends(require_admin)
+):
+    """Reset user password (admin)"""
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    # Don't allow resetting admin passwords through this endpoint
+    if user.get("role") == "admin":
+        raise HTTPException(status_code=403, detail="لا يمكن إعادة تعيين كلمة مرور المدير")
+    
+    if len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="كلمة المرور يجب أن تكون 6 أحرف على الأقل")
+    
+    hashed = hash_password(new_password)
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"password_hash": hashed, "updated_at": datetime.utcnow()}}
+    )
+    
+    return {"message": "تم إعادة تعيين كلمة المرور بنجاح"}
+
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user(user_id: str, admin: dict = Depends(require_admin)):
+    """Delete a user (admin)"""
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    # Don't allow deleting admin accounts
+    if user.get("role") == "admin":
+        raise HTTPException(status_code=403, detail="لا يمكن حذف حساب المدير")
+    
+    # Delete the user
+    await db.users.delete_one({"id": user_id})
+    
+    # If user is a restaurant owner, also handle restaurant data
+    if user.get("role") == "restaurant":
+        await db.restaurants.update_many(
+            {"owner_id": user_id},
+            {"$set": {"is_active": False, "deleted_at": datetime.utcnow()}}
+        )
+    
+    return {"message": "تم حذف المستخدم بنجاح"}
+
 @api_router.get("/admin/restaurants")
 async def get_all_restaurants(
     status: str = None,
