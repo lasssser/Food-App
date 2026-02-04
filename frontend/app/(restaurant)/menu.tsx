@@ -335,6 +335,22 @@ export default function RestaurantMenu() {
             </View>
 
             <ScrollView style={styles.modalForm} showsVerticalScrollIndicator={false}>
+              {/* Image Picker */}
+              <Text style={styles.inputLabel}>صورة الصنف</Text>
+              <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+                {formImage ? (
+                  <Image source={{ uri: formImage }} style={styles.pickedImage} />
+                ) : (
+                  <View style={styles.imagePickerPlaceholder}>
+                    <Ionicons name="camera-outline" size={36} color={COLORS.textLight} />
+                    <Text style={styles.imagePickerText}>اضغط لإضافة صورة</Text>
+                  </View>
+                )}
+                <View style={styles.imagePickerBadge}>
+                  <Ionicons name="camera" size={14} color={COLORS.textWhite} />
+                </View>
+              </TouchableOpacity>
+
               <Text style={styles.inputLabel}>اسم الصنف *</Text>
               <TextInput
                 style={styles.input}
