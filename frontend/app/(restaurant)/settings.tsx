@@ -122,7 +122,7 @@ export default function RestaurantSettings() {
       subtitle: 'المبيعات والأداء',
       icon: 'bar-chart' as const,
       color: '#9C27B0',
-      onPress: () => Alert.alert('قريباً', 'التقارير المتقدمة قيد التطوير'),
+      onPress: () => router.push('/(restaurant)/reports'),
     },
   ];
 
