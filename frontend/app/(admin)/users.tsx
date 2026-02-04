@@ -179,22 +179,34 @@ export default function AdminUsers() {
   };
 
   const handleDeleteUser = async (user: User) => {
-    // For web, use window.confirm instead of Alert.alert
-    if (Platform.OS === 'web') {
-      const confirmed = window.confirm(`هل أنت متأكد من حذف حساب "${user.name}"؟\nهذا الإجراء لا يمكن التراجع عنه.`);
-      if (!confirmed) return;
-      
+    const doDelete = async () => {
       setActionLoading(true);
       try {
         await adminAPI.deleteUser(user.id);
-        alert('تم حذف الحساب بنجاح');
+        if (Platform.OS === 'web') {
+          alert('تم حذف الحساب بنجاح');
+        } else {
+          Alert.alert('نجاح', 'تم حذف الحساب بنجاح');
+        }
         setShowUserModal(false);
         fetchUsers();
       } catch (error: any) {
         console.error('Error deleting user:', error);
-        alert(error.response?.data?.detail || 'فشل في حذف الحساب');
+        const errorMsg = error.response?.data?.detail || 'فشل في حذف الحساب';
+        if (Platform.OS === 'web') {
+          alert(errorMsg);
+        } else {
+          Alert.alert('خطأ', errorMsg);
+        }
       } finally {
         setActionLoading(false);
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(`هل أنت متأكد من حذف حساب "${user.name}"؟\nهذا الإجراء لا يمكن التراجع عنه.`);
+      if (confirmed) {
+        doDelete();
       }
     } else {
       Alert.alert(
@@ -202,24 +214,7 @@ export default function AdminUsers() {
         `هل أنت متأكد من حذف حساب "${user.name}"؟\nهذا الإجراء لا يمكن التراجع عنه.`,
         [
           { text: 'إلغاء', style: 'cancel' },
-          {
-            text: 'حذف',
-            style: 'destructive',
-            onPress: async () => {
-              setActionLoading(true);
-              try {
-                await adminAPI.deleteUser(user.id);
-                Alert.alert('نجاح', 'تم حذف الحساب بنجاح');
-                setShowUserModal(false);
-                fetchUsers();
-              } catch (error: any) {
-                console.error('Error deleting user:', error);
-                Alert.alert('خطأ', error.response?.data?.detail || 'فشل في حذف الحساب');
-              } finally {
-                setActionLoading(false);
-              }
-            },
-          },
+          { text: 'حذف', style: 'destructive', onPress: doDelete },
         ]
       );
     }
