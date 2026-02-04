@@ -8,6 +8,9 @@ import {
   RefreshControl,
   ActivityIndicator,
   Modal,
+  Linking,
+  Platform,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
