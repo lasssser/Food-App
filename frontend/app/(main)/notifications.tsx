@@ -1,41 +1,46 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  FlatList,
+  ScrollView,
   TouchableOpacity,
+  Switch,
   RefreshControl,
   ActivityIndicator,
+  Alert,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { notificationAPI } from '../../src/services/api';
+import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+import { scheduleLocalNotification } from '../../src/services/notifications';
 
-interface Notification {
+interface NotificationItem {
   id: string;
-  user_id: string;
   title: string;
   body: string;
   type: string;
-  data?: any;
   is_read: boolean;
   created_at: string;
+  data?: any;
 }
-
-const NOTIFICATION_ICONS: Record<string, { name: string; color: string }> = {
-  order_update: { name: 'receipt', color: '#2196F3' },
-  new_order: { name: 'notifications', color: '#FF6B35' },
-  payment: { name: 'card', color: '#4CAF50' },
-  promo: { name: 'gift', color: '#E91E63' },
-};
 
 export default function NotificationsScreen() {
   const router = useRouter();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState<'all' | 'settings'>('all');
+  
+  // Notification Settings
+  const [orderUpdates, setOrderUpdates] = useState(true);
+  const [newOffers, setNewOffers] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [vibrationEnabled, setVibrationEnabled] = useState(true);
 
   const fetchNotifications = async () => {
     try {
@@ -60,114 +65,328 @@ export default function NotificationsScreen() {
     fetchNotifications();
   };
 
-  const handleNotificationPress = async (notification: Notification) => {
-    if (!notification.is_read) {
-      try {
-        await notificationAPI.markAsRead(notification.id);
-        setNotifications(
-          notifications.map((n) =>
-            n.id === notification.id ? { ...n, is_read: true } : n
-          )
-        );
-      } catch (error) {
-        console.error('Error marking notification as read:', error);
-      }
-    }
-
-    // Navigate based on notification type
-    if (notification.type === 'order_update' && notification.data?.order_id) {
-      router.push('/(main)/orders');
-    }
-  };
-
   const handleMarkAllRead = async () => {
     try {
       await notificationAPI.markAllAsRead();
-      setNotifications(notifications.map((n) => ({ ...n, is_read: true })));
+      setNotifications(notifications.map(n => ({ ...n, is_read: true })));
     } catch (error) {
       console.error('Error marking all as read:', error);
+    }
+  };
+
+  const handleMarkAsRead = async (notificationId: string) => {
+    try {
+      await notificationAPI.markAsRead(notificationId);
+      setNotifications(notifications.map(n => 
+        n.id === notificationId ? { ...n, is_read: true } : n
+      ));
+    } catch (error) {
+      console.error('Error marking as read:', error);
+    }
+  };
+
+  const handleTestNotification = async () => {
+    try {
+      // Try to send from backend first
+      await notificationAPI.testPushNotification();
+      Alert.alert('تم', 'تم إرسال إشعار تجريبي إلى جهازك');
+    } catch (error: any) {
+      // If backend fails (no token registered), try local notification
+      if (Platform.OS !== 'web') {
+        try {
+          await scheduleLocalNotification(
+            '🔔 إشعار تجريبي',
+            'هذا إشعار تجريبي من يلا ناكل؟',
+            { type: 'test' },
+            1
+          );
+          Alert.alert('تم', 'تم جدولة إشعار تجريبي محلي');
+        } catch (e) {
+          Alert.alert('تنبيه', 'يرجى استخدام التطبيق على جهاز حقيقي لتلقي الإشعارات');
+        }
+      } else {
+        Alert.alert('تنبيه', 'الإشعارات غير مدعومة على الويب');
+      }
+    }
+  };
+
+  const getNotificationIcon = (type: string): keyof typeof Ionicons.glyphMap => {
+    switch (type) {
+      case 'order_update':
+        return 'bag-check';
+      case 'new_order':
+        return 'restaurant';
+      case 'payment':
+        return 'card';
+      case 'promo':
+        return 'gift';
+      default:
+        return 'notifications';
+    }
+  };
+
+  const getNotificationColor = (type: string): string => {
+    switch (type) {
+      case 'order_update':
+        return COLORS.success;
+      case 'new_order':
+        return COLORS.primary;
+      case 'payment':
+        return '#2196F3';
+      case 'promo':
+        return '#FF9800';
+      default:
+        return COLORS.textSecondary;
     }
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
 
-    if (diffMins < 1) return 'الآن';
-    if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
-    if (diffHours < 24) return `منذ ${diffHours} ساعة`;
-    if (diffDays < 7) return `منذ ${diffDays} يوم`;
+    if (minutes < 1) return 'الآن';
+    if (minutes < 60) return `منذ ${minutes} دقيقة`;
+    if (hours < 24) return `منذ ${hours} ساعة`;
+    if (days < 7) return `منذ ${days} يوم`;
     return date.toLocaleDateString('ar-SY');
   };
 
-  const renderNotification = ({ item }: { item: Notification }) => {
-    const icon = NOTIFICATION_ICONS[item.type] || { name: 'notifications', color: '#999' };
+  const unreadCount = notifications.filter(n => !n.is_read).length;
 
-    return (
-      <TouchableOpacity
-        style={[styles.notificationCard, !item.is_read && styles.unread]}
-        onPress={() => handleNotificationPress(item)}
-      >
-        <View style={[styles.iconContainer, { backgroundColor: `${icon.color}20` }]}>
-          <Ionicons name={icon.name as any} size={24} color={icon.color} />
+  const renderNotificationsList = () => (
+    <ScrollView
+      style={styles.content}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} />
+      }
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Header Actions */}
+      {notifications.length > 0 && unreadCount > 0 && (
+        <TouchableOpacity style={styles.markAllButton} onPress={handleMarkAllRead} activeOpacity={0.7}>
+          <Ionicons name="checkmark-done" size={18} color={COLORS.primary} />
+          <Text style={styles.markAllText}>تحديد الكل كمقروء</Text>
+        </TouchableOpacity>
+      )}
+
+      {/* Notifications List */}
+      {notifications.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <View style={styles.emptyIconContainer}>
+            <Ionicons name="notifications-off-outline" size={50} color={COLORS.textLight} />
+          </View>
+          <Text style={styles.emptyTitle}>لا توجد إشعارات</Text>
+          <Text style={styles.emptySubtitle}>ستظهر هنا الإشعارات الجديدة</Text>
         </View>
-        <View style={styles.contentContainer}>
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.body} numberOfLines={2}>
-            {item.body}
-          </Text>
-          <Text style={styles.time}>{formatDate(item.created_at)}</Text>
+      ) : (
+        notifications.map((notification) => (
+          <TouchableOpacity
+            key={notification.id}
+            style={[
+              styles.notificationCard,
+              !notification.is_read && styles.unreadCard,
+            ]}
+            onPress={() => handleMarkAsRead(notification.id)}
+            activeOpacity={0.7}
+          >
+            <View style={[
+              styles.notificationIcon,
+              { backgroundColor: `${getNotificationColor(notification.type)}15` },
+            ]}>
+              <Ionicons
+                name={getNotificationIcon(notification.type)}
+                size={24}
+                color={getNotificationColor(notification.type)}
+              />
+            </View>
+            <View style={styles.notificationContent}>
+              <View style={styles.notificationHeader}>
+                <Text style={styles.notificationTitle}>{notification.title}</Text>
+                {!notification.is_read && <View style={styles.unreadDot} />}
+              </View>
+              <Text style={styles.notificationBody} numberOfLines={2}>
+                {notification.body}
+              </Text>
+              <Text style={styles.notificationTime}>
+                {formatDate(notification.created_at)}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        ))
+      )}
+
+      <View style={{ height: 100 }} />
+    </ScrollView>
+  );
+
+  const renderSettings = () => (
+    <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      {/* Notification Types */}
+      <View style={styles.settingsSection}>
+        <Text style={styles.sectionTitle}>أنواع الإشعارات</Text>
+        
+        <View style={styles.settingItem}>
+          <Switch
+            value={orderUpdates}
+            onValueChange={setOrderUpdates}
+            trackColor={{ false: COLORS.border, true: `${COLORS.success}80` }}
+            thumbColor={orderUpdates ? COLORS.success : COLORS.textLight}
+          />
+          <View style={styles.settingInfo}>
+            <Text style={styles.settingTitle}>تحديثات الطلبات</Text>
+            <Text style={styles.settingDesc}>إشعارات عن حالة طلباتك</Text>
+          </View>
+          <View style={[styles.settingIcon, { backgroundColor: `${COLORS.success}15` }]}>
+            <Ionicons name="bag-check" size={22} color={COLORS.success} />
+          </View>
         </View>
-        {!item.is_read && <View style={styles.unreadDot} />}
-      </TouchableOpacity>
-    );
-  };
+
+        <View style={styles.settingItem}>
+          <Switch
+            value={newOffers}
+            onValueChange={setNewOffers}
+            trackColor={{ false: COLORS.border, true: `${COLORS.primary}80` }}
+            thumbColor={newOffers ? COLORS.primary : COLORS.textLight}
+          />
+          <View style={styles.settingInfo}>
+            <Text style={styles.settingTitle}>العروض والخصومات</Text>
+            <Text style={styles.settingDesc}>أحدث العروض من المطاعم</Text>
+          </View>
+          <View style={[styles.settingIcon, { backgroundColor: `${COLORS.primary}15` }]}>
+            <Ionicons name="gift" size={22} color={COLORS.primary} />
+          </View>
+        </View>
+      </View>
+
+      {/* Sound & Vibration */}
+      <View style={styles.settingsSection}>
+        <Text style={styles.sectionTitle}>الصوت والاهتزاز</Text>
+        
+        <View style={styles.settingItem}>
+          <Switch
+            value={soundEnabled}
+            onValueChange={setSoundEnabled}
+            trackColor={{ false: COLORS.border, true: `${COLORS.info}80` }}
+            thumbColor={soundEnabled ? COLORS.info : COLORS.textLight}
+          />
+          <View style={styles.settingInfo}>
+            <Text style={styles.settingTitle}>صوت الإشعارات</Text>
+            <Text style={styles.settingDesc}>تشغيل صوت عند وصول إشعار</Text>
+          </View>
+          <View style={[styles.settingIcon, { backgroundColor: `${COLORS.info}15` }]}>
+            <Ionicons name="volume-high" size={22} color={COLORS.info} />
+          </View>
+        </View>
+
+        <View style={styles.settingItem}>
+          <Switch
+            value={vibrationEnabled}
+            onValueChange={setVibrationEnabled}
+            trackColor={{ false: COLORS.border, true: `${COLORS.info}80` }}
+            thumbColor={vibrationEnabled ? COLORS.info : COLORS.textLight}
+          />
+          <View style={styles.settingInfo}>
+            <Text style={styles.settingTitle}>الاهتزاز</Text>
+            <Text style={styles.settingDesc}>اهتزاز عند وصول إشعار</Text>
+          </View>
+          <View style={[styles.settingIcon, { backgroundColor: `${COLORS.info}15` }]}>
+            <Ionicons name="phone-portrait" size={22} color={COLORS.info} />
+          </View>
+        </View>
+      </View>
+
+      {/* Test Notification */}
+      <View style={styles.settingsSection}>
+        <Text style={styles.sectionTitle}>اختبار الإشعارات</Text>
+        
+        <TouchableOpacity
+          style={styles.testButton}
+          onPress={handleTestNotification}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={[COLORS.primary, COLORS.primaryDark]}
+            style={styles.testButtonGradient}
+          >
+            <Ionicons name="paper-plane" size={20} color={COLORS.textWhite} />
+            <Text style={styles.testButtonText}>إرسال إشعار تجريبي</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        <Text style={styles.testNote}>
+          سيتم إرسال إشعار تجريبي إلى جهازك للتأكد من عمل الإشعارات بشكل صحيح
+        </Text>
+      </View>
+
+      <View style={{ height: 100 }} />
+    </ScrollView>
+  );
 
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B35" />
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       </SafeAreaView>
     );
   }
 
-  const unreadCount = notifications.filter((n) => !n.is_read).length;
-
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Header */}
       <View style={styles.header}>
-        {unreadCount > 0 && (
-          <TouchableOpacity onPress={handleMarkAllRead}>
-            <Text style={styles.markAllRead}>قراءة الكل</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
+          <Ionicons name="chevron-forward" size={28} color={COLORS.textPrimary} />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>الإشعارات</Text>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-forward" size={24} color="#333" />
+        <View style={{ width: 28 }} />
+      </View>
+
+      {/* Tabs */}
+      <View style={styles.tabs}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'all' && styles.activeTab]}
+          onPress={() => setActiveTab('all')}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="notifications"
+            size={20}
+            color={activeTab === 'all' ? COLORS.primary : COLORS.textSecondary}
+          />
+          <Text style={[styles.tabText, activeTab === 'all' && styles.activeTabText]}>
+            الكل
+          </Text>
+          {unreadCount > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{unreadCount}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'settings' && styles.activeTab]}
+          onPress={() => setActiveTab('settings')}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="settings"
+            size={20}
+            color={activeTab === 'settings' ? COLORS.primary : COLORS.textSecondary}
+          />
+          <Text style={[styles.tabText, activeTab === 'settings' && styles.activeTabText]}>
+            الإعدادات
+          </Text>
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={notifications}
-        keyExtractor={(item) => item.id}
-        renderItem={renderNotification}
-        contentContainerStyle={styles.listContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#FF6B35']} />
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons name="notifications-off-outline" size={60} color="#ccc" />
-            <Text style={styles.emptyText}>لا توجد إشعارات</Text>
-          </View>
-        }
-      />
+      {/* Content */}
+      {activeTab === 'all' ? renderNotificationsList() : renderSettings()}
     </SafeAreaView>
   );
 }
@@ -175,7 +394,7 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: COLORS.background,
   },
   loadingContainer: {
     flex: 1,
@@ -186,79 +405,225 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: COLORS.divider,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.textPrimary,
   },
-  markAllRead: {
+  tabs: {
+    flexDirection: 'row-reverse',
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: SPACING.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.divider,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.md,
+    gap: SPACING.sm,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  activeTab: {
+    borderBottomColor: COLORS.primary,
+  },
+  tabText: {
     fontSize: 14,
-    color: '#FF6B35',
+    color: COLORS.textSecondary,
+    fontWeight: '500',
   },
-  listContent: {
-    padding: 16,
+  activeTabText: {
+    color: COLORS.primary,
+    fontWeight: '600',
   },
+  badge: {
+    backgroundColor: COLORS.error,
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+  },
+  badgeText: {
+    color: COLORS.textWhite,
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  content: {
+    flex: 1,
+  },
+  markAllButton: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: SPACING.md,
+    gap: SPACING.sm,
+  },
+  markAllText: {
+    fontSize: 14,
+    color: COLORS.primary,
+    fontWeight: '500',
+  },
+
+  // Notification Card
   notificationCard: {
     flexDirection: 'row-reverse',
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 8,
+    backgroundColor: COLORS.surface,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.sm,
+    padding: SPACING.md,
+    borderRadius: RADIUS.lg,
+    ...SHADOWS.small,
   },
-  unread: {
-    backgroundColor: '#FFF5F2',
+  unreadCard: {
+    backgroundColor: `${COLORS.primary}08`,
+    borderRightWidth: 3,
+    borderRightColor: COLORS.primary,
   },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  notificationIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  contentContainer: {
+  notificationContent: {
     flex: 1,
-    marginRight: 12,
+    marginRight: SPACING.md,
     alignItems: 'flex-end',
   },
-  title: {
-    fontSize: 16,
+  notificationHeader: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  notificationTitle: {
+    fontSize: 15,
     fontWeight: '600',
-    color: '#333',
-    textAlign: 'right',
-  },
-  body: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 4,
-    textAlign: 'right',
-  },
-  time: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 8,
+    color: COLORS.textPrimary,
   },
   unreadDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#FF6B35',
-    position: 'absolute',
-    top: 16,
-    left: 16,
+    backgroundColor: COLORS.primary,
   },
+  notificationBody: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+    textAlign: 'right',
+    lineHeight: 20,
+  },
+  notificationTime: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    marginTop: SPACING.sm,
+  },
+
+  // Empty State
   emptyContainer: {
     alignItems: 'center',
-    paddingTop: 60,
+    paddingTop: 80,
   },
-  emptyText: {
+  emptyIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: COLORS.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+    ...SHADOWS.small,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.sm,
+  },
+
+  // Settings
+  settingsSection: {
+    backgroundColor: COLORS.surface,
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    ...SHADOWS.small,
+  },
+  sectionTitle: {
     fontSize: 16,
-    color: '#999',
-    marginTop: 12,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    textAlign: 'right',
+    marginBottom: SPACING.md,
+  },
+  settingItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SPACING.md,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.divider,
+  },
+  settingIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  settingInfo: {
+    flex: 1,
+    marginHorizontal: SPACING.md,
+    alignItems: 'flex-end',
+  },
+  settingTitle: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: COLORS.textPrimary,
+  },
+  settingDesc: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  testButton: {
+    borderRadius: RADIUS.md,
+    overflow: 'hidden',
+    marginTop: SPACING.sm,
+  },
+  testButtonGradient: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.lg,
+    gap: SPACING.sm,
+  },
+  testButtonText: {
+    color: COLORS.textWhite,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  testNote: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    textAlign: 'center',
+    marginTop: SPACING.md,
+    lineHeight: 18,
   },
 });
