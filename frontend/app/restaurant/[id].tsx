@@ -1067,4 +1067,97 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
+
+  // Ratings Section
+  ratingsContainer: {
+    padding: SPACING.lg,
+  },
+  ratingSummary: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xl,
+    marginBottom: SPACING.lg,
+    alignItems: 'center',
+    ...SHADOWS.small,
+  },
+  ratingBigScore: {
+    alignItems: 'center',
+  },
+  ratingBigNumber: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  ratingStarsRow: {
+    flexDirection: 'row-reverse',
+    gap: 4,
+    marginTop: SPACING.sm,
+  },
+  ratingCount: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.sm,
+  },
+  noRatings: {
+    alignItems: 'center',
+    paddingVertical: SPACING.xxl,
+  },
+  noRatingsText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+    marginTop: SPACING.md,
+  },
+  noRatingsSubtext: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.sm,
+  },
+  ratingCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.md,
+    ...SHADOWS.small,
+  },
+  ratingHeader: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  ratingUser: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  userAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  ratingStars: {
+    flexDirection: 'row-reverse',
+    gap: 2,
+  },
+  ratingComment: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    lineHeight: 22,
+    textAlign: 'right',
+    marginBottom: SPACING.sm,
+  },
+  ratingDate: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    textAlign: 'right',
+  },
 });
