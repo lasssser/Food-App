@@ -16,7 +16,7 @@ export interface PushNotificationState {
 }
 
 export function usePushNotifications() {
-  const { user, token: authToken } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const [state, setState] = useState<PushNotificationState>({
     expoPushToken: null,
     notification: null,
@@ -29,7 +29,7 @@ export function usePushNotifications() {
 
   useEffect(() => {
     // Only register if user is logged in
-    if (!user || !authToken) {
+    if (!user || !isAuthenticated) {
       setState(prev => ({ ...prev, loading: false }));
       return;
     }
@@ -78,7 +78,7 @@ export function usePushNotifications() {
       notificationListener.current?.remove();
       responseListener.current?.remove();
     };
-  }, [user, authToken]);
+  }, [user, isAuthenticated]);
 
   // Cleanup on logout
   const cleanup = async () => {
