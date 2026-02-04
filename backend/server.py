@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 import jwt
 from passlib.context import CryptContext
 import bcrypt
+import httpx
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
