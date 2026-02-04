@@ -277,6 +277,33 @@ export default function OrdersScreen() {
             <Text style={styles.cancelOrderText}>إلغاء الطلب</Text>
           </TouchableOpacity>
         )}
+
+        {/* Rate Button - shown for delivered orders not yet rated */}
+        {isDelivered && !ratedOrders.has(order.id) && (
+          <TouchableOpacity 
+            style={styles.rateButton}
+            onPress={() => {
+              setOrderToRate(order);
+              setRatingModalVisible(true);
+            }}
+          >
+            <LinearGradient
+              colors={['#FFD700', '#FFA500']}
+              style={styles.rateButtonGradient}
+            >
+              <Ionicons name="star" size={20} color={COLORS.textWhite} />
+              <Text style={styles.rateButtonText}>قيّم تجربتك</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
+
+        {/* Already rated indicator */}
+        {isDelivered && ratedOrders.has(order.id) && (
+          <View style={styles.ratedBadge}>
+            <Ionicons name="checkmark-circle" size={18} color={COLORS.success} />
+            <Text style={styles.ratedText}>تم التقييم</Text>
+          </View>
+        )}
       </View>
     );
   };
