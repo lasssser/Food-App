@@ -66,6 +66,7 @@ export default function RestaurantOrders() {
   const [refreshing, setRefreshing] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [previousOrderCount, setPreviousOrderCount] = useState(0);
+  const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active');
   
   // Modal states
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -94,6 +95,10 @@ export default function RestaurantOrders() {
       setRefreshing(false);
     }
   };
+
+  // Filter orders
+  const activeOrders = orders.filter(o => !['delivered', 'cancelled'].includes(o.order_status));
+  const completedOrders = orders.filter(o => ['delivered', 'cancelled'].includes(o.order_status));
 
   const fetchDrivers = async () => {
     try {
