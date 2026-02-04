@@ -115,18 +115,31 @@ export default function AdminUsers() {
   const handleEditUser = async () => {
     if (!selectedUser) return;
     if (!editName.trim()) {
-      Alert.alert('خطأ', 'يرجى إدخال الاسم');
+      if (Platform.OS === 'web') {
+        alert('يرجى إدخال الاسم');
+      } else {
+        Alert.alert('خطأ', 'يرجى إدخال الاسم');
+      }
       return;
     }
     setActionLoading(true);
     try {
       await adminAPI.updateUser(selectedUser.id, editName.trim(), editPhone.trim() || undefined);
-      Alert.alert('نجاح', 'تم تحديث بيانات المستخدم');
+      if (Platform.OS === 'web') {
+        alert('تم تحديث بيانات المستخدم');
+      } else {
+        Alert.alert('نجاح', 'تم تحديث بيانات المستخدم');
+      }
       setShowEditModal(false);
       fetchUsers();
     } catch (error: any) {
       console.error('Error updating user:', error);
-      Alert.alert('خطأ', error.response?.data?.detail || 'فشل في تحديث البيانات');
+      const errorMsg = error.response?.data?.detail || 'فشل في تحديث البيانات';
+      if (Platform.OS === 'web') {
+        alert(errorMsg);
+      } else {
+        Alert.alert('خطأ', errorMsg);
+      }
     } finally {
       setActionLoading(false);
     }
