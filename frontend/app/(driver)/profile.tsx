@@ -129,6 +129,20 @@ export default function DriverProfile() {
 
           <TouchableOpacity 
             style={styles.menuItem} 
+            onPress={() => setShowComplaintModal(true)}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+            <View style={styles.menuItemContent}>
+              <Text style={styles.menuItemText}>إرسال شكوى</Text>
+              <View style={[styles.menuIcon, { backgroundColor: `${COLORS.error}15` }]}>
+                <Ionicons name="chatbubble-ellipses" size={20} color={COLORS.error} />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.menuItem} 
             onPress={() => setShowHelpModal(true)}
             activeOpacity={0.7}
           >
