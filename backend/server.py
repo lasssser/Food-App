@@ -1081,6 +1081,100 @@ async def get_restaurant_reports(
         ]
     }
 
+@api_router.get("/restaurant/info")
+async def get_restaurant_info(current_user: dict = Depends(get_current_user)):
+    """Get restaurant details for editing"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    return {
+        "id": restaurant["id"],
+        "name": restaurant.get("name", ""),
+        "name_en": restaurant.get("name_en", ""),
+        "description": restaurant.get("description", ""),
+        "address": restaurant.get("address", ""),
+        "area": restaurant.get("area", ""),
+        "city_id": restaurant.get("city_id", "damascus"),
+        "cuisine_type": restaurant.get("cuisine_type", ""),
+        "is_open": restaurant.get("is_open", True),
+        "delivery_fee": restaurant.get("delivery_fee", 5000),
+        "min_order": restaurant.get("min_order", 10000),
+        "delivery_time": restaurant.get("delivery_time", "30-45 دقيقة"),
+        "opening_time": restaurant.get("opening_time", "09:00"),
+        "closing_time": restaurant.get("closing_time", "23:00"),
+        "working_days": restaurant.get("working_days", ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"]),
+        "rating": restaurant.get("rating", 0),
+        "review_count": restaurant.get("review_count", 0),
+        "image": restaurant.get("image", ""),
+    }
+
+@api_router.put("/restaurant/info")
+async def update_restaurant_info(
+    update_data: RestaurantUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update restaurant information"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    # Build update dict from non-None fields
+    update_dict = {}
+    for field, value in update_data.dict().items():
+        if value is not None:
+            update_dict[field] = value
+    
+    if not update_dict:
+        raise HTTPException(status_code=400, detail="لا توجد بيانات للتحديث")
+    
+    update_dict["updated_at"] = datetime.utcnow()
+    
+    await db.restaurants.update_one(
+        {"id": restaurant["id"]},
+        {"$set": update_dict}
+    )
+    
+    # Return updated restaurant
+    updated_restaurant = await db.restaurants.find_one({"id": restaurant["id"]})
+    return {
+        "message": "تم تحديث بيانات المطعم بنجاح",
+        "restaurant": {
+            "id": updated_restaurant["id"],
+            "name": updated_restaurant.get("name", ""),
+            "description": updated_restaurant.get("description", ""),
+            "is_open": updated_restaurant.get("is_open", True),
+        }
+    }
+
+@api_router.put("/restaurant/toggle-status")
+async def toggle_restaurant_status(current_user: dict = Depends(get_current_user)):
+    """Toggle restaurant open/close status"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    new_status = not restaurant.get("is_open", True)
+    
+    await db.restaurants.update_one(
+        {"id": restaurant["id"]},
+        {"$set": {"is_open": new_status, "updated_at": datetime.utcnow()}}
+    )
+    
+    return {
+        "message": "مفتوح الآن" if new_status else "مغلق الآن",
+        "is_open": new_status
+    }
+
 # ==================== Restaurant Drivers Management ====================
 
 def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
