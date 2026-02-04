@@ -271,6 +271,23 @@ export default function RestaurantSettings() {
           <View style={styles.menuCard}>
             <TouchableOpacity
               style={[styles.menuItem, styles.menuItemBorder]}
+              onPress={() => setShowComplaintModal(true)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+              <View style={styles.menuItemContent}>
+                <View style={styles.menuItemText}>
+                  <Text style={styles.menuItemTitle}>إرسال شكوى</Text>
+                  <Text style={styles.menuItemSubtitle}>أرسل شكوى للإدارة</Text>
+                </View>
+                <View style={[styles.menuItemIcon, { backgroundColor: `${COLORS.warning}15` }]}>
+                  <Ionicons name="chatbubble-ellipses" size={22} color={COLORS.warning} />
+                </View>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.menuItem, styles.menuItemBorder]}
               onPress={() => setShowHelpModal(true)}
               activeOpacity={0.7}
             >
