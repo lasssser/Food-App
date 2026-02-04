@@ -407,28 +407,16 @@ export const adminAPI = {
     const response = await api.put(`/admin/users/${userId}/status`, { is_active: isActive });
     return response.data;
   },
-  getRestaurants: async (status?: string, page: number = 1, limit: number = 20) => {
-    const params = new URLSearchParams();
-    if (status) params.append('status', status);
-    params.append('page', page.toString());
-    params.append('limit', limit.toString());
-    const response = await api.get(`/admin/restaurants?${params.toString()}`);
+  updateUser: async (userId: string, name?: string, phone?: string) => {
+    const response = await api.put(`/admin/users/${userId}`, { name, phone });
     return response.data;
   },
-  approveRestaurant: async (restaurantId: string, approved: boolean) => {
-    const response = await api.put(`/admin/restaurants/${restaurantId}/approve`, { approved });
+  resetUserPassword: async (userId: string, newPassword: string) => {
+    const response = await api.put(`/admin/users/${userId}/reset-password`, { new_password: newPassword });
     return response.data;
   },
-  getDrivers: async (status?: string, page: number = 1, limit: number = 20) => {
-    const params = new URLSearchParams();
-    if (status) params.append('status', status);
-    params.append('page', page.toString());
-    params.append('limit', limit.toString());
-    const response = await api.get(`/admin/drivers?${params.toString()}`);
-    return response.data;
-  },
-  approveDriver: async (driverId: string, approved: boolean) => {
-    const response = await api.put(`/admin/drivers/${driverId}/approve`, { approved });
+  deleteUser: async (userId: string) => {
+    const response = await api.delete(`/admin/users/${userId}`);
     return response.data;
   },
   getComplaints: async (status?: string, page: number = 1, limit: number = 20) => {
@@ -447,12 +435,21 @@ export const adminAPI = {
     const res = await api.put(`/admin/complaints/${complaintId}/respond`, { response, status });
     return res.data;
   },
-  getOrders: async (status?: string, page: number = 1, limit: number = 20) => {
-    const params = new URLSearchParams();
-    if (status) params.append('status', status);
-    params.append('page', page.toString());
-    params.append('limit', limit.toString());
-    const response = await api.get(`/admin/orders?${params.toString()}`);
+};
+
+// Complaints API (for all users)
+export const complaintsAPI = {
+  submit: async (subject: string, message: string, type: string = 'general', orderId?: string) => {
+    const response = await api.post('/complaints', {
+      subject,
+      message,
+      type,
+      order_id: orderId,
+    });
+    return response.data;
+  },
+  getMyComplaints: async () => {
+    const response = await api.get('/complaints/my');
     return response.data;
   },
 };
