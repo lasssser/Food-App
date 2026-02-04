@@ -2752,6 +2752,29 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database and create admin account"""
+    # Create admin account if not exists
+    admin_phone = "0900000000"
+    existing_admin = await db.users.find_one({"phone": admin_phone})
+    
+    if not existing_admin:
+        admin_user = {
+            "id": "admin-1",
+            "name": "مدير التطبيق",
+            "phone": admin_phone,
+            "password": hash_password("admin123"),
+            "role": "admin",
+            "is_active": True,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        await db.users.insert_one(admin_user)
+        logger.info("Admin account created successfully")
+    else:
+        logger.info("Admin account already exists")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
