@@ -263,8 +263,9 @@ export default function RestaurantOrders() {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
   };
 
+  // Filter orders for display
   const pendingOrders = orders.filter(o => o.order_status === 'pending');
-  const activeOrders = orders.filter(o => ['accepted', 'preparing', 'ready', 'driver_assigned', 'picked_up', 'out_for_delivery'].includes(o.order_status));
+  const activeOrders = orders.filter(o => !['delivered', 'cancelled'].includes(o.order_status));
   const completedOrders = orders.filter(o => ['delivered', 'cancelled'].includes(o.order_status));
 
   const renderOrder = ({ item: order }: { item: Order }) => {
