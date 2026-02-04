@@ -16,7 +16,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../src/store/authStore';
-import { addressAPI } from '../../src/services/api';
+import { addressAPI, complaintsAPI } from '../../src/services/api';
 import { Address } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
@@ -33,6 +33,11 @@ export default function ProfileScreen() {
   const [newAddressLabel, setNewAddressLabel] = useState('');
   const [newAddressLine, setNewAddressLine] = useState('');
   const [newAddressArea, setNewAddressArea] = useState('');
+  // Complaint states
+  const [showComplaintModal, setShowComplaintModal] = useState(false);
+  const [complaintSubject, setComplaintSubject] = useState('');
+  const [complaintMessage, setComplaintMessage] = useState('');
+  const [submittingComplaint, setSubmittingComplaint] = useState(false);
 
   useEffect(() => {
     if (!isGuest) {
