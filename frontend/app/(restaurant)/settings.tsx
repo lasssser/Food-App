@@ -90,7 +90,7 @@ export default function RestaurantSettings() {
       subtitle: 'الاسم، الوصف، أوقات العمل',
       icon: 'business' as const,
       color: COLORS.primary,
-      onPress: () => Alert.alert('قريباً', 'هذه الميزة قيد التطوير'),
+      onPress: () => router.push('/(restaurant)/restaurant-info'),
     },
     {
       id: 'orders',
