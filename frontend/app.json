@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "يلا ناكل؟",
-    "slug": "yalla-nakol",
+    "name": "أكلة عالسريع",
+    "slug": "akla-3alsare3",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "yallanakol",
+    "scheme": "akla3alsare3",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
