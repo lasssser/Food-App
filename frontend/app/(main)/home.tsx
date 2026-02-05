@@ -542,6 +542,16 @@ export default function HomeScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Map Location Picker */}
+      <MapLocationPicker
+        visible={showMapPicker}
+        onClose={() => setShowMapPicker(false)}
+        onLocationSelected={(location) => {
+          setLocation(undefined, undefined, location.latitude, location.longitude);
+          setShowMapPicker(false);
+        }}
+      />
     </SafeAreaView>
   );
 }
