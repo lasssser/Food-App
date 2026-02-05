@@ -878,6 +878,184 @@ export default function ProfileScreen() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* Role Request Modal */}
+      <Modal visible={showRoleRequestModal} animationType="slide" transparent={false}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.surface }}>
+          <View style={[styles.modalHeader, { paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md, borderBottomWidth: 1, borderBottomColor: COLORS.divider }]}>
+            <TouchableOpacity 
+              onPress={() => {
+                setShowRoleRequestModal(false);
+                setSelectedRole(null);
+              }} 
+              activeOpacity={0.7}
+              style={{ padding: 8, backgroundColor: '#f0f0f0', borderRadius: 20 }}
+            >
+              <Ionicons name="close" size={22} color={COLORS.textPrimary} />
+            </TouchableOpacity>
+            <Text style={[styles.modalTitle, { fontFamily: 'Cairo_700Bold' }]}>
+              {selectedRole === 'driver' ? 'التقدم كسائق' : 'التقدم كصاحب مطعم'}
+            </Text>
+            <View style={{ width: 38 }} />
+          </View>
+
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1 }}
+          >
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: SPACING.lg }}>
+              {/* Header Info */}
+              <View style={styles.roleRequestHeader}>
+                <View style={[styles.roleRequestHeaderIcon, { backgroundColor: selectedRole === 'driver' ? `${COLORS.info}15` : `${COLORS.success}15` }]}>
+                  <Ionicons 
+                    name={selectedRole === 'driver' ? 'car' : 'restaurant'} 
+                    size={40} 
+                    color={selectedRole === 'driver' ? COLORS.info : COLORS.success} 
+                  />
+                </View>
+                <Text style={styles.roleRequestHeaderTitle}>
+                  {selectedRole === 'driver' 
+                    ? 'انضم لفريق السائقين' 
+                    : 'أضف مطعمك معنا'}
+                </Text>
+                <Text style={styles.roleRequestHeaderDesc}>
+                  {selectedRole === 'driver'
+                    ? 'اربح المال بوقتك الخاص وبمرونة تامة'
+                    : 'وسّع نطاق عملك وزد مبيعاتك'}
+                </Text>
+              </View>
+
+              {/* Common Fields */}
+              <Text style={styles.formSectionTitle}>المعلومات الأساسية</Text>
+              
+              <TextInput
+                style={styles.modalInput}
+                placeholder="الاسم الكامل *"
+                placeholderTextColor={COLORS.textLight}
+                value={roleRequestForm.full_name}
+                onChangeText={(text) => setRoleRequestForm({ ...roleRequestForm, full_name: text })}
+                textAlign="right"
+              />
+
+              <TextInput
+                style={styles.modalInput}
+                placeholder="رقم الهاتف *"
+                placeholderTextColor={COLORS.textLight}
+                value={roleRequestForm.phone}
+                onChangeText={(text) => setRoleRequestForm({ ...roleRequestForm, phone: text })}
+                textAlign="right"
+                keyboardType="phone-pad"
+              />
+
+              {/* Restaurant-specific fields */}
+              {selectedRole === 'restaurant' && (
+                <>
+                  <Text style={styles.formSectionTitle}>معلومات المطعم</Text>
+                  
+                  <TextInput
+                    style={styles.modalInput}
+                    placeholder="اسم المطعم *"
+                    placeholderTextColor={COLORS.textLight}
+                    value={roleRequestForm.restaurant_name}
+                    onChangeText={(text) => setRoleRequestForm({ ...roleRequestForm, restaurant_name: text })}
+                    textAlign="right"
+                  />
+
+                  <TextInput
+                    style={styles.modalInput}
+                    placeholder="عنوان المطعم"
+                    placeholderTextColor={COLORS.textLight}
+                    value={roleRequestForm.restaurant_address}
+                    onChangeText={(text) => setRoleRequestForm({ ...roleRequestForm, restaurant_address: text })}
+                    textAlign="right"
+                  />
+
+                  <TextInput
+                    style={styles.modalInput}
+                    placeholder="المنطقة"
+                    placeholderTextColor={COLORS.textLight}
+                    value={roleRequestForm.restaurant_area}
+                    onChangeText={(text) => setRoleRequestForm({ ...roleRequestForm, restaurant_area: text })}
+                    textAlign="right"
+                  />
+                </>
+              )}
+
+              {/* Driver-specific fields */}
+              {selectedRole === 'driver' && (
+                <>
+                  <Text style={styles.formSectionTitle}>معلومات السائق</Text>
+                  
+                  <Text style={styles.inputLabel}>نوع المركبة</Text>
+                  <View style={styles.vehicleOptions}>
+                    {['دراجة نارية', 'سيارة', 'دراجة هوائية'].map((type) => (
+                      <TouchableOpacity
+                        key={type}
+                        style={[
+                          styles.vehicleOption,
+                          roleRequestForm.vehicle_type === type && styles.vehicleOptionSelected
+                        ]}
+                        onPress={() => setRoleRequestForm({ ...roleRequestForm, vehicle_type: type })}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[
+                          styles.vehicleOptionText,
+                          roleRequestForm.vehicle_type === type && styles.vehicleOptionTextSelected
+                        ]}>
+                          {type}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+
+                  <TextInput
+                    style={styles.modalInput}
+                    placeholder="رقم رخصة القيادة (اختياري)"
+                    placeholderTextColor={COLORS.textLight}
+                    value={roleRequestForm.license_number}
+                    onChangeText={(text) => setRoleRequestForm({ ...roleRequestForm, license_number: text })}
+                    textAlign="right"
+                  />
+                </>
+              )}
+
+              {/* Notes */}
+              <Text style={styles.formSectionTitle}>ملاحظات إضافية</Text>
+              <TextInput
+                style={[styles.modalInput, { height: 100, textAlignVertical: 'top' }]}
+                placeholder="أي معلومات إضافية تود مشاركتها..."
+                placeholderTextColor={COLORS.textLight}
+                value={roleRequestForm.notes}
+                onChangeText={(text) => setRoleRequestForm({ ...roleRequestForm, notes: text })}
+                textAlign="right"
+                multiline
+                numberOfLines={4}
+              />
+
+              {/* Submit Button */}
+              <TouchableOpacity 
+                style={[styles.saveButton, submittingRoleRequest && { opacity: 0.7 }]} 
+                onPress={handleSubmitRoleRequest} 
+                activeOpacity={0.7}
+                disabled={submittingRoleRequest}
+              >
+                <LinearGradient
+                  colors={selectedRole === 'driver' ? [COLORS.info, '#1565C0'] : [COLORS.success, '#2E7D32']}
+                  style={styles.saveButtonGradient}
+                >
+                  {submittingRoleRequest ? (
+                    <ActivityIndicator color={COLORS.textWhite} />
+                  ) : (
+                    <Text style={styles.saveButtonText}>إرسال الطلب</Text>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+
+              <View style={{ height: 40 }} />
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
