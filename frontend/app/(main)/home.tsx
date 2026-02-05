@@ -458,15 +458,15 @@ export default function HomeScreen() {
                       <TouchableOpacity
                         key={city.id}
                         style={[styles.cityCard, isSelected && styles.cityCardSelected]}
-                        onPress={() => setSelectedCityLocal(city)}
+                        onPress={() => {
+                          setLocation(city);
+                          setShowLocationModal(false);
+                        }}
                         activeOpacity={0.7}
                       >
                         <Text style={styles.cityCardIcon}>{cityIcons[city.name] || '📍'}</Text>
                         <Text style={[styles.cityCardName, isSelected && styles.cityCardNameSelected]}>
                           {city.name}
-                        </Text>
-                        <Text style={styles.cityCardCount}>
-                          {city.districts?.length || 0} حي
                         </Text>
                         {isSelected && (
                           <View style={styles.cityCardCheck}>
@@ -478,69 +478,7 @@ export default function HomeScreen() {
                   })}
                 </View>
               </ScrollView>
-            ) : (
-              /* District Selection */
-              <View style={{ flex: 1 }}>
-                {/* District Search */}
-                <View style={styles.districtSearchBox}>
-                  <Ionicons name="search" size={18} color="#999" />
-                  <TextInput
-                    style={styles.districtSearchInput}
-                    placeholder={`ابحث في أحياء ${selectedCityLocal.name}...`}
-                    placeholderTextColor="#bbb"
-                    value={districtSearch}
-                    onChangeText={setDistrictSearch}
-                    textAlign="right"
-                  />
-                </View>
-
-                {/* Select city without district */}
-                <TouchableOpacity
-                  style={styles.allCityBtn}
-                  onPress={() => {
-                    setLocation(selectedCityLocal);
-                    setSelectedCityLocal(null);
-                    setDistrictSearch('');
-                    setShowLocationModal(false);
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons name="location" size={18} color={COLORS.primary} />
-                  <Text style={styles.allCityBtnText}>كل {selectedCityLocal.name}</Text>
-                </TouchableOpacity>
-
-                {/* Districts List */}
-                <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-                  <View style={styles.districtGrid}>
-                    {(selectedCityLocal.districts || [])
-                      .filter((d) => d.name.includes(districtSearch))
-                      .map((district) => {
-                        const isSelected = selectedDistrict?.id === district.id && selectedCity?.id === selectedCityLocal.id;
-                        return (
-                          <TouchableOpacity
-                            key={district.id}
-                            style={[styles.districtChip, isSelected && styles.districtChipSelected]}
-                            onPress={() => {
-                              setLocation(selectedCityLocal, district);
-                              setSelectedCityLocal(null);
-                              setDistrictSearch('');
-                              setShowLocationModal(false);
-                            }}
-                            activeOpacity={0.7}
-                          >
-                            <Text style={[styles.districtChipText, isSelected && styles.districtChipTextSelected]}>
-                              {district.name}
-                            </Text>
-                            {isSelected && (
-                              <Ionicons name="checkmark-circle" size={16} color="#fff" style={{ marginRight: 4 }} />
-                            )}
-                          </TouchableOpacity>
-                        );
-                      })}
-                  </View>
-                </ScrollView>
-              </View>
-            )}
+            ) : null}
           </View>
         </View>
       </Modal>
