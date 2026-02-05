@@ -2057,11 +2057,32 @@ async def create_order(order_data: OrderCreate, current_user: dict = Depends(get
     # Set payment status based on method
     payment_status = "unpaid"
     order_status = "pending"
+    payment_transaction_id = None
+    payment_screenshot = None
     
-    if order_data.payment_method == "COD":
+    if order_data.payment_method == "cod":
+        # Check if customer is verified for COD
+        verified_order = await db.orders.find_one({
+            "user_id": current_user["id"],
+            "order_status": "delivered",
+            "payment_method": {"$in": ["mtn_cash", "syriatel_cash", "shamcash"]},
+            "payment_status": "paid"
+        })
+        if not verified_order:
+            raise HTTPException(status_code=400, detail="يجب إتمام طلب واحد مدفوع إلكترونياً أولاً لتفعيل الدفع عند الاستلام")
+        payment_status = "cod"
+    elif order_data.payment_method in ["mtn_cash", "syriatel_cash", "shamcash"]:
+        # Electronic payment requires transaction info
+        if not order_data.payment_info or not order_data.payment_info.transaction_id:
+            raise HTTPException(status_code=400, detail="يرجى إدخال رقم العملية")
+        payment_status = "pending_verification"
+        payment_transaction_id = order_data.payment_info.transaction_id
+        payment_screenshot = order_data.payment_info.payment_screenshot
+    # Backward compatibility for old payment methods
+    elif order_data.payment_method == "COD":
         payment_status = "cod"
     elif order_data.payment_method == "SHAMCASH":
-        payment_status = "pending"
+        payment_status = "pending_verification"
     
     order = Order(
         user_id=current_user["id"],
@@ -2073,6 +2094,8 @@ async def create_order(order_data: OrderCreate, current_user: dict = Depends(get
         total=total,
         payment_method=order_data.payment_method,
         payment_status=payment_status,
+        payment_transaction_id=payment_transaction_id,
+        payment_screenshot=payment_screenshot,
         order_status=order_status,
         address={
             "label": address["label"],
