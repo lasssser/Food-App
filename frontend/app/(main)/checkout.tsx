@@ -74,12 +74,24 @@ export default function CheckoutScreen() {
       return;
     }
 
+    if (!selectedLocation) {
+      setErrorMessage('يرجى تحديد موقعك على الخريطة');
+      setShowErrorModal(true);
+      return;
+    }
+
     try {
-      const address = await addressAPI.create(newAddress);
+      const addressData = {
+        ...newAddress,
+        lat: selectedLocation.lat,
+        lng: selectedLocation.lng,
+      };
+      const address = await addressAPI.create(addressData);
       setAddresses([...addresses, address]);
       setSelectedAddress(address.id);
       setShowAddAddress(false);
-      setNewAddress({ label: '', address_line: '', area: '' });
+      setNewAddress({ label: '', address_line: '', area: '', lat: 0, lng: 0 });
+      setSelectedLocation(null);
     } catch (error) {
       setErrorMessage('فشل إضافة العنوان');
       setShowErrorModal(true);
