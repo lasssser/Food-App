@@ -126,25 +126,11 @@ export default function CheckoutScreen() {
         setSelectedAddress(addressData[0].id);
       }
 
-      // Fetch payment methods
-      if (restaurant?.id) {
-        const paymentData = await restaurantAPI.getPaymentMethods(restaurant.id);
-        setPaymentMethods(paymentData.methods || []);
-        // Set first enabled method as default
-        const firstEnabled = paymentData.methods?.find((m: PaymentMethod) => m.is_enabled);
-        if (firstEnabled) {
-          setSelectedPaymentMethod(firstEnabled.method);
-        }
-      }
+      // Use default payment methods (available for all customers)
+      setPaymentMethods(DEFAULT_PAYMENT_METHODS);
+      // Set COD as default payment method
+      setSelectedPaymentMethod('cod');
 
-      // Check customer verification status
-      try {
-        const verificationData = await customerAPI.getVerificationStatus();
-        setIsCustomerVerified(verificationData.is_verified);
-      } catch (e) {
-        // Not logged in or error
-        setIsCustomerVerified(false);
-      }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
