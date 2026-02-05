@@ -2292,10 +2292,10 @@ async def test_push_notification(current_user: dict = Depends(get_current_user))
 async def seed_database():
     """Seed database with demo data including images and add-ons"""
     
-    # Clear existing data
-    await db.restaurants.delete_many({})
-    await db.menu_items.delete_many({})
-    await db.addon_groups.delete_many({})
+    # Check if already seeded
+    existing_restaurants = await db.restaurants.count_documents({"id": {"$regex": "^rest-"}})
+    if existing_restaurants > 0:
+        return {"message": "Database already seeded", "skipped": True}
     
     # Demo Restaurants with images
     restaurants = [
