@@ -894,6 +894,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: 'Cairo_700Bold',
     color: COLORS.textPrimary,
   },
 
@@ -904,6 +905,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     marginBottom: SPACING.md,
   },
@@ -919,6 +921,7 @@ const styles = StyleSheet.create({
   },
   addAddressText: {
     fontSize: 14,
+    fontFamily: 'Cairo_600SemiBold',
     color: COLORS.primary,
     fontWeight: '600',
   },
@@ -939,16 +942,19 @@ const styles = StyleSheet.create({
   addressLabel: {
     fontSize: 15,
     fontWeight: '600',
+    fontFamily: 'Cairo_600SemiBold',
     color: COLORS.textPrimary,
   },
   addressLine: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 4,
     textAlign: 'right',
   },
   addressArea: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     marginTop: 2,
   },
