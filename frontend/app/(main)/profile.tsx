@@ -594,7 +594,11 @@ export default function ProfileScreen() {
                 <Text style={styles.developerTitle}>تم التطوير بواسطة</Text>
                 
                 <View style={styles.developerLogo}>
-                  <Ionicons name="code-slash" size={40} color={COLORS.primary} />
+                  <Image 
+                    source={require('../../assets/images/wethaq-logo.png')} 
+                    style={styles.developerLogoImage}
+                    resizeMode="contain"
+                  />
                 </View>
                 <Text style={styles.developerName}>Wethaq Digital Solutions</Text>
                 
