@@ -1131,6 +1131,7 @@ const styles = StyleSheet.create({
     color: COLORS.textWhite,
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: 'Cairo_700Bold',
   },
   registerButton: {
     paddingVertical: SPACING.md,
@@ -1139,6 +1140,7 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: 'Cairo_600SemiBold',
   },
 
   // Profile Card
