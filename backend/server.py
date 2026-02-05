@@ -174,6 +174,43 @@ class RestaurantPaymentMethods(BaseModel):
 class PaymentMethodUpdate(BaseModel):
     methods: List[PaymentMethodConfig]
 
+# Role Request Models (طلبات تغيير الدور)
+class RoleRequestCreate(BaseModel):
+    requested_role: str  # driver, restaurant
+    full_name: str
+    phone: str
+    # For restaurant owners
+    restaurant_name: Optional[str] = None
+    restaurant_address: Optional[str] = None
+    restaurant_area: Optional[str] = None
+    # For drivers
+    vehicle_type: Optional[str] = None  # motorcycle, car, bicycle
+    license_number: Optional[str] = None
+    # Common
+    notes: Optional[str] = None
+
+class RoleRequest(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    user_name: str
+    user_phone: str
+    requested_role: str  # driver, restaurant
+    status: str = "pending"  # pending, approved, rejected
+    full_name: str
+    phone: str
+    # For restaurant owners
+    restaurant_name: Optional[str] = None
+    restaurant_address: Optional[str] = None
+    restaurant_area: Optional[str] = None
+    # For drivers
+    vehicle_type: Optional[str] = None
+    license_number: Optional[str] = None
+    # Common
+    notes: Optional[str] = None
+    admin_notes: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
 # Order Add-on Selection
 class OrderAddOnSelection(BaseModel):
     group_name: str
