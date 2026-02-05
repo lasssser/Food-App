@@ -458,4 +458,16 @@ export const complaintsAPI = {
   },
 };
 
+// Settings API
+export const settingsAPI = {
+  get: async () => {
+    const response = await api.get('/settings');
+    return response.data;
+  },
+  update: async (settings: { whatsapp_number?: string; support_email?: string; support_phone?: string }) => {
+    const response = await api.put('/admin/settings', settings);
+    return response.data;
+  },
+};
+
 export default api;
