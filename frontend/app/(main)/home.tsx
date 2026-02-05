@@ -701,6 +701,9 @@ const styles = StyleSheet.create({
   badgeDiscount: {
     backgroundColor: COLORS.accent,
   },
+  badgeFeatured: {
+    backgroundColor: '#FF9800',
+  },
   badgeText: {
     color: COLORS.textWhite,
     fontSize: 12,
