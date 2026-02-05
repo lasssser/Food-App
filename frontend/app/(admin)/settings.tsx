@@ -224,6 +224,12 @@ export default function AdminSettings() {
           <Text style={styles.sectionTitle}>أدوات المطور</Text>
           <View style={styles.menuCard}>
             <MenuItem
+              icon="settings-outline"
+              title="إعدادات الدعم الفني"
+              subtitle="تغيير رقم الواتساب والبريد الإلكتروني"
+              onPress={() => setShowSupportSettingsModal(true)}
+            />
+            <MenuItem
               icon="trash-outline"
               title="حذف البيانات التجريبية"
               subtitle="حذف جميع المطاعم والمستخدمين التجريبيين"
@@ -238,6 +244,75 @@ export default function AdminSettings() {
           <Text style={styles.footerSubtext}>جميع الحقوق محفوظة</Text>
         </View>
       </ScrollView>
+
+      {/* Support Settings Modal */}
+      <Modal visible={showSupportSettingsModal} animationType="slide" transparent>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setShowSupportSettingsModal(false)}>
+                <Ionicons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>إعدادات الدعم الفني</Text>
+              <View style={{ width: 24 }} />
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View style={styles.settingItem}>
+                <Text style={styles.settingLabel}>رقم الواتساب</Text>
+                <TextInput
+                  style={styles.settingInput}
+                  value={whatsappNumber}
+                  onChangeText={setWhatsappNumber}
+                  placeholder="+963XXXXXXXXX"
+                  keyboardType="phone-pad"
+                  textAlign="left"
+                />
+                <Text style={styles.settingHint}>سيظهر هذا الرقم في زر "راسلنا عبر واتساب"</Text>
+              </View>
+
+              <View style={styles.settingItem}>
+                <Text style={styles.settingLabel}>البريد الإلكتروني للدعم</Text>
+                <TextInput
+                  style={styles.settingInput}
+                  value={supportEmail}
+                  onChangeText={setSupportEmail}
+                  placeholder="support@example.com"
+                  keyboardType="email-address"
+                  textAlign="left"
+                />
+              </View>
+
+              <View style={styles.settingItem}>
+                <Text style={styles.settingLabel}>رقم هاتف الدعم</Text>
+                <TextInput
+                  style={styles.settingInput}
+                  value={supportPhone}
+                  onChangeText={setSupportPhone}
+                  placeholder="+963XXXXXXXXX"
+                  keyboardType="phone-pad"
+                  textAlign="left"
+                />
+              </View>
+
+              <TouchableOpacity
+                style={[styles.saveSettingsBtn, savingSettings && { opacity: 0.7 }]}
+                onPress={handleSaveSettings}
+                disabled={savingSettings}
+              >
+                {savingSettings ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.saveSettingsBtnText}>حفظ الإعدادات</Text>
+                )}
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
 
       {/* Logout Modal */}
       <Modal visible={showLogoutModal} animationType="fade" transparent>
