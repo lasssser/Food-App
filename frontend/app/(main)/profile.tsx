@@ -824,14 +824,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: COLORS.surface,
     padding: SPACING.xl,
-    marginBottom: SPACING.md,
-    ...SHADOWS.small,
+    marginHorizontal: SPACING.lg,
+    marginTop: -30,
+    marginBottom: SPACING.lg,
+    borderRadius: RADIUS.xl,
+    ...SHADOWS.medium,
   },
   avatarContainer: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: `${COLORS.primary}15`,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -843,6 +845,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 20,
     fontWeight: 'bold',
+    fontFamily: 'Cairo_700Bold',
     color: COLORS.textPrimary,
   },
   userPhone: {
