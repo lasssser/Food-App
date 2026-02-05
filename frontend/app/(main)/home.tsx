@@ -993,6 +993,39 @@ const styles = StyleSheet.create({
   locationScroll: {
     padding: 16,
   },
+  mapPickerBtn: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1.5,
+    borderColor: '#E53935',
+    gap: 12,
+  },
+  mapPickerIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: '#E53935',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mapPickerInfo: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  mapPickerTitle: {
+    fontSize: 16,
+    fontFamily: 'Cairo_700Bold',
+    color: '#E53935',
+  },
+  mapPickerSubtitle: {
+    fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
+    color: '#999',
+  },
   locationHint: {
     fontSize: 14,
     fontFamily: 'Cairo_400Regular',
