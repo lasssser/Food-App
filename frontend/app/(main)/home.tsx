@@ -582,6 +582,55 @@ const styles = StyleSheet.create({
     color: COLORS.textWhite,
   },
 
+  // Advertisements
+  adsContainer: {
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  adCard: {
+    width: '100%',
+    height: 150,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
+    ...SHADOWS.medium,
+  },
+  adImage: {
+    width: '100%',
+    height: '100%',
+  },
+  adOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '50%',
+    justifyContent: 'flex-end',
+    padding: SPACING.md,
+  },
+  adTitle: {
+    fontSize: 16,
+    fontFamily: 'Cairo_700Bold',
+    fontWeight: 'bold',
+    color: COLORS.textWhite,
+    textAlign: 'right',
+  },
+  dotsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: SPACING.sm,
+    gap: 6,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.border,
+  },
+  dotActive: {
+    backgroundColor: COLORS.primary,
+    width: 20,
+  },
+
   // Section Header
   sectionHeader: {
     flexDirection: 'row',
