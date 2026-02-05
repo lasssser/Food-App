@@ -990,6 +990,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: RADIUS.xl,
     borderTopRightRadius: RADIUS.xl,
     padding: SPACING.xl,
+    paddingTop: SPACING.xxl + 10,
   },
   modalHeader: {
     flexDirection: 'row',
