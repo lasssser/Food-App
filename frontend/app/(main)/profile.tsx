@@ -1129,13 +1129,18 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.lg,
   },
   aboutLogo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 20,
     backgroundColor: `${COLORS.primary}15`,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.lg,
+    overflow: 'hidden',
+  },
+  aboutLogoImage: {
+    width: 80,
+    height: 80,
   },
   aboutEmoji: {
     fontSize: 40,
