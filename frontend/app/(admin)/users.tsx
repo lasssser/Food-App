@@ -35,6 +35,7 @@ const ROLE_LABELS: Record<string, string> = {
   customer: 'زبون',
   restaurant: 'مطعم',
   driver: 'سائق',
+  moderator: 'مشرف',
   admin: 'مدير',
 };
 
@@ -42,6 +43,7 @@ const ROLE_COLORS: Record<string, string> = {
   customer: '#3b82f6',
   restaurant: '#22c55e',
   driver: '#f59e0b',
+  moderator: '#8b5cf6',
   admin: '#6366f1',
 };
 
