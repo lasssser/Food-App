@@ -971,6 +971,77 @@ const styles = StyleSheet.create({
     color: COLORS.textLight,
     marginTop: SPACING.xl,
   },
+  aboutLogoContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 20,
+    backgroundColor: `${COLORS.primary}15`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+    overflow: 'hidden',
+  },
+  aboutLogoImage: {
+    width: 80,
+    height: 80,
+  },
+  developerSection: {
+    marginTop: SPACING.xl,
+    alignItems: 'center',
+    width: '100%',
+  },
+  developerDivider: {
+    width: 60,
+    height: 4,
+    backgroundColor: COLORS.divider,
+    borderRadius: 2,
+    marginBottom: SPACING.lg,
+  },
+  developerTitle: {
+    fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.md,
+  },
+  developerLogo: {
+    width: 180,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.lg,
+    marginBottom: SPACING.md,
+    padding: SPACING.md,
+  },
+  developerLogoImage: {
+    width: 160,
+    height: 60,
+  },
+  developerName: {
+    fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.md,
+  },
+  developerContacts: {
+    width: '100%',
+    gap: SPACING.sm,
+  },
+  contactItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    backgroundColor: COLORS.background,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+  },
+  contactText: {
+    fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
+    color: COLORS.primary,
+  },
 
   // Confirm Modal
   confirmOverlay: {
