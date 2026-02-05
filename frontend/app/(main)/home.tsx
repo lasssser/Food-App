@@ -56,7 +56,7 @@ const CATEGORIES = [
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
-  const { selectedCity, selectedDistrict, cities, setCities, setLocation, isLocationSet } = useLocationStore();
+  const { selectedCity, selectedDistrict, cities, setCities, setLocation, setMapLocation, mapAddress, isLocationSet } = useLocationStore();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [advertisements, setAdvertisements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
