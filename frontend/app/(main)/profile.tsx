@@ -214,7 +214,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.version}>يلا ناكل؟ v1.0.0</Text>
+        <Text style={styles.version}>أكلة عالسريع v1.0.0</Text>
 
         {/* Help Modal */}
         <Modal visible={showHelpModal} animationType="slide" transparent>
@@ -260,7 +260,7 @@ export default function ProfileScreen() {
                   <View style={styles.aboutLogo}>
                     <Text style={styles.aboutEmoji}>🍔</Text>
                   </View>
-                  <Text style={styles.aboutName}>يلا ناكل؟</Text>
+                  <Text style={styles.aboutName}>أكلة عالسريع</Text>
                   <Text style={styles.aboutVersion}>الإصدار 1.0.0</Text>
                   <Text style={styles.aboutDesc}>
                     تطبيق توصيل الطعام الأسرع والأسهل!
@@ -435,7 +435,7 @@ export default function ProfileScreen() {
           <Text style={styles.logoutText}>تسجيل الخروج</Text>
         </TouchableOpacity>
 
-        <Text style={styles.version}>يلا ناكل؟ v1.0.0</Text>
+        <Text style={styles.version}>أكلة عالسريع v1.0.0</Text>
       </ScrollView>
 
       {/* Add Address Modal */}
@@ -602,7 +602,7 @@ export default function ProfileScreen() {
                 <View style={styles.aboutLogo}>
                   <Text style={styles.aboutEmoji}>🍔</Text>
                 </View>
-                <Text style={styles.aboutName}>يلا ناكل؟</Text>
+                <Text style={styles.aboutName}>أكلة عالسريع</Text>
                 <Text style={styles.aboutVersion}>الإصدار 1.0.0</Text>
                 <Text style={styles.aboutDesc}>
                   تطبيق توصيل الطعام الأسرع والأسهل!

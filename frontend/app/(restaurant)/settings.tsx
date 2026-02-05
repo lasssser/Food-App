@@ -351,7 +351,7 @@ export default function RestaurantSettings() {
           </View>
         </TouchableOpacity>
 
-        <Text style={styles.version}>يلا ناكل؟ - لوحة المطعم v1.0.0</Text>
+        <Text style={styles.version}>أكلة عالسريع - لوحة المطعم v1.0.0</Text>
       </ScrollView>
 
       {/* Help Modal */}
@@ -442,7 +442,7 @@ export default function RestaurantSettings() {
               >
                 <Text style={styles.aboutEmoji}>🍔</Text>
               </LinearGradient>
-              <Text style={styles.aboutName}>يلا ناكل؟</Text>
+              <Text style={styles.aboutName}>أكلة عالسريع</Text>
               <Text style={styles.aboutTagline}>اطلب أشهى المأكولات بضغطة زر</Text>
               
               <View style={styles.versionBadge}>
@@ -468,7 +468,7 @@ export default function RestaurantSettings() {
                 </View>
               </View>
 
-              <Text style={styles.aboutCopyright}>© 2025 يلا ناكل؟ - جميع الحقوق محفوظة</Text>
+              <Text style={styles.aboutCopyright}>© 2025 أكلة عالسريع - جميع الحقوق محفوظة</Text>
             </View>
           </View>
         </View>

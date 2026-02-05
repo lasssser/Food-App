@@ -191,7 +191,7 @@ export default function AdminSettings() {
             <MenuItem
               icon="information-circle-outline"
               title="عن التطبيق"
-              subtitle="يلا ناكل؟ - إصدار 1.0.0"
+              subtitle="أكلة عالسريع - إصدار 1.0.0"
               onPress={() => setShowAboutModal(true)}
             />
             <MenuItem
@@ -240,7 +240,7 @@ export default function AdminSettings() {
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>يلا ناكل؟ © 2025</Text>
+          <Text style={styles.footerText}>أكلة عالسريع © 2025</Text>
           <Text style={styles.footerSubtext}>جميع الحقوق محفوظة</Text>
         </View>
       </ScrollView>
@@ -356,7 +356,7 @@ export default function AdminSettings() {
               <View style={styles.appLogo}>
                 <Text style={styles.logoEmoji}>🍔</Text>
               </View>
-              <Text style={styles.appName}>يلا ناكل؟</Text>
+              <Text style={styles.appName}>أكلة عالسريع</Text>
               <Text style={styles.appVersion}>الإصدار 1.0.0</Text>
               <Text style={styles.appDescription}>
                 تطبيق توصيل الطعام الأسرع والأسهل في سوريا!{'\n'}
@@ -376,7 +376,7 @@ export default function AdminSettings() {
                   <Text style={styles.featureText}>دفع آمن</Text>
                 </View>
               </View>
-              <Text style={styles.copyright}>© 2025 يلا ناكل؟ - جميع الحقوق محفوظة</Text>
+              <Text style={styles.copyright}>© 2025 أكلة عالسريع - جميع الحقوق محفوظة</Text>
             </View>
           </View>
         </View>
@@ -432,7 +432,7 @@ export default function AdminSettings() {
             <ScrollView style={styles.policyContent}>
               <Text style={styles.policyTitle}>1. قبول الشروط</Text>
               <Text style={styles.policyText}>
-                باستخدامك لتطبيق يلا ناكل؟، فإنك توافق على الالتزام بهذه الشروط والأحكام.
+                باستخدامك لتطبيق أكلة عالسريع، فإنك توافق على الالتزام بهذه الشروط والأحكام.
               </Text>
               
               <Text style={styles.policyTitle}>2. استخدام الخدمة</Text>

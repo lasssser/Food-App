@@ -202,7 +202,7 @@ export default function RestaurantReports() {
         </head>
         <body>
           <div class="header">
-            <h1>🍔 يلا ناكل؟</h1>
+            <h1>🍔 أكلة عالسريع</h1>
             <p>تقرير ${getPeriodLabel(selectedPeriod)} - ${new Date().toLocaleDateString('ar-SA')}</p>
           </div>
 
@@ -283,7 +283,7 @@ export default function RestaurantReports() {
           </div>
 
           <div class="footer">
-            تم إنشاء التقرير بواسطة تطبيق يلا ناكل؟ - ${new Date().toLocaleString('ar-SA')}
+            تم إنشاء التقرير بواسطة تطبيق أكلة عالسريع - ${new Date().toLocaleString('ar-SA')}
           </div>
         </body>
         </html>

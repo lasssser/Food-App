@@ -89,7 +89,7 @@ export default function LoginScreen() {
               <View style={styles.logoContainer}>
                 <Text style={styles.logoEmoji}>🍔</Text>
               </View>
-              <Text style={styles.title}>يلا ناكل؟</Text>
+              <Text style={styles.title}>أكلة عالسريع</Text>
               <Text style={styles.subtitle}>اطلب أشهى المأكولات بضغطة زر</Text>
             </View>
 

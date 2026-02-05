@@ -86,7 +86,7 @@ export default function RegisterScreen() {
               <View style={styles.logoContainer}>
                 <Text style={styles.logoEmoji}>🍔</Text>
               </View>
-              <Text style={styles.title}>يلا ناكل؟</Text>
+              <Text style={styles.title}>أكلة عالسريع</Text>
               <Text style={styles.subtitle}>سجّل الآن واستمتع بأشهى المأكولات</Text>
             </View>
 

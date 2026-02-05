@@ -96,7 +96,7 @@ export default function NotificationsScreen() {
         try {
           await scheduleLocalNotification(
             '🔔 إشعار تجريبي',
-            'هذا إشعار تجريبي من يلا ناكل؟',
+            'هذا إشعار تجريبي من أكلة عالسريع',
             { type: 'test' },
             1
           );

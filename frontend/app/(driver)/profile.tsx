@@ -179,7 +179,7 @@ export default function DriverProfile() {
           <Text style={styles.logoutText}>تسجيل الخروج</Text>
         </TouchableOpacity>
 
-        <Text style={styles.version}>يلا ناكل؟ - تطبيق السائق v1.0.0</Text>
+        <Text style={styles.version}>أكلة عالسريع - تطبيق السائق v1.0.0</Text>
       </ScrollView>
 
       {/* Logout Confirmation Modal */}
