@@ -2732,6 +2732,13 @@ async def require_admin(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="يجب أن تكون مديراً للوصول لهذه الصفحة")
     return current_user
 
+async def require_admin_or_moderator(current_user: dict = Depends(get_current_user)):
+    """Middleware to check if user is admin or moderator"""
+    role = current_user.get("role")
+    if role not in ["admin", "moderator"]:
+        raise HTTPException(status_code=403, detail="غير مصرح لك بالوصول لهذه الصفحة")
+    return current_user
+
 @api_router.get("/admin/stats")
 async def get_admin_stats(admin: dict = Depends(require_admin)):
     """Get overall app statistics"""
