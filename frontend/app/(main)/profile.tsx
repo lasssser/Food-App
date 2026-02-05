@@ -611,20 +611,22 @@ export default function ProfileScreen() {
       {/* About Modal */}
       <Modal visible={showAboutModal} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { paddingTop: SPACING.xl }]}>
-            <View style={[styles.modalHeader, { marginTop: 20, marginBottom: SPACING.lg }]}>
-              <TouchableOpacity 
-                onPress={() => setShowAboutModal(false)} 
-                activeOpacity={0.7}
-                style={{ padding: 8, backgroundColor: '#f0f0f0', borderRadius: 20 }}
-              >
-                <Ionicons name="close" size={24} color={COLORS.textPrimary} />
-              </TouchableOpacity>
-              <Text style={[styles.modalTitle, { fontFamily: 'Cairo_700Bold' }]}>عن التطبيق</Text>
-              <View style={{ width: 40 }} />
-            </View>
+          <View style={[styles.modalContent, { maxHeight: '90%', paddingTop: 0 }]}>
+            <SafeAreaView edges={['top']}>
+              <View style={[styles.modalHeader, { paddingTop: SPACING.lg, marginBottom: SPACING.md }]}>
+                <TouchableOpacity 
+                  onPress={() => setShowAboutModal(false)} 
+                  activeOpacity={0.7}
+                  style={{ padding: 10, backgroundColor: '#f0f0f0', borderRadius: 22 }}
+                >
+                  <Ionicons name="close" size={22} color={COLORS.textPrimary} />
+                </TouchableOpacity>
+                <Text style={[styles.modalTitle, { fontFamily: 'Cairo_700Bold' }]}>عن التطبيق</Text>
+                <View style={{ width: 42 }} />
+              </View>
+            </SafeAreaView>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false} style={{ paddingHorizontal: SPACING.lg }}>
               <View style={styles.aboutContent}>
                 <View style={styles.aboutLogo}>
                   <Image 
