@@ -611,43 +611,41 @@ export default function ProfileScreen() {
       </Modal>
 
       {/* About Modal */}
-      <Modal visible={showAboutModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { maxHeight: '90%', paddingTop: 0 }]}>
-            <SafeAreaView edges={['top']}>
-              <View style={[styles.modalHeader, { paddingTop: SPACING.lg, marginBottom: SPACING.md }]}>
-                <TouchableOpacity 
-                  onPress={() => setShowAboutModal(false)} 
-                  activeOpacity={0.7}
-                  style={{ padding: 10, backgroundColor: '#f0f0f0', borderRadius: 22 }}
-                >
-                  <Ionicons name="close" size={22} color={COLORS.textPrimary} />
-                </TouchableOpacity>
-                <Text style={[styles.modalTitle, { fontFamily: 'Cairo_700Bold' }]}>عن التطبيق</Text>
-                <View style={{ width: 42 }} />
-              </View>
-            </SafeAreaView>
+      <Modal visible={showAboutModal} animationType="slide" transparent={false}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.surface }}>
+          {/* Fixed Header */}
+          <View style={[styles.modalHeader, { paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md, borderBottomWidth: 1, borderBottomColor: COLORS.divider }]}>
+            <TouchableOpacity 
+              onPress={() => setShowAboutModal(false)} 
+              activeOpacity={0.7}
+              style={{ padding: 8, backgroundColor: '#f0f0f0', borderRadius: 20 }}
+            >
+              <Ionicons name="close" size={22} color={COLORS.textPrimary} />
+            </TouchableOpacity>
+            <Text style={[styles.modalTitle, { fontFamily: 'Cairo_700Bold' }]}>عن التطبيق</Text>
+            <View style={{ width: 38 }} />
+          </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} style={{ paddingHorizontal: SPACING.lg }}>
-              <View style={styles.aboutContent}>
-                <View style={styles.aboutLogo}>
-                  <Image 
-                    source={require('../../assets/images/logo_food2_small.png')} 
-                    style={styles.aboutLogoImage}
-                    resizeMode="contain"
-                  />
-                </View>
-                <Text style={[styles.aboutName, { fontFamily: 'Cairo_700Bold' }]}>أكلة عالسريع</Text>
-                <Text style={[styles.aboutVersion, { fontFamily: 'Cairo_400Regular' }]}>الإصدار 1.0.0</Text>
-                <Text style={[styles.aboutDesc, { fontFamily: 'Cairo_400Regular' }]}>
-                  تطبيق توصيل الطعام الأسرع والأسهل!
-                </Text>
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: SPACING.lg }}>
+            <View style={styles.aboutContent}>
+              <View style={styles.aboutLogo}>
+                <Image 
+                  source={require('../../assets/images/logo_food2_small.png')} 
+                  style={styles.aboutLogoImage}
+                  resizeMode="contain"
+                />
               </View>
+              <Text style={[styles.aboutName, { fontFamily: 'Cairo_700Bold' }]}>أكلة عالسريع</Text>
+              <Text style={[styles.aboutVersion, { fontFamily: 'Cairo_400Regular' }]}>الإصدار 1.0.0</Text>
+              <Text style={[styles.aboutDesc, { fontFamily: 'Cairo_400Regular' }]}>
+                تطبيق توصيل الطعام الأسرع والأسهل!
+              </Text>
+            </View>
 
-              {/* Developer Info */}
-              <View style={styles.developerSection}>
-                <View style={styles.developerDivider} />
-                <Text style={[styles.developerTitle, { fontFamily: 'Cairo_400Regular' }]}>تم التطوير بواسطة</Text>
+            {/* Developer Info */}
+            <View style={styles.developerSection}>
+              <View style={styles.developerDivider} />
+              <Text style={[styles.developerTitle, { fontFamily: 'Cairo_400Regular' }]}>تم التطوير بواسطة</Text>
                 
                 <View style={styles.developerLogo}>
                   <Image 
