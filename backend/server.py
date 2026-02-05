@@ -2740,7 +2740,7 @@ async def require_admin_or_moderator(current_user: dict = Depends(get_current_us
     return current_user
 
 @api_router.get("/admin/stats")
-async def get_admin_stats(admin: dict = Depends(require_admin)):
+async def get_admin_stats(admin: dict = Depends(require_admin_or_moderator)):
     """Get overall app statistics"""
     # Users stats
     total_customers = await db.users.count_documents({"role": "customer"})
@@ -2802,7 +2802,7 @@ async def get_all_users(
     search: str = None,
     skip: int = 0,
     limit: int = 50,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Get all users with filtering"""
     query = {}
@@ -2829,7 +2829,7 @@ async def get_all_users(
     return {"users": users, "total": total}
 
 @api_router.get("/admin/users/{user_id}")
-async def get_user_details(user_id: str, admin: dict = Depends(require_admin)):
+async def get_user_details(user_id: str, admin: dict = Depends(require_admin_or_moderator)):
     """Get detailed user info"""
     user = await db.users.find_one({"id": user_id})
     if not user:
@@ -2854,7 +2854,7 @@ class UpdateUserStatusRequest(BaseModel):
 async def update_user_status(
     user_id: str,
     request: UpdateUserStatusRequest,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Activate or deactivate a user"""
     result = await db.users.update_one(
@@ -2875,7 +2875,7 @@ class UpdateUserInfoRequest(BaseModel):
 async def update_user_info(
     user_id: str,
     request: UpdateUserInfoRequest,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Update user information (admin)"""
     user = await db.users.find_one({"id": user_id})
@@ -2907,7 +2907,7 @@ class ResetPasswordRequest(BaseModel):
 async def reset_user_password(
     user_id: str,
     request: ResetPasswordRequest,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Reset user password (admin)"""
     user = await db.users.find_one({"id": user_id})
@@ -2936,7 +2936,7 @@ class ChangeRoleRequest(BaseModel):
 async def change_user_role(
     user_id: str,
     request: ChangeRoleRequest,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Change user role (admin)"""
     # Validate role
@@ -2997,7 +2997,7 @@ async def change_user_role(
     return {"message": f"تم تغيير دور المستخدم إلى {role_names.get(request.role, request.role)} بنجاح"}
 
 @api_router.delete("/admin/users/{user_id}")
-async def delete_user(user_id: str, admin: dict = Depends(require_admin)):
+async def delete_user(user_id: str, admin: dict = Depends(require_admin_or_moderator)):
     """Delete a user (admin)"""
     user = await db.users.find_one({"id": user_id})
     if not user:
@@ -3025,7 +3025,7 @@ async def get_all_restaurants(
     search: str = None,
     skip: int = 0,
     limit: int = 50,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Get all restaurants"""
     query = {}
@@ -3055,7 +3055,7 @@ async def get_all_restaurants(
 async def approve_restaurant(
     restaurant_id: str,
     is_approved: bool,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Approve or reject a restaurant"""
     result = await db.restaurants.update_one(
@@ -3073,7 +3073,7 @@ async def get_all_drivers(
     status: str = None,
     skip: int = 0,
     limit: int = 50,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Get all drivers"""
     query = {"role": "driver"}
@@ -3104,7 +3104,7 @@ async def get_all_drivers(
 async def approve_driver(
     driver_id: str,
     is_approved: bool,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Approve or reject a driver"""
     result = await db.users.update_one(
@@ -3175,7 +3175,7 @@ async def get_all_complaints(
     return {"complaints": complaints, "total": total}
 
 @api_router.get("/admin/complaints/{complaint_id}")
-async def get_complaint_details(complaint_id: str, admin: dict = Depends(require_admin)):
+async def get_complaint_details(complaint_id: str, admin: dict = Depends(require_admin_or_moderator)):
     """Get complaint details"""
     complaint = await db.complaints.find_one({"id": complaint_id})
     if not complaint:
@@ -3196,7 +3196,7 @@ async def get_complaint_details(complaint_id: str, admin: dict = Depends(require
 async def respond_to_complaint(
     complaint_id: str,
     response_data: ComplaintResponse,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Respond to a complaint"""
     result = await db.complaints.update_one(
@@ -3221,7 +3221,7 @@ async def get_all_orders_admin(
     status: str = None,
     skip: int = 0,
     limit: int = 50,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Get all orders (admin)"""
     query = {}
@@ -3237,7 +3237,7 @@ async def get_all_orders_admin(
     return {"orders": orders, "total": total}
 
 @api_router.delete("/admin/test-data")
-async def clear_test_data(admin: dict = Depends(require_admin)):
+async def clear_test_data(admin: dict = Depends(require_admin_or_moderator)):
     """Clear all test/seed data from the database (admin only)"""
     try:
         # Delete seeded restaurants (those with id starting with 'rest-')
@@ -3311,7 +3311,7 @@ async def get_app_settings():
 @api_router.put("/admin/settings")
 async def update_app_settings(
     settings_data: AppSettingsUpdate,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Update app settings (admin only)"""
     update_data = {k: v for k, v in settings_data.dict().items() if v is not None}
