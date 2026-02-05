@@ -1212,6 +1212,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
+  mapSection: {
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  mapSectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
+    textAlign: 'right',
+  },
   driversSection: {
     maxHeight: 350,
   },
