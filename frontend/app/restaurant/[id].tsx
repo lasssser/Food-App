@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
   },
   heroInfo: {
     position: 'absolute',
-    bottom: SPACING.xl,
+    bottom: SPACING.xl + 12,
     left: SPACING.lg,
     right: SPACING.lg,
   },
@@ -722,7 +722,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   heroStatText: {
-    fontSize: 16,
+    fontSize: 13,
     fontFamily: 'Cairo_600SemiBold',
     fontWeight: 'bold',
     color: '#FFFFFF',
@@ -731,7 +731,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   heroStatLabel: {
-    fontSize: 14,
+    fontSize: 11,
     fontFamily: 'Cairo_400Regular',
     color: '#FFFFFF',
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
