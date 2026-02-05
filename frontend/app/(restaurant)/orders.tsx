@@ -1171,6 +1171,79 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     lineHeight: 20,
   },
+  // Payment Verification Section
+  paymentVerificationSection: {
+    marginTop: SPACING.lg,
+    backgroundColor: '#FFF8E1',
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    borderWidth: 1,
+    borderColor: '#FFE082',
+  },
+  paymentVerificationHeader: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: SPACING.sm,
+    marginBottom: SPACING.md,
+  },
+  paymentVerificationTitle: {
+    fontSize: 16,
+    fontFamily: 'Cairo_700Bold',
+    fontWeight: 'bold',
+    color: '#FF9800',
+  },
+  paymentDetailsBox: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
+    padding: SPACING.md,
+    marginBottom: SPACING.lg,
+  },
+  paymentDetailRow: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 6,
+  },
+  paymentDetailLabel: {
+    fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
+    color: COLORS.textSecondary,
+  },
+  paymentDetailValue: {
+    fontSize: 14,
+    fontFamily: 'Cairo_600SemiBold',
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  transactionIdText: {
+    color: COLORS.primary,
+    fontSize: 15,
+  },
+  paymentActionButtons: {
+    flexDirection: 'row',
+    gap: SPACING.md,
+  },
+  paymentActionBtn: {
+    flex: 1,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.md,
+  },
+  confirmPaymentBtn: {
+    backgroundColor: COLORS.success,
+  },
+  rejectPaymentBtn: {
+    backgroundColor: COLORS.error,
+  },
+  paymentActionBtnText: {
+    fontSize: 14,
+    fontFamily: 'Cairo_700Bold',
+    fontWeight: 'bold',
+    color: '#FFF',
+  },
   actionsSection: {
     flexDirection: 'row-reverse',
     padding: SPACING.lg,
