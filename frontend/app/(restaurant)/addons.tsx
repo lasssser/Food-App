@@ -132,11 +132,13 @@ export default function AddOnsManagement() {
 
   const handleSave = async () => {
     if (!formName.trim()) {
+      alert('يرجى إدخال اسم المجموعة');
       return;
     }
 
     const validOptions = formOptions.filter(o => o.name.trim());
     if (validOptions.length === 0) {
+      alert('يرجى إضافة خيار واحد على الأقل');
       return;
     }
 
@@ -150,8 +152,10 @@ export default function AddOnsManagement() {
 
       if (editingGroup) {
         await restaurantPanelAPI.updateAddOnGroup(editingGroup.id, data);
+        alert('تم تحديث مجموعة الإضافات بنجاح');
       } else if (selectedItem) {
         await restaurantPanelAPI.createAddOnGroup(selectedItem.id, data);
+        alert('تم إضافة مجموعة الإضافات بنجاح');
       }
 
       setShowModal(false);
@@ -160,6 +164,7 @@ export default function AddOnsManagement() {
       }
     } catch (error: any) {
       console.error('Error saving add-on group:', error);
+      alert(error.response?.data?.detail || 'فشل في حفظ مجموعة الإضافات');
     }
   };
 
