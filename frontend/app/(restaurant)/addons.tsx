@@ -713,7 +713,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
   optionRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.sm,
     marginBottom: SPACING.sm,
