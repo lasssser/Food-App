@@ -19,6 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { restaurantPanelAPI } from '../../src/services/api';
 import { Order } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+import LocationViewer from '../../src/components/LocationViewer';
 
 interface RestaurantDriver {
   id: string;
