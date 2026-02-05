@@ -64,6 +64,7 @@ export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [selectedCityLocal, setSelectedCityLocal] = useState<City | null>(null);
+  const [districtSearch, setDistrictSearch] = useState('');
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
 
   // Fetch cities and advertisements on mount
