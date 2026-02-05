@@ -185,6 +185,66 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleOpenRoleRequestModal = (role: 'driver' | 'restaurant') => {
+    setSelectedRole(role);
+    setRoleRequestForm({
+      full_name: user?.name || '',
+      phone: user?.phone || '',
+      restaurant_name: '',
+      restaurant_address: '',
+      restaurant_area: '',
+      vehicle_type: 'دراجة نارية',
+      license_number: '',
+      notes: '',
+    });
+    setShowRoleRequestModal(true);
+  };
+
+  const handleSubmitRoleRequest = async () => {
+    if (!selectedRole) return;
+    
+    // Validation
+    if (!roleRequestForm.full_name.trim() || !roleRequestForm.phone.trim()) {
+      Alert.alert('تنبيه', 'يرجى ملء الاسم ورقم الهاتف');
+      return;
+    }
+    
+    if (selectedRole === 'restaurant' && !roleRequestForm.restaurant_name.trim()) {
+      Alert.alert('تنبيه', 'يرجى إدخال اسم المطعم');
+      return;
+    }
+    
+    setSubmittingRoleRequest(true);
+    try {
+      await roleRequestsAPI.create({
+        requested_role: selectedRole,
+        full_name: roleRequestForm.full_name.trim(),
+        phone: roleRequestForm.phone.trim(),
+        restaurant_name: selectedRole === 'restaurant' ? roleRequestForm.restaurant_name.trim() : undefined,
+        restaurant_address: selectedRole === 'restaurant' ? roleRequestForm.restaurant_address.trim() : undefined,
+        restaurant_area: selectedRole === 'restaurant' ? roleRequestForm.restaurant_area.trim() : undefined,
+        vehicle_type: selectedRole === 'driver' ? roleRequestForm.vehicle_type : undefined,
+        license_number: selectedRole === 'driver' ? roleRequestForm.license_number.trim() : undefined,
+        notes: roleRequestForm.notes.trim() || undefined,
+      });
+      
+      setShowRoleRequestModal(false);
+      setSelectedRole(null);
+      fetchMyRoleRequests();
+      
+      Alert.alert(
+        'تم إرسال الطلب ✅',
+        'سيتم مراجعة طلبك من قبل الإدارة وإعلامك بالنتيجة',
+        [{ text: 'حسناً' }]
+      );
+    } catch (error: any) {
+      const message = error.response?.data?.detail || 'حدث خطأ في إرسال الطلب';
+      Alert.alert('خطأ', message);
+    } finally {
+      setSubmittingRoleRequest(false);
+    }
+  };
+
   // Guest View
   if (isGuest) {
     return (
