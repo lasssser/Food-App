@@ -580,6 +580,11 @@ export const adminStatisticsAPI = {
     const response = await api.get('/admin/statistics/restaurants');
     return response.data;
   },
+  getMonthlyStats: async (year?: number) => {
+    const url = year ? `/admin/statistics/restaurants/monthly?year=${year}` : '/admin/statistics/restaurants/monthly';
+    const response = await api.get(url);
+    return response.data;
+  },
   getOverview: async () => {
     const response = await api.get('/admin/statistics/overview');
     return response.data;
