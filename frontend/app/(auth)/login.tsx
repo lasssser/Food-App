@@ -236,31 +236,32 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'flex-start',
-    padding: SPACING.xl,
-    paddingTop: SPACING.md,
+    justifyContent: 'space-between',
+    padding: SPACING.lg,
+    paddingTop: SPACING.sm,
+    paddingBottom: SPACING.md,
   },
 
   // Header
   header: {
     alignItems: 'center',
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.sm,
   },
   logoContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     backgroundColor: 'rgba(255,255,255,0.15)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.sm,
     borderWidth: 3,
     borderColor: COLORS.primary,
     overflow: 'visible',
   },
   logoImage: {
-    width: 160,
-    height: 160,
+    width: 130,
+    height: 130,
   },
   logoEmoji: {
     fontSize: 50,
