@@ -975,7 +975,10 @@ const styles = StyleSheet.create({
   // Menu Section
   menuSection: {
     backgroundColor: COLORS.surface,
+    marginHorizontal: SPACING.lg,
     marginBottom: SPACING.md,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
     ...SHADOWS.small,
   },
   menuItem: {
@@ -995,6 +998,7 @@ const styles = StyleSheet.create({
   menuItemText: {
     flex: 1,
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     textAlign: 'right',
   },
