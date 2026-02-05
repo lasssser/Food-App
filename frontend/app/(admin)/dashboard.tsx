@@ -232,11 +232,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 24,
     marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
+    ...Platform.select({
+      web: { boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.08)' },
+      default: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 4 },
+    }),
   },
   mainStatItem: {
     flex: 1,
