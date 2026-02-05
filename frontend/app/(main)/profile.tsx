@@ -234,17 +234,57 @@ export default function ProfileScreen() {
                 <View style={{ width: 24 }} />
               </View>
 
-              <View style={styles.aboutContent}>
-                <View style={styles.aboutLogo}>
-                  <Text style={styles.aboutEmoji}>🍔</Text>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={styles.aboutContent}>
+                  <View style={styles.aboutLogo}>
+                    <Text style={styles.aboutEmoji}>🍔</Text>
+                  </View>
+                  <Text style={styles.aboutName}>يلا ناكل؟</Text>
+                  <Text style={styles.aboutVersion}>الإصدار 1.0.0</Text>
+                  <Text style={styles.aboutDesc}>
+                    تطبيق توصيل الطعام الأسرع والأسهل!
+                  </Text>
                 </View>
-                <Text style={styles.aboutName}>يلا ناكل؟</Text>
-                <Text style={styles.aboutVersion}>الإصدار 1.0.0</Text>
-                <Text style={styles.aboutDesc}>
-                  تطبيق توصيل الطعام الأسرع والأسهل!
-                </Text>
-                <Text style={styles.aboutCopyright}>© 2025 يلا ناكل؟</Text>
-              </View>
+
+                {/* Developer Info */}
+                <View style={styles.developerSection}>
+                  <View style={styles.developerDivider} />
+                  <Text style={styles.developerTitle}>تم التطوير بواسطة</Text>
+                  
+                  <View style={styles.developerLogo}>
+                    <Ionicons name="code-slash" size={40} color={COLORS.primary} />
+                  </View>
+                  <Text style={styles.developerName}>Wethaq Digital Solutions</Text>
+                  
+                  <View style={styles.developerContacts}>
+                    <TouchableOpacity 
+                      style={styles.contactItem}
+                      onPress={() => Linking.openURL('https://www.wethaqdigital.com')}
+                    >
+                      <Text style={styles.contactText}>www.wethaqdigital.com</Text>
+                      <Ionicons name="globe-outline" size={20} color={COLORS.primary} />
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity 
+                      style={styles.contactItem}
+                      onPress={() => Linking.openURL('mailto:info@wethaqdigital.com')}
+                    >
+                      <Text style={styles.contactText}>info@wethaqdigital.com</Text>
+                      <Ionicons name="mail-outline" size={20} color={COLORS.primary} />
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity 
+                      style={styles.contactItem}
+                      onPress={() => Linking.openURL('tel:+963981401274')}
+                    >
+                      <Text style={styles.contactText}>+963 981 401 274</Text>
+                      <Ionicons name="call-outline" size={20} color={COLORS.primary} />
+                    </TouchableOpacity>
+                  </View>
+                  
+                  <Text style={styles.copyright}>© 2026 Wethaq Digital Solutions. All rights reserved.</Text>
+                </View>
+              </ScrollView>
             </View>
           </View>
         </Modal>
