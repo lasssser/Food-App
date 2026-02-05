@@ -857,15 +857,35 @@ const styles = StyleSheet.create({
   },
   userPhone: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 4,
+  },
+  userBadge: {
+    position: 'absolute',
+    bottom: SPACING.md,
+    left: SPACING.lg,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: `${COLORS.success}15`,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 4,
+    borderRadius: RADIUS.sm,
+  },
+  userBadgeText: {
+    fontSize: 11,
+    fontFamily: 'Cairo_400Regular',
+    color: COLORS.success,
   },
 
   // Section
   section: {
     backgroundColor: COLORS.surface,
     padding: SPACING.lg,
+    marginHorizontal: SPACING.lg,
     marginBottom: SPACING.md,
+    borderRadius: RADIUS.lg,
     ...SHADOWS.small,
   },
   sectionHeader: {
