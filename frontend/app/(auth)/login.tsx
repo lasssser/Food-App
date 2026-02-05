@@ -189,22 +189,6 @@ export default function LoginScreen() {
                 <Text style={styles.registerText}>ليس لديك حساب؟ </Text>
               </View>
             </View>
-
-            {/* Features */}
-            <View style={styles.featuresContainer}>
-              <View style={styles.featureItem}>
-                <Ionicons name="bicycle" size={20} color={COLORS.accent} />
-                <Text style={styles.featureText}>توصيل سريع</Text>
-              </View>
-              <View style={styles.featureItem}>
-                <Ionicons name="restaurant" size={20} color={COLORS.accent} />
-                <Text style={styles.featureText}>+200 مطعم</Text>
-              </View>
-              <View style={styles.featureItem}>
-                <Ionicons name="star" size={20} color={COLORS.accent} />
-                <Text style={styles.featureText}>أفضل العروض</Text>
-              </View>
-            </View>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
