@@ -551,7 +551,6 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     alignItems: 'center',
-    ...SHADOWS.small,
   },
   overviewIcon: {
     width: 44,
