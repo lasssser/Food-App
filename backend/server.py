@@ -3851,6 +3851,165 @@ async def reject_role_request(
     
     return {"message": "تم رفض الطلب"}
 
+# ==================== Advertisements (الإعلانات) ====================
+
+@api_router.get("/advertisements")
+async def get_advertisements(active_only: bool = True):
+    """Get all advertisements (public)"""
+    query = {"is_active": True} if active_only else {}
+    ads = await db.advertisements.find(query).sort("order", 1).to_list(20)
+    for ad in ads:
+        ad.pop("_id", None)
+    return ads
+
+@api_router.post("/admin/advertisements")
+async def create_advertisement(
+    ad_data: AdvertisementCreate,
+    admin: dict = Depends(require_admin)
+):
+    """Create a new advertisement (admin only)"""
+    ad = Advertisement(
+        title=ad_data.title,
+        image_url=ad_data.image_url,
+        link_type=ad_data.link_type,
+        link_value=ad_data.link_value,
+        is_active=ad_data.is_active,
+        order=ad_data.order
+    )
+    await db.advertisements.insert_one(ad.dict())
+    return {"message": "تم إنشاء الإعلان بنجاح", "id": ad.id}
+
+@api_router.put("/admin/advertisements/{ad_id}")
+async def update_advertisement(
+    ad_id: str,
+    ad_data: AdvertisementCreate,
+    admin: dict = Depends(require_admin)
+):
+    """Update an advertisement (admin only)"""
+    result = await db.advertisements.update_one(
+        {"id": ad_id},
+        {"$set": {
+            "title": ad_data.title,
+            "image_url": ad_data.image_url,
+            "link_type": ad_data.link_type,
+            "link_value": ad_data.link_value,
+            "is_active": ad_data.is_active,
+            "order": ad_data.order
+        }}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="الإعلان غير موجود")
+    return {"message": "تم تحديث الإعلان بنجاح"}
+
+@api_router.delete("/admin/advertisements/{ad_id}")
+async def delete_advertisement(
+    ad_id: str,
+    admin: dict = Depends(require_admin)
+):
+    """Delete an advertisement (admin only)"""
+    result = await db.advertisements.delete_one({"id": ad_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="الإعلان غير موجود")
+    return {"message": "تم حذف الإعلان بنجاح"}
+
+# ==================== Restaurant Featured (تمييز المطاعم) ====================
+
+@api_router.put("/admin/restaurants/{restaurant_id}/feature")
+async def toggle_restaurant_featured(
+    restaurant_id: str,
+    is_featured: bool = True,
+    admin: dict = Depends(require_admin)
+):
+    """Toggle restaurant featured status (admin only)"""
+    result = await db.restaurants.update_one(
+        {"id": restaurant_id},
+        {"$set": {"is_featured": is_featured, "featured_at": datetime.utcnow() if is_featured else None}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="المطعم غير موجود")
+    status = "تم تمييز" if is_featured else "تم إلغاء تمييز"
+    return {"message": f"{status} المطعم بنجاح"}
+
+# ==================== Admin Statistics (إحصائيات الأدمن) ====================
+
+@api_router.get("/admin/statistics/restaurants")
+async def get_restaurant_statistics(
+    admin: dict = Depends(require_admin_or_moderator)
+):
+    """Get order statistics per restaurant (admin)"""
+    # Aggregate orders by restaurant
+    pipeline = [
+        {"$group": {
+            "_id": "$restaurant_id",
+            "total_orders": {"$sum": 1},
+            "total_revenue": {"$sum": "$total"},
+            "completed_orders": {
+                "$sum": {"$cond": [{"$eq": ["$order_status", "delivered"]}, 1, 0]}
+            },
+            "cancelled_orders": {
+                "$sum": {"$cond": [{"$eq": ["$order_status", "cancelled"]}, 1, 0]}
+            }
+        }},
+        {"$sort": {"total_orders": -1}}
+    ]
+    
+    stats = await db.orders.aggregate(pipeline).to_list(100)
+    
+    # Get restaurant names
+    result = []
+    for stat in stats:
+        restaurant = await db.restaurants.find_one({"id": stat["_id"]})
+        if restaurant:
+            result.append({
+                "restaurant_id": stat["_id"],
+                "restaurant_name": restaurant.get("name", "غير معروف"),
+                "restaurant_image": restaurant.get("image"),
+                "is_featured": restaurant.get("is_featured", False),
+                "total_orders": stat["total_orders"],
+                "completed_orders": stat["completed_orders"],
+                "cancelled_orders": stat["cancelled_orders"],
+                "total_revenue": stat["total_revenue"]
+            })
+    
+    return result
+
+@api_router.get("/admin/statistics/overview")
+async def get_admin_overview_statistics(
+    admin: dict = Depends(require_admin_or_moderator)
+):
+    """Get overview statistics (admin)"""
+    # Count totals
+    total_orders = await db.orders.count_documents({})
+    total_users = await db.users.count_documents({"role": "customer"})
+    total_restaurants = await db.restaurants.count_documents({})
+    total_drivers = await db.users.count_documents({"role": "driver"})
+    
+    # Orders by status
+    pending_orders = await db.orders.count_documents({"order_status": "pending"})
+    delivered_orders = await db.orders.count_documents({"order_status": "delivered"})
+    
+    # Revenue
+    revenue_pipeline = [
+        {"$match": {"order_status": "delivered"}},
+        {"$group": {"_id": None, "total": {"$sum": "$total"}}}
+    ]
+    revenue_result = await db.orders.aggregate(revenue_pipeline).to_list(1)
+    total_revenue = revenue_result[0]["total"] if revenue_result else 0
+    
+    # Pending role requests
+    pending_role_requests = await db.role_requests.count_documents({"status": "pending"})
+    
+    return {
+        "total_orders": total_orders,
+        "pending_orders": pending_orders,
+        "delivered_orders": delivered_orders,
+        "total_users": total_users,
+        "total_restaurants": total_restaurants,
+        "total_drivers": total_drivers,
+        "total_revenue": total_revenue,
+        "pending_role_requests": pending_role_requests
+    }
+
 # ==================== Health Check ====================
 
 @api_router.get("/")
