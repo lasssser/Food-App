@@ -94,7 +94,6 @@ export default function CheckoutScreen() {
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
-  const [isCustomerVerified, setIsCustomerVerified] = useState(false);
   const [transactionId, setTransactionId] = useState('');
   const [paymentScreenshot, setPaymentScreenshot] = useState<string | null>(null);
   const [orderNotes, setOrderNotes] = useState('');
