@@ -2854,7 +2854,7 @@ class UpdateUserStatusRequest(BaseModel):
 async def update_user_status(
     user_id: str,
     request: UpdateUserStatusRequest,
-    admin: dict = Depends(require_admin_or_moderator)
+    admin: dict = Depends(require_admin)
 ):
     """Activate or deactivate a user"""
     result = await db.users.update_one(
@@ -2875,7 +2875,7 @@ class UpdateUserInfoRequest(BaseModel):
 async def update_user_info(
     user_id: str,
     request: UpdateUserInfoRequest,
-    admin: dict = Depends(require_admin_or_moderator)
+    admin: dict = Depends(require_admin)
 ):
     """Update user information (admin)"""
     user = await db.users.find_one({"id": user_id})
@@ -2907,7 +2907,7 @@ class ResetPasswordRequest(BaseModel):
 async def reset_user_password(
     user_id: str,
     request: ResetPasswordRequest,
-    admin: dict = Depends(require_admin_or_moderator)
+    admin: dict = Depends(require_admin)
 ):
     """Reset user password (admin)"""
     user = await db.users.find_one({"id": user_id})
@@ -2936,7 +2936,7 @@ class ChangeRoleRequest(BaseModel):
 async def change_user_role(
     user_id: str,
     request: ChangeRoleRequest,
-    admin: dict = Depends(require_admin_or_moderator)
+    admin: dict = Depends(require_admin)
 ):
     """Change user role (admin)"""
     # Validate role
@@ -3237,7 +3237,7 @@ async def get_all_orders_admin(
     return {"orders": orders, "total": total}
 
 @api_router.delete("/admin/test-data")
-async def clear_test_data(admin: dict = Depends(require_admin_or_moderator)):
+async def clear_test_data(admin: dict = Depends(require_admin)):
     """Clear all test/seed data from the database (admin only)"""
     try:
         # Delete seeded restaurants (those with id starting with 'rest-')
@@ -3311,7 +3311,7 @@ async def get_app_settings():
 @api_router.put("/admin/settings")
 async def update_app_settings(
     settings_data: AppSettingsUpdate,
-    admin: dict = Depends(require_admin_or_moderator)
+    admin: dict = Depends(require_admin)
 ):
     """Update app settings (admin only)"""
     update_data = {k: v for k, v in settings_data.dict().items() if v is not None}
