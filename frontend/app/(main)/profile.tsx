@@ -611,27 +611,31 @@ export default function ProfileScreen() {
       {/* About Modal */}
       <Modal visible={showAboutModal} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={() => setShowAboutModal(false)} activeOpacity={0.7}>
+          <View style={[styles.modalContent, { paddingTop: SPACING.xl }]}>
+            <View style={[styles.modalHeader, { marginTop: 20, marginBottom: SPACING.lg }]}>
+              <TouchableOpacity 
+                onPress={() => setShowAboutModal(false)} 
+                activeOpacity={0.7}
+                style={{ padding: 8, backgroundColor: '#f0f0f0', borderRadius: 20 }}
+              >
                 <Ionicons name="close" size={24} color={COLORS.textPrimary} />
               </TouchableOpacity>
-              <Text style={styles.modalTitle}>عن التطبيق</Text>
-              <View style={{ width: 24 }} />
+              <Text style={[styles.modalTitle, { fontFamily: 'Cairo_700Bold' }]}>عن التطبيق</Text>
+              <View style={{ width: 40 }} />
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
               <View style={styles.aboutContent}>
                 <View style={styles.aboutLogo}>
                   <Image 
-                    source={require('../../assets/images/logo_food2.png')} 
+                    source={require('../../assets/images/logo_food2_small.png')} 
                     style={styles.aboutLogoImage}
                     resizeMode="contain"
                   />
                 </View>
-                <Text style={styles.aboutName}>أكلة عالسريع</Text>
-                <Text style={styles.aboutVersion}>الإصدار 1.0.0</Text>
-                <Text style={styles.aboutDesc}>
+                <Text style={[styles.aboutName, { fontFamily: 'Cairo_700Bold' }]}>أكلة عالسريع</Text>
+                <Text style={[styles.aboutVersion, { fontFamily: 'Cairo_400Regular' }]}>الإصدار 1.0.0</Text>
+                <Text style={[styles.aboutDesc, { fontFamily: 'Cairo_400Regular' }]}>
                   تطبيق توصيل الطعام الأسرع والأسهل!
                 </Text>
               </View>
@@ -639,7 +643,7 @@ export default function ProfileScreen() {
               {/* Developer Info */}
               <View style={styles.developerSection}>
                 <View style={styles.developerDivider} />
-                <Text style={styles.developerTitle}>تم التطوير بواسطة</Text>
+                <Text style={[styles.developerTitle, { fontFamily: 'Cairo_400Regular' }]}>تم التطوير بواسطة</Text>
                 
                 <View style={styles.developerLogo}>
                   <Image 
@@ -648,14 +652,14 @@ export default function ProfileScreen() {
                     resizeMode="contain"
                   />
                 </View>
-                <Text style={styles.developerName}>Wethaq Digital Solutions</Text>
+                <Text style={[styles.developerName, { fontFamily: 'Cairo_600SemiBold' }]}>Wethaq Digital Solutions</Text>
                 
                 <View style={styles.developerContacts}>
                   <TouchableOpacity 
                     style={styles.contactItem}
                     onPress={() => Linking.openURL('https://www.wethaqdigital.com')}
                   >
-                    <Text style={styles.contactText}>www.wethaqdigital.com</Text>
+                    <Text style={[styles.contactText, { fontFamily: 'Cairo_400Regular' }]}>www.wethaqdigital.com</Text>
                     <Ionicons name="globe-outline" size={20} color={COLORS.primary} />
                   </TouchableOpacity>
                   
