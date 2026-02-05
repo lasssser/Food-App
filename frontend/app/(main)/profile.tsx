@@ -1355,6 +1355,20 @@ const styles = StyleSheet.create({
     fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     textAlign: 'center',
+    paddingBottom: 4,
+  },
+  poweredBy: {
+    fontSize: 11,
+    fontFamily: 'Cairo_400Regular',
+    color: COLORS.textLight,
+    textAlign: 'center',
+    marginTop: 2,
+  },
+  rightsText: {
+    fontSize: 10,
+    fontFamily: 'Cairo_400Regular',
+    color: COLORS.textLight,
+    textAlign: 'center',
     paddingBottom: 100,
   },
 
