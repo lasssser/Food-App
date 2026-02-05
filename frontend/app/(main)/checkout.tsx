@@ -445,8 +445,12 @@ export default function CheckoutScreen() {
             placeholder="أضف ملاحظات للطلب (اختياري)"
             placeholderTextColor={COLORS.textLight}
             textAlign="right"
-            multiline
+            multiline={true}
             numberOfLines={3}
+            editable={true}
+            scrollEnabled={true}
+            textAlignVertical="top"
+            blurOnSubmit={false}
           />
         </View>
 
