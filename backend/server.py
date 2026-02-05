@@ -2997,7 +2997,7 @@ async def change_user_role(
     return {"message": f"تم تغيير دور المستخدم إلى {role_names.get(request.role, request.role)} بنجاح"}
 
 @api_router.delete("/admin/users/{user_id}")
-async def delete_user(user_id: str, admin: dict = Depends(require_admin_or_moderator)):
+async def delete_user(user_id: str, admin: dict = Depends(require_admin)):
     """Delete a user (admin)"""
     user = await db.users.find_one({"id": user_id})
     if not user:
@@ -3025,7 +3025,7 @@ async def get_all_restaurants(
     search: str = None,
     skip: int = 0,
     limit: int = 50,
-    admin: dict = Depends(require_admin_or_moderator)
+    admin: dict = Depends(require_admin)
 ):
     """Get all restaurants"""
     query = {}
