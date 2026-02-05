@@ -256,6 +256,18 @@ export default function AdminSettings() {
           <Text style={styles.sectionTitle}>أدوات المطور</Text>
           <View style={styles.menuCard}>
             <MenuItem
+              icon="stats-chart-outline"
+              title="الإحصائيات"
+              subtitle="عدد الطلبات والإيرادات لكل مطعم"
+              onPress={() => router.push('/(admin)/statistics')}
+            />
+            <MenuItem
+              icon="images-outline"
+              title="إدارة الإعلانات"
+              subtitle="إضافة وتعديل إعلانات الصفحة الرئيسية"
+              onPress={() => router.push('/(admin)/advertisements')}
+            />
+            <MenuItem
               icon="people-outline"
               title="طلبات تغيير الدور"
               subtitle="طلبات التقدم كسائق أو صاحب مطعم"
