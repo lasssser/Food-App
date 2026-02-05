@@ -339,12 +339,30 @@ export default function CheckoutScreen() {
         >
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={() => setShowAddAddress(false)} activeOpacity={0.7}>
+              <TouchableOpacity onPress={() => {
+                setShowAddAddress(false);
+                setSelectedLocation(null);
+              }} activeOpacity={0.7}>
                 <Ionicons name="close" size={24} color={COLORS.textPrimary} />
               </TouchableOpacity>
               <Text style={styles.modalTitle}>إضافة عنوان جديد</Text>
               <View style={{ width: 24 }} />
             </View>
+
+            {/* Map for location selection */}
+            <Text style={styles.mapLabel}>📍 حدد موقعك على الخريطة</Text>
+            <LocationPicker
+              initialLocation={selectedLocation}
+              onLocationSelect={setSelectedLocation}
+              editable={true}
+              height={200}
+            />
+            {selectedLocation && (
+              <View style={styles.locationConfirmed}>
+                <Ionicons name="checkmark-circle" size={16} color={COLORS.success} />
+                <Text style={styles.locationConfirmedText}>تم تحديد الموقع</Text>
+              </View>
+            )}
 
             <TextInput
               style={styles.modalInput}
@@ -356,8 +374,8 @@ export default function CheckoutScreen() {
             />
 
             <TextInput
-              style={styles.modalInput}
-              placeholder="العنوان بالتفصيل"
+              style={[styles.modalInput, { minHeight: 80 }]}
+              placeholder="العنوان بالتفصيل (الشارع، البناء، الطابق...)"
               placeholderTextColor={COLORS.textLight}
               value={newAddress.address_line}
               onChangeText={(text) => setNewAddress({ ...newAddress, address_line: text })}
