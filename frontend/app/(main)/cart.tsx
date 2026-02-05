@@ -422,6 +422,28 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: SPACING.sm,
   },
+  notesInputContainer: {
+    marginTop: SPACING.sm,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: SPACING.md,
+  },
+  notesInput: {
+    fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
+    color: COLORS.textPrimary,
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  notesCount: {
+    fontSize: 11,
+    fontFamily: 'Cairo_400Regular',
+    color: COLORS.textLight,
+    textAlign: 'left',
+    marginTop: 4,
+  },
 
   // Summary Card
   summaryCard: {
