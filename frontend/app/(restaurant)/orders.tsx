@@ -610,7 +610,7 @@ export default function RestaurantOrders() {
                   />
                 </View>
               )}
-            )}
+            </View>
 
             <ScrollView style={styles.driversSection}>
               {/* My Drivers Section */}
