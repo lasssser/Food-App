@@ -211,6 +211,25 @@ class RoleRequest(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Advertisement Models (الإعلانات)
+class AdvertisementCreate(BaseModel):
+    title: str
+    image_url: str
+    link_type: Optional[str] = None  # restaurant, external, none
+    link_value: Optional[str] = None  # restaurant_id or external URL
+    is_active: bool = True
+    order: int = 0
+
+class Advertisement(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    image_url: str
+    link_type: Optional[str] = None
+    link_value: Optional[str] = None
+    is_active: bool = True
+    order: int = 0
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
 # Order Add-on Selection
 class OrderAddOnSelection(BaseModel):
     group_name: str
