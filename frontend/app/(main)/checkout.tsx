@@ -267,7 +267,7 @@ export default function CheckoutScreen() {
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 280 }}
+        contentContainerStyle={{ paddingBottom: 320 }}
       >
         {/* Address Section */}
         <View style={styles.section}>
