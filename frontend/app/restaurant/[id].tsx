@@ -277,18 +277,18 @@ export default function RestaurantScreen() {
           
           <View style={styles.heroStats}>
             <View style={styles.heroStat}>
-              <Ionicons name="star" size={18} color={COLORS.accent} />
+              <Ionicons name="star" size={14} color={COLORS.accent} />
               <Text style={styles.heroStatText}>{restaurant.rating.toFixed(1)}</Text>
               <Text style={styles.heroStatLabel}>({restaurant.review_count}+ تقييم)</Text>
             </View>
             <View style={styles.heroDivider} />
             <View style={styles.heroStat}>
-              <Ionicons name="time-outline" size={18} color={COLORS.textWhite} />
+              <Ionicons name="time-outline" size={14} color={COLORS.textWhite} />
               <Text style={styles.heroStatText}>{restaurant.delivery_time}</Text>
             </View>
             <View style={styles.heroDivider} />
             <View style={styles.heroStat}>
-              <Ionicons name="bicycle-outline" size={18} color={COLORS.textWhite} />
+              <Ionicons name="bicycle-outline" size={14} color={COLORS.textWhite} />
               <Text style={styles.heroStatText}>{restaurant.delivery_fee.toLocaleString()} ل.س</Text>
             </View>
           </View>
