@@ -594,6 +594,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: SPACING.md,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   header: {
@@ -611,11 +612,13 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
   headerSubtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
     marginTop: 4,
   },
@@ -642,11 +645,13 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
   statLabel: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
     marginTop: 2,
   },
@@ -681,6 +686,7 @@ const styles = StyleSheet.create({
   },
   quickActionText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
@@ -701,6 +707,7 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.info,
     textAlign: 'right',
@@ -708,6 +715,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'right',
     lineHeight: 20,
@@ -728,11 +736,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   emptySubtext: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: SPACING.sm,
   },
@@ -751,6 +761,7 @@ const styles = StyleSheet.create({
   emptyButtonText: {
     color: COLORS.textWhite,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   driversList: {
@@ -758,6 +769,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     textAlign: 'right',
@@ -794,6 +806,7 @@ const styles = StyleSheet.create({
   },
   driverName: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
@@ -812,15 +825,18 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 11,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
   },
   driverPhone: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 4,
   },
   driverNotes: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     marginTop: 4,
     fontStyle: 'italic',
@@ -877,6 +893,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
@@ -898,11 +915,13 @@ const styles = StyleSheet.create({
   },
   avatarPreviewText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
   inputLabel: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '500',
     color: COLORS.textSecondary,
     textAlign: 'right',
@@ -924,6 +943,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: SPACING.md,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     textAlign: 'right',
   },
@@ -956,6 +976,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: COLORS.textWhite,
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
 
@@ -987,11 +1008,13 @@ const styles = StyleSheet.create({
   },
   detailsName: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
   detailsPhone: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
     marginTop: 4,
   },
@@ -1006,6 +1029,7 @@ const styles = StyleSheet.create({
   },
   detailsStatusText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
   },
   detailsBody: {
@@ -1020,6 +1044,7 @@ const styles = StyleSheet.create({
   },
   detailsSectionTitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textSecondary,
     textAlign: 'right',
@@ -1027,6 +1052,7 @@ const styles = StyleSheet.create({
   },
   detailsNotes: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     textAlign: 'right',
     lineHeight: 22,
@@ -1054,6 +1080,7 @@ const styles = StyleSheet.create({
   detailsActionText: {
     color: COLORS.textWhite,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   detailsQuickMessages: {
@@ -1063,6 +1090,7 @@ const styles = StyleSheet.create({
   },
   quickMessagesTitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textSecondary,
     textAlign: 'right',
@@ -1076,6 +1104,7 @@ const styles = StyleSheet.create({
   },
   quickMessageText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     textAlign: 'right',
   },
@@ -1107,11 +1136,13 @@ const styles = StyleSheet.create({
   },
   confirmTitle: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   confirmMessage: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: SPACING.sm,
@@ -1135,6 +1166,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     fontWeight: '600',
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
   },
   deleteConfirmButton: {
     backgroundColor: COLORS.error,
@@ -1143,5 +1175,6 @@ const styles = StyleSheet.create({
     color: COLORS.textWhite,
     fontWeight: '600',
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
   },
 });

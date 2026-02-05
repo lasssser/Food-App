@@ -503,6 +503,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: SPACING.md,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
 
@@ -527,6 +528,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
@@ -552,11 +554,13 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textWhite,
   },
   statusAction: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
     textDecorationLine: 'underline',
   },
@@ -572,6 +576,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
     textAlign: 'right',
@@ -603,6 +608,7 @@ const styles = StyleSheet.create({
   },
   imagePlaceholderText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     marginTop: SPACING.sm,
   },
@@ -630,6 +636,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'right',
     marginBottom: SPACING.sm,
@@ -640,6 +647,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     borderWidth: 1,
     borderColor: COLORS.divider,
@@ -671,6 +679,7 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
   },
   dropdown: {
@@ -692,6 +701,7 @@ const styles = StyleSheet.create({
   },
   dropdownItemText: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     textAlign: 'right',
   },
@@ -720,6 +730,7 @@ const styles = StyleSheet.create({
   },
   dayChipText: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   dayChipTextActive: {
@@ -740,12 +751,14 @@ const styles = StyleSheet.create({
   },
   ratingValue: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     marginTop: SPACING.sm,
   },
   ratingLabel: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 4,
   },
@@ -778,6 +791,7 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },

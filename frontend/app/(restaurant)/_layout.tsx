@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
   },
   tabBarLabel: {
     fontSize: 10,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
   },
 });

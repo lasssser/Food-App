@@ -797,6 +797,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: SPACING.md,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
 
@@ -813,11 +814,13 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
   headerSubtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
     textAlign: 'right',
     marginTop: 4,
@@ -833,6 +836,7 @@ const styles = StyleSheet.create({
   },
   exportButtonText: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textWhite,
   },
@@ -856,6 +860,7 @@ const styles = StyleSheet.create({
   },
   periodButtonText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.7)',
     fontWeight: '500',
   },
@@ -891,6 +896,7 @@ const styles = StyleSheet.create({
   },
   chartTabText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   chartTabTextActive: {
@@ -944,11 +950,13 @@ const styles = StyleSheet.create({
   },
   summaryValue: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
   summaryLabel: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
     marginTop: 4,
   },
@@ -964,6 +972,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
     textAlign: 'right',
@@ -993,10 +1002,12 @@ const styles = StyleSheet.create({
   },
   statusLabel: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   statusValue: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     marginTop: 4,
@@ -1013,10 +1024,12 @@ const styles = StyleSheet.create({
   },
   completionLabel: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   completionRate: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.success,
   },
@@ -1056,6 +1069,7 @@ const styles = StyleSheet.create({
   },
   topItemRankText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textSecondary,
   },
@@ -1066,11 +1080,13 @@ const styles = StyleSheet.create({
   },
   topItemName: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
   topItemStats: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 2,
   },
@@ -1103,16 +1119,19 @@ const styles = StyleSheet.create({
   },
   paymentLabel: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '500',
     color: COLORS.textPrimary,
   },
   paymentCount: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 2,
   },
   paymentTotal: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.success,
   },
@@ -1141,11 +1160,13 @@ const styles = StyleSheet.create({
   },
   deliveryCount: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   deliveryLabel: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 4,
   },
@@ -1175,11 +1196,13 @@ const styles = StyleSheet.create({
   },
   peakTime: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
   peakOrders: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   peakBar: {
@@ -1198,6 +1221,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     marginTop: SPACING.sm,
   },

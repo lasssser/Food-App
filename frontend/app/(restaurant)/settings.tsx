@@ -600,6 +600,7 @@ const styles = StyleSheet.create({
   },
   avatarEmoji: {
     fontSize: 35,
+    fontFamily: 'Cairo_400Regular',
   },
   profileInfo: {
     flex: 1,
@@ -608,11 +609,13 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: 22,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
   profilePhone: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
     marginTop: 2,
   },
@@ -628,6 +631,7 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textWhite,
     fontWeight: '600',
   },
@@ -645,11 +649,13 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 22,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
   statLabel: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
     marginTop: 2,
   },
@@ -669,6 +675,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textSecondary,
     marginBottom: SPACING.md,
@@ -709,11 +716,13 @@ const styles = StyleSheet.create({
   },
   menuItemTitle: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
   menuItemSubtitle: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     marginTop: 2,
   },
@@ -732,11 +741,13 @@ const styles = StyleSheet.create({
   },
   toggleTitle: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
   toggleSubtitle: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     marginTop: 2,
   },
@@ -760,11 +771,13 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.error,
     fontWeight: '600',
   },
   version: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     textAlign: 'center',
     paddingVertical: SPACING.xl,
@@ -800,6 +813,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
@@ -830,11 +844,13 @@ const styles = StyleSheet.create({
   },
   helpCardTitle: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
   helpCardDesc: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 2,
   },
@@ -854,14 +870,17 @@ const styles = StyleSheet.create({
   },
   aboutEmoji: {
     fontSize: 45,
+    fontFamily: 'Cairo_400Regular',
   },
   aboutName: {
     fontSize: 28,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.primary,
   },
   aboutTagline: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 4,
   },
@@ -874,11 +893,13 @@ const styles = StyleSheet.create({
   },
   versionBadgeText: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     fontWeight: '500',
   },
   aboutDesc: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
@@ -896,10 +917,12 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
   },
   aboutCopyright: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     marginTop: SPACING.xl,
   },
@@ -932,12 +955,14 @@ const styles = StyleSheet.create({
   },
   confirmTitle: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     marginBottom: SPACING.sm,
   },
   confirmMessage: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginBottom: SPACING.xl,
@@ -956,6 +981,7 @@ const styles = StyleSheet.create({
   },
   cancelBtnText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
@@ -970,6 +996,7 @@ const styles = StyleSheet.create({
   },
   confirmBtnText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textWhite,
   },
@@ -978,6 +1005,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     padding: SPACING.md,
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     textAlign: 'right',
     marginBottom: SPACING.md,
@@ -995,6 +1023,7 @@ const styles = StyleSheet.create({
   },
   submitComplaintText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textWhite,
   },

@@ -454,12 +454,14 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
     textAlign: 'right',
   },
   headerSubtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
     textAlign: 'right',
     marginTop: 4,
@@ -470,6 +472,7 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
     textAlign: 'right',
@@ -497,6 +500,7 @@ const styles = StyleSheet.create({
   },
   itemChipText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   itemChipTextActive: {
@@ -514,6 +518,7 @@ const styles = StyleSheet.create({
   },
   addOnsTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
@@ -530,6 +535,7 @@ const styles = StyleSheet.create({
     color: COLORS.textWhite,
     fontWeight: '600',
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -538,6 +544,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     marginTop: SPACING.md,
   },
@@ -559,6 +566,7 @@ const styles = StyleSheet.create({
   },
   selectPromptText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     marginTop: SPACING.md,
   },
@@ -584,6 +592,7 @@ const styles = StyleSheet.create({
   },
   groupName: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
@@ -602,10 +611,12 @@ const styles = StyleSheet.create({
   requiredText: {
     color: COLORS.textWhite,
     fontSize: 11,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   maxText: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   groupActions: {
@@ -628,10 +639,12 @@ const styles = StyleSheet.create({
   },
   optionName: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
   },
   optionPrice: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.success,
     fontWeight: '600',
   },
@@ -658,6 +671,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
@@ -666,6 +680,7 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'right',
     marginBottom: SPACING.sm,
@@ -675,6 +690,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     padding: SPACING.md,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     marginBottom: SPACING.md,
     borderWidth: 1,
@@ -688,6 +704,7 @@ const styles = StyleSheet.create({
   },
   switchLabel: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
   },
   optionRow: {
@@ -717,6 +734,7 @@ const styles = StyleSheet.create({
   },
   addOptionText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.primary,
     fontWeight: '600',
   },
@@ -732,6 +750,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: COLORS.textWhite,
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   
@@ -753,12 +772,14 @@ const styles = StyleSheet.create({
   },
   confirmTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     marginTop: SPACING.md,
   },
   confirmMessage: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: SPACING.sm,

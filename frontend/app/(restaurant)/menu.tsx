@@ -465,6 +465,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: SPACING.md,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   header: {
@@ -482,11 +483,13 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
   headerSubtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
     marginTop: 4,
   },
@@ -514,6 +517,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
@@ -525,6 +529,7 @@ const styles = StyleSheet.create({
   },
   sectionCount: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.primary,
   },
@@ -550,11 +555,13 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
   itemDescription: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 4,
     textAlign: 'right',
@@ -579,6 +586,7 @@ const styles = StyleSheet.create({
   },
   itemPrice: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.primary,
   },
@@ -597,6 +605,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
   },
 
@@ -617,11 +626,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   emptySubtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: SPACING.sm,
   },
@@ -640,6 +651,7 @@ const styles = StyleSheet.create({
   emptyButtonText: {
     color: COLORS.textWhite,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
 
@@ -665,6 +677,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
@@ -695,6 +708,7 @@ const styles = StyleSheet.create({
   },
   imagePickerText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     marginTop: SPACING.sm,
   },
@@ -716,6 +730,7 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '500',
     color: COLORS.textSecondary,
     textAlign: 'right',
@@ -726,6 +741,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     padding: SPACING.md,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     marginBottom: SPACING.lg,
     borderWidth: 1,
@@ -744,6 +760,7 @@ const styles = StyleSheet.create({
   },
   availabilityLabel: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     fontWeight: '500',
   },
@@ -762,6 +779,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: COLORS.textWhite,
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
 
@@ -791,12 +809,14 @@ const styles = StyleSheet.create({
   },
   confirmTitle: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     marginBottom: SPACING.sm,
   },
   confirmMessage: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginBottom: SPACING.xl,
@@ -815,6 +835,7 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
@@ -827,6 +848,7 @@ const styles = StyleSheet.create({
   },
   deleteConfirmButtonText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textWhite,
   },

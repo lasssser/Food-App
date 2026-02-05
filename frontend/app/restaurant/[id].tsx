@@ -622,6 +622,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   errorContainer: {
@@ -632,10 +633,12 @@ const styles = StyleSheet.create({
   },
   errorIcon: {
     fontSize: 60,
+    fontFamily: 'Cairo_400Regular',
     marginBottom: SPACING.lg,
   },
   errorText: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     marginBottom: SPACING.lg,
   },
@@ -648,6 +651,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     color: COLORS.textWhite,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
 
@@ -689,6 +693,7 @@ const styles = StyleSheet.create({
   },
   heroName: {
     fontSize: 28,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
     textAlign: 'right',
@@ -696,6 +701,7 @@ const styles = StyleSheet.create({
   },
   heroCuisine: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.9)',
     textAlign: 'right',
     marginBottom: SPACING.md,
@@ -711,11 +717,13 @@ const styles = StyleSheet.create({
   },
   heroStatText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
   heroStatLabel: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.7)',
   },
   heroDivider: {
@@ -764,6 +772,7 @@ const styles = StyleSheet.create({
   },
   categoryTabText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textSecondary,
   },
@@ -794,6 +803,7 @@ const styles = StyleSheet.create({
   },
   menuItemName: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     textAlign: 'right',
@@ -801,12 +811,14 @@ const styles = StyleSheet.create({
   },
   menuItemDesc: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'right',
     marginBottom: SPACING.sm,
   },
   menuItemPrice: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.primary,
   },
@@ -854,6 +866,7 @@ const styles = StyleSheet.create({
   quantityText: {
     color: COLORS.secondary,
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
 
@@ -887,17 +900,20 @@ const styles = StyleSheet.create({
   cartBadgeText: {
     color: COLORS.primary,
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   floatingCartText: {
     flex: 1,
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
     textAlign: 'center',
   },
   floatingCartPrice: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
@@ -930,6 +946,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     textAlign: 'center',
@@ -951,6 +968,7 @@ const styles = StyleSheet.create({
   },
   addOnGroupTitle: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     textAlign: 'right',
@@ -969,10 +987,12 @@ const styles = StyleSheet.create({
   requiredText: {
     color: COLORS.textWhite,
     fontSize: 11,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   maxSelectionsText: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   
@@ -1017,6 +1037,7 @@ const styles = StyleSheet.create({
   },
   addOnOptionName: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
   },
   addOnOptionNameSelected: {
@@ -1025,6 +1046,7 @@ const styles = StyleSheet.create({
   },
   addOnOptionPrice: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.success,
     fontWeight: '600',
   },
@@ -1044,10 +1066,12 @@ const styles = StyleSheet.create({
   },
   modalTotalLabel: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   modalTotalPrice: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.primary,
   },
@@ -1064,6 +1088,7 @@ const styles = StyleSheet.create({
   },
   modalAddButtonText: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
@@ -1085,6 +1110,7 @@ const styles = StyleSheet.create({
   },
   ratingBigNumber: {
     fontSize: 48,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
@@ -1095,6 +1121,7 @@ const styles = StyleSheet.create({
   },
   ratingCount: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: SPACING.sm,
   },
@@ -1104,12 +1131,14 @@ const styles = StyleSheet.create({
   },
   noRatingsText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
     marginTop: SPACING.md,
   },
   noRatingsSubtext: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: SPACING.sm,
   },
@@ -1141,6 +1170,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
@@ -1150,6 +1180,7 @@ const styles = StyleSheet.create({
   },
   ratingComment: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     lineHeight: 22,
     textAlign: 'right',
@@ -1157,6 +1188,7 @@ const styles = StyleSheet.create({
   },
   ratingDate: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     textAlign: 'right',
   },

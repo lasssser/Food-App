@@ -197,10 +197,12 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: '#666',
   },
   restaurantName: {
     fontSize: 22,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: '#333',
   },
@@ -232,10 +234,12 @@ const styles = StyleSheet.create({
   },
   statusLabel: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
   },
   statusText: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: '#fff',
   },
@@ -256,12 +260,14 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 28,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: '#333',
     marginTop: 8,
   },
   statLabel: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: '#666',
     marginTop: 4,
   },
@@ -273,6 +279,7 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: '#333',
     textAlign: 'right',
@@ -293,10 +300,12 @@ const styles = StyleSheet.create({
   },
   infoLabelText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: '#666',
   },
   infoValue: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: '#333',
     fontWeight: '500',
   },
