@@ -256,6 +256,12 @@ export default function AdminSettings() {
           <Text style={styles.sectionTitle}>أدوات المطور</Text>
           <View style={styles.menuCard}>
             <MenuItem
+              icon="people-outline"
+              title="طلبات تغيير الدور"
+              subtitle="طلبات التقدم كسائق أو صاحب مطعم"
+              onPress={() => router.push('/(admin)/role-requests')}
+            />
+            <MenuItem
               icon="settings-outline"
               title="إعدادات الدعم الفني"
               subtitle="تغيير رقم الواتساب والبريد الإلكتروني"
