@@ -738,7 +738,6 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: RADIUS.lg,
     overflow: 'hidden',
-    ...SHADOWS.medium,
   },
   adImage: {
     width: '100%',
