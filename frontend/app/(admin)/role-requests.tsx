@@ -559,7 +559,8 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     marginBottom: SPACING.md,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
   },
   cardHeader: {
     flexDirection: 'row',
