@@ -159,11 +159,31 @@ class AddOnGroup(BaseModel):
     options: List[AddOnOption] = []
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Payment Method Models (طرق الدفع للمطعم)
+class PaymentMethodConfig(BaseModel):
+    method: str  # mtn_cash, syriatel_cash, shamcash, cod
+    is_enabled: bool = True
+    display_name: str  # اسم العرض للزبون
+    payment_info: str  # رقم الهاتف أو رابط أو تعليمات
+    instructions: Optional[str] = None  # تعليمات إضافية
+
+class RestaurantPaymentMethods(BaseModel):
+    restaurant_id: str
+    methods: List[PaymentMethodConfig] = []
+
+class PaymentMethodUpdate(BaseModel):
+    methods: List[PaymentMethodConfig]
+
 # Order Add-on Selection
 class OrderAddOnSelection(BaseModel):
     group_name: str
     option_name: str
     price: float
+
+# Payment Info from Customer
+class OrderPaymentInfo(BaseModel):
+    transaction_id: str  # رقم العملية (إجباري)
+    payment_screenshot: Optional[str] = None  # صورة الدفع (اختياري) - base64
 
 class OrderItemCreate(BaseModel):
     menu_item_id: str
