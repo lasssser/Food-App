@@ -102,7 +102,6 @@ export default function CheckoutScreen() {
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const [showCodInfoModal, setShowCodInfoModal] = useState(false);
   const [showPaymentInfoModal, setShowPaymentInfoModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [newAddress, setNewAddress] = useState({ label: '', address_line: '', area: '', lat: 0, lng: 0 });
