@@ -327,19 +327,30 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
+      {/* Header with Gradient */}
+      <LinearGradient
+        colors={[COLORS.primary, COLORS.primaryDark]}
+        style={styles.headerGradient}
+      >
         <Text style={styles.headerTitle}>حسابي</Text>
-      </View>
+      </LinearGradient>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* User Info */}
+        {/* User Info Card */}
         <View style={styles.profileCard}>
-          <View style={styles.avatarContainer}>
-            <Ionicons name="person" size={35} color={COLORS.primary} />
-          </View>
+          <LinearGradient
+            colors={[COLORS.primary, COLORS.primaryDark]}
+            style={styles.avatarContainer}
+          >
+            <Ionicons name="person" size={35} color="#FFFFFF" />
+          </LinearGradient>
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{user?.name}</Text>
             <Text style={styles.userPhone}>{user?.phone}</Text>
+          </View>
+          <View style={styles.userBadge}>
+            <Ionicons name="checkmark-circle" size={16} color={COLORS.success} />
+            <Text style={styles.userBadgeText}>حساب موثق</Text>
           </View>
         </View>
 
