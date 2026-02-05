@@ -806,7 +806,6 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     marginBottom: SPACING.lg,
     overflow: 'hidden',
-    ...SHADOWS.large,
   },
   imageContainer: {
     height: 200,
