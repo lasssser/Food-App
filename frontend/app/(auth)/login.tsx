@@ -87,7 +87,11 @@ export default function LoginScreen() {
             {/* Logo Section */}
             <View style={styles.header}>
               <View style={styles.logoContainer}>
-                <Text style={styles.logoEmoji}>🍔</Text>
+                <Image 
+                  source={require('../../assets/images/logo.png')} 
+                  style={styles.logoImage}
+                  resizeMode="contain"
+                />
               </View>
               <Text style={styles.title}>أكلة عالسريع</Text>
               <Text style={styles.subtitle}>اطلب أشهى المأكولات بضغطة زر</Text>
