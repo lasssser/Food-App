@@ -12,13 +12,15 @@ import {
   Linking,
   Image,
   StatusBar,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../src/store/authStore';
-import { addressAPI, complaintsAPI, settingsAPI } from '../../src/services/api';
+import { addressAPI, complaintsAPI, settingsAPI, roleRequestsAPI } from '../../src/services/api';
 import { Address } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
@@ -42,6 +44,23 @@ export default function ProfileScreen() {
   const [complaintSubject, setComplaintSubject] = useState('');
   const [complaintMessage, setComplaintMessage] = useState('');
   const [submittingComplaint, setSubmittingComplaint] = useState(false);
+  
+  // Role Request states
+  const [showRoleRequestModal, setShowRoleRequestModal] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<'driver' | 'restaurant' | null>(null);
+  const [roleRequestForm, setRoleRequestForm] = useState({
+    full_name: '',
+    phone: '',
+    restaurant_name: '',
+    restaurant_address: '',
+    restaurant_area: '',
+    vehicle_type: '',
+    license_number: '',
+    notes: '',
+  });
+  const [submittingRoleRequest, setSubmittingRoleRequest] = useState(false);
+  const [myRoleRequests, setMyRoleRequests] = useState<any[]>([]);
+  const [hasPendingRequest, setHasPendingRequest] = useState(false);
 
   useEffect(() => {
     if (!isGuest) {
