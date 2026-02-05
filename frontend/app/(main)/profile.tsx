@@ -309,6 +309,8 @@ export default function ProfileScreen() {
         </View>
 
         <Text style={styles.version}>أكلة عالسريع v1.0.0</Text>
+        <Text style={styles.poweredBy}>Powered by Wethaq Digital Solutions</Text>
+        <Text style={styles.rightsText}>All rights reserved.</Text>
 
         {/* Help Modal */}
         <Modal visible={showHelpModal} animationType="slide" transparent>
