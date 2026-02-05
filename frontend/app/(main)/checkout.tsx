@@ -328,57 +328,97 @@ export default function CheckoutScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>💳 طريقة الدفع</Text>
 
-          {/* COD */}
-          <TouchableOpacity
-            style={[
-              styles.paymentCard,
-              paymentMethod === 'COD' && styles.paymentCardSelected,
-            ]}
-            onPress={() => setPaymentMethod('COD')}
-            activeOpacity={0.7}
-          >
-            <View style={styles.paymentContent}>
-              <View style={[styles.paymentIcon, { backgroundColor: `${COLORS.success}15` }]}>
-                <Ionicons name="cash" size={24} color={COLORS.success} />
-              </View>
-              <View style={styles.paymentInfo}>
-                <Text style={styles.paymentTitle}>الدفع عند الاستلام</Text>
-                <Text style={styles.paymentDesc}>ادفع نقداً للسائق</Text>
-              </View>
+          {paymentMethods.length === 0 ? (
+            <View style={styles.noPaymentMethods}>
+              <Text style={styles.noPaymentText}>لا توجد طرق دفع متاحة</Text>
             </View>
-            <View style={[
-              styles.radioButton,
-              paymentMethod === 'COD' && styles.radioButtonSelected,
-            ]}>
-              {paymentMethod === 'COD' && <View style={styles.radioButtonInner} />}
-            </View>
-          </TouchableOpacity>
+          ) : (
+            paymentMethods.map((method) => (
+              <TouchableOpacity
+                key={method.method}
+                style={[
+                  styles.paymentCard,
+                  selectedPaymentMethod === method.method && styles.paymentCardSelected,
+                  method.method === 'cod' && !isCustomerVerified && styles.paymentCardDisabled,
+                ]}
+                onPress={() => handleSelectPaymentMethod(method.method)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.paymentContent}>
+                  <View style={[styles.paymentIcon, { backgroundColor: `${METHOD_COLORS[method.method] || COLORS.primary}15` }]}>
+                    <Ionicons 
+                      name={METHOD_ICONS[method.method] as any || 'card'} 
+                      size={24} 
+                      color={METHOD_COLORS[method.method] || COLORS.primary} 
+                    />
+                  </View>
+                  <View style={styles.paymentInfo}>
+                    <Text style={styles.paymentTitle}>{method.display_name}</Text>
+                    {method.method === 'cod' && !isCustomerVerified ? (
+                      <Text style={[styles.paymentDesc, { color: COLORS.warning }]}>
+                        🔒 يتطلب توثيق الحساب أولاً
+                      </Text>
+                    ) : (
+                      <Text style={styles.paymentDesc}>
+                        {method.method === 'cod' ? 'ادفع نقداً للسائق' : method.instructions || 'حوّل المبلغ وأدخل رقم العملية'}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+                <View style={[
+                  styles.radioButton,
+                  selectedPaymentMethod === method.method && styles.radioButtonSelected,
+                ]}>
+                  {selectedPaymentMethod === method.method && <View style={styles.radioButtonInner} />}
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
 
-          {/* ShamCash */}
-          <TouchableOpacity
-            style={[
-              styles.paymentCard,
-              paymentMethod === 'SHAMCASH' && styles.paymentCardSelected,
-            ]}
-            onPress={() => setPaymentMethod('SHAMCASH')}
-            activeOpacity={0.7}
-          >
-            <View style={styles.paymentContent}>
-              <View style={[styles.paymentIcon, { backgroundColor: `${COLORS.info}15` }]}>
-                <Ionicons name="wallet" size={24} color={COLORS.info} />
+          {/* Show transaction input for electronic payments */}
+          {selectedPaymentMethod && selectedPaymentMethod !== 'cod' && (
+            <View style={styles.transactionSection}>
+              <View style={styles.paymentInfoBox}>
+                <Ionicons name="information-circle" size={20} color={COLORS.info} />
+                <Text style={styles.paymentInfoText}>
+                  {paymentMethods.find(m => m.method === selectedPaymentMethod)?.payment_info || 'رقم غير متوفر'}
+                </Text>
               </View>
-              <View style={styles.paymentInfo}>
-                <Text style={styles.paymentTitle}>ShamCash</Text>
-                <Text style={styles.paymentDesc}>محفظة إلكترونية</Text>
-              </View>
+              
+              <Text style={styles.inputLabel}>رقم العملية *</Text>
+              <TextInput
+                style={styles.transactionInput}
+                value={transactionId}
+                onChangeText={setTransactionId}
+                placeholder="أدخل رقم عملية التحويل"
+                placeholderTextColor={COLORS.textLight}
+                textAlign="right"
+              />
+
+              <Text style={styles.inputLabel}>صورة الدفع (اختياري)</Text>
+              <TouchableOpacity 
+                style={styles.uploadButton}
+                onPress={pickPaymentScreenshot}
+              >
+                {paymentScreenshot ? (
+                  <View style={styles.screenshotPreview}>
+                    <Image source={{ uri: paymentScreenshot }} style={styles.screenshotImage} />
+                    <TouchableOpacity 
+                      style={styles.removeScreenshot}
+                      onPress={() => setPaymentScreenshot(null)}
+                    >
+                      <Ionicons name="close-circle" size={24} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <>
+                    <Ionicons name="camera-outline" size={24} color={COLORS.primary} />
+                    <Text style={styles.uploadButtonText}>رفع صورة إيصال الدفع</Text>
+                  </>
+                )}
+              </TouchableOpacity>
             </View>
-            <View style={[
-              styles.radioButton,
-              paymentMethod === 'SHAMCASH' && styles.radioButtonSelected,
-            ]}>
-              {paymentMethod === 'SHAMCASH' && <View style={styles.radioButtonInner} />}
-            </View>
-          </TouchableOpacity>
+          )}
         </View>
 
         {/* Order Summary */}
