@@ -170,11 +170,7 @@ export default function CheckoutScreen() {
   };
 
   const handleSelectPaymentMethod = (method: string) => {
-    // If COD and not verified, show info modal
-    if (method === 'cod' && !isCustomerVerified) {
-      setShowCodInfoModal(true);
-      return;
-    }
+    // Simply select the payment method - no verification required
     setSelectedPaymentMethod(method);
     // If electronic payment, show payment info modal
     if (method !== 'cod') {
