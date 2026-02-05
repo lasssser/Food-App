@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
   },
   tabBarLabel: {
     fontSize: 11,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
   },
   activeIconContainer: {
@@ -149,6 +150,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: COLORS.textWhite,
     fontSize: 10,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
 });

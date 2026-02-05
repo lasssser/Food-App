@@ -408,12 +408,14 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 26,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
     textAlign: 'right',
   },
   headerSubtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
     textAlign: 'right',
     marginTop: 4,
@@ -425,12 +427,14 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     marginTop: SPACING.lg,
   },
   emptySubtext: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: SPACING.sm,
   },
@@ -460,6 +464,7 @@ const styles = StyleSheet.create({
   },
   restaurantName: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
@@ -471,11 +476,13 @@ const styles = StyleSheet.create({
   },
   orderNumber: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.primary,
     fontWeight: '600',
   },
   orderDate: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   statusContainer: {
@@ -492,6 +499,7 @@ const styles = StyleSheet.create({
     color: COLORS.textWhite,
     fontWeight: 'bold',
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
   },
   driverSection: {
     flexDirection: 'row-reverse',
@@ -522,10 +530,12 @@ const styles = StyleSheet.create({
   },
   driverLabel: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   driverName: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
@@ -542,6 +552,7 @@ const styles = StyleSheet.create({
     color: COLORS.textWhite,
     fontWeight: '600',
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
   },
   progressSection: {
     paddingHorizontal: SPACING.md,
@@ -549,6 +560,7 @@ const styles = StyleSheet.create({
   },
   progressTitle: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     textAlign: 'right',
@@ -595,6 +607,7 @@ const styles = StyleSheet.create({
   progressLabel: {
     flex: 1,
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     textAlign: 'right',
   },
@@ -613,6 +626,7 @@ const styles = StyleSheet.create({
   },
   detailsTitle: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     textAlign: 'right',
@@ -625,10 +639,12 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
   },
   itemPrice: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   totalRow: {
@@ -642,10 +658,12 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   totalValue: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.primary,
   },
@@ -658,6 +676,7 @@ const styles = StyleSheet.create({
   cancelOrderText: {
     color: COLORS.error,
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
   },
 
@@ -679,12 +698,14 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     marginTop: SPACING.md,
   },
   modalMessage: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: SPACING.sm,
@@ -734,6 +755,7 @@ const styles = StyleSheet.create({
   rateButtonText: {
     color: COLORS.textWhite,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   ratedBadge: {
@@ -748,6 +770,7 @@ const styles = StyleSheet.create({
   ratedText: {
     color: COLORS.success,
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
   },
 });

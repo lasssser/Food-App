@@ -279,6 +279,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: SPACING.md,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   header: {
@@ -296,11 +297,13 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
   headerSubtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
     marginTop: 4,
   },
@@ -322,6 +325,7 @@ const styles = StyleSheet.create({
   liveText: {
     color: COLORS.textWhite,
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
   },
   listContent: {
@@ -350,6 +354,7 @@ const styles = StyleSheet.create({
   urgencyText: {
     color: COLORS.textWhite,
     fontSize: 11,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   restaurantSection: {
@@ -373,11 +378,13 @@ const styles = StyleSheet.create({
   },
   restaurantName: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   orderId: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 2,
   },
@@ -410,10 +417,12 @@ const styles = StyleSheet.create({
   },
   routeLabel: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   routeAddress: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     marginTop: 2,
     textAlign: 'right',
@@ -439,11 +448,13 @@ const styles = StyleSheet.create({
   },
   summaryValue: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   summaryLabel: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 2,
   },
@@ -468,6 +479,7 @@ const styles = StyleSheet.create({
   acceptButtonText: {
     color: COLORS.textWhite,
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   totalBadge: {
@@ -480,6 +492,7 @@ const styles = StyleSheet.create({
   totalBadgeText: {
     color: COLORS.textWhite,
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   emptyContainer: {
@@ -498,11 +511,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   emptySubtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: SPACING.sm,
@@ -522,6 +537,7 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontWeight: '600',
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
   },
 
   // Modal styles
@@ -551,11 +567,13 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   modalMessage: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: SPACING.sm,
@@ -571,5 +589,6 @@ const styles = StyleSheet.create({
     color: COLORS.textWhite,
     fontWeight: 'bold',
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
   },
 });

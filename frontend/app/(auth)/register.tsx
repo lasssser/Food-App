@@ -268,15 +268,18 @@ const styles = StyleSheet.create({
   },
   logoEmoji: {
     fontSize: 45,
+    fontFamily: 'Cairo_400Regular',
   },
   title: {
     fontSize: 32,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
     marginBottom: SPACING.xs,
   },
   subtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
   },
 
@@ -289,6 +292,7 @@ const styles = StyleSheet.create({
   },
   formTitle: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     textAlign: 'center',
@@ -312,6 +316,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     paddingHorizontal: SPACING.sm,
   },
@@ -335,6 +340,7 @@ const styles = StyleSheet.create({
   registerButtonText: {
     color: COLORS.textWhite,
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
 
@@ -346,10 +352,12 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   loginLink: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.primary,
     fontWeight: 'bold',
   },
@@ -367,5 +375,6 @@ const styles = StyleSheet.create({
   featureText: {
     color: 'rgba(255,255,255,0.7)',
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
   },
 });

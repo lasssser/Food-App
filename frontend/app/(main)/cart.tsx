@@ -245,11 +245,13 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   clearText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.error,
     fontWeight: '600',
   },
@@ -280,11 +282,13 @@ const styles = StyleSheet.create({
   },
   restaurantName: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   itemCount: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 2,
   },
@@ -318,6 +322,7 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
     textAlign: 'right',
@@ -328,11 +333,13 @@ const styles = StyleSheet.create({
   },
   addOnText: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'right',
   },
   itemPrice: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.primary,
   },
@@ -359,6 +366,7 @@ const styles = StyleSheet.create({
   },
   quantityText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     marginHorizontal: SPACING.md,
@@ -381,6 +389,7 @@ const styles = StyleSheet.create({
   },
   notesText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.primary,
     fontWeight: '600',
     marginLeft: SPACING.sm,
@@ -406,10 +415,12 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   summaryValue: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     fontWeight: '500',
   },
@@ -420,11 +431,13 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   totalValue: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.primary,
   },
@@ -442,6 +455,7 @@ const styles = StyleSheet.create({
   },
   checkoutButtonText: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
@@ -464,15 +478,18 @@ const styles = StyleSheet.create({
   },
   emptyIcon: {
     fontSize: 60,
+    fontFamily: 'Cairo_400Regular',
   },
   emptyTitle: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     marginBottom: SPACING.sm,
   },
   emptySubtitle: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginBottom: SPACING.xl,
   },
@@ -489,6 +506,7 @@ const styles = StyleSheet.create({
   },
   browseButtonText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },

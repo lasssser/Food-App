@@ -225,10 +225,12 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
   },
   driverName: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
@@ -272,16 +274,19 @@ const styles = StyleSheet.create({
   },
   statusLabel: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
   },
   statusText: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
     marginTop: 4,
   },
   statusHint: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.7)',
     marginTop: 4,
   },
@@ -322,11 +327,13 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 26,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   statLabel: {
     fontSize: 11,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 4,
     textAlign: 'center',
@@ -348,16 +355,19 @@ const styles = StyleSheet.create({
   },
   earningsTitle: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textSecondary,
   },
   earningsAmount: {
     fontSize: 36,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.primary,
   },
   earningsHint: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     marginTop: SPACING.sm,
   },
@@ -370,6 +380,7 @@ const styles = StyleSheet.create({
   },
   tipsTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     textAlign: 'right',
@@ -393,6 +404,7 @@ const styles = StyleSheet.create({
   },
   tipText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     flex: 1,
     textAlign: 'right',

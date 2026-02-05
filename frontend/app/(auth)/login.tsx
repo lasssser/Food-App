@@ -247,15 +247,18 @@ const styles = StyleSheet.create({
   },
   logoEmoji: {
     fontSize: 50,
+    fontFamily: 'Cairo_400Regular',
   },
   title: {
     fontSize: 36,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
     marginBottom: SPACING.xs,
   },
   subtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
   },
 
@@ -268,6 +271,7 @@ const styles = StyleSheet.create({
   },
   formTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     textAlign: 'center',
@@ -291,6 +295,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     paddingHorizontal: SPACING.sm,
   },
@@ -314,6 +319,7 @@ const styles = StyleSheet.create({
   loginButtonText: {
     color: COLORS.textWhite,
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
 
@@ -332,6 +338,7 @@ const styles = StyleSheet.create({
     marginHorizontal: SPACING.sm,
     color: COLORS.textLight,
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
   },
 
   // Guest Button
@@ -346,6 +353,7 @@ const styles = StyleSheet.create({
   guestButtonText: {
     color: COLORS.textPrimary,
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
   },
 
@@ -357,10 +365,12 @@ const styles = StyleSheet.create({
   },
   registerText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   registerLink: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.primary,
     fontWeight: 'bold',
   },
@@ -378,5 +388,6 @@ const styles = StyleSheet.create({
   featureText: {
     color: 'rgba(255,255,255,0.7)',
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
   },
 });

@@ -413,6 +413,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
@@ -438,6 +439,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     fontWeight: '500',
   },
@@ -457,6 +459,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: COLORS.textWhite,
     fontSize: 11,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   content: {
@@ -471,6 +474,7 @@ const styles = StyleSheet.create({
   },
   markAllText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.primary,
     fontWeight: '500',
   },
@@ -509,6 +513,7 @@ const styles = StyleSheet.create({
   },
   notificationTitle: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
@@ -520,6 +525,7 @@ const styles = StyleSheet.create({
   },
   notificationBody: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 4,
     textAlign: 'right',
@@ -527,6 +533,7 @@ const styles = StyleSheet.create({
   },
   notificationTime: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     marginTop: SPACING.sm,
   },
@@ -548,11 +555,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   emptySubtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: SPACING.sm,
   },
@@ -568,6 +577,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     textAlign: 'right',
@@ -594,11 +604,13 @@ const styles = StyleSheet.create({
   },
   settingTitle: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '500',
     color: COLORS.textPrimary,
   },
   settingDesc: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 2,
   },
@@ -617,10 +629,12 @@ const styles = StyleSheet.create({
   testButtonText: {
     color: COLORS.textWhite,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   testNote: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     textAlign: 'center',
     marginTop: SPACING.md,

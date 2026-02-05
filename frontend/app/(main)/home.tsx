@@ -393,6 +393,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
 
@@ -420,10 +421,12 @@ const styles = StyleSheet.create({
   },
   locationLabel: {
     fontSize: 11,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.7)',
   },
   locationText: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textWhite,
   },
@@ -439,12 +442,14 @@ const styles = StyleSheet.create({
   },
   headerGreeting: {
     fontSize: 28,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
   },
   headerIcon: {
@@ -457,6 +462,7 @@ const styles = StyleSheet.create({
   },
   headerEmoji: {
     fontSize: 30,
+    fontFamily: 'Cairo_400Regular',
   },
 
   // Search
@@ -472,6 +478,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     marginHorizontal: SPACING.md,
   },
@@ -500,10 +507,12 @@ const styles = StyleSheet.create({
   },
   categoryIcon: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     marginLeft: SPACING.sm,
   },
   categoryText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
@@ -521,11 +530,13 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   seeAll: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.primary,
     fontWeight: '600',
   },
@@ -581,6 +592,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: COLORS.textWhite,
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   imageTextContainer: {
@@ -590,12 +602,14 @@ const styles = StyleSheet.create({
   },
   restaurantNameOnImage: {
     fontSize: 22,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
     textAlign: 'right',
   },
   cuisineTypeOnImage: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.9)',
     textAlign: 'right',
   },
@@ -617,11 +631,13 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   reviewCount: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
   },
   deliveryInfo: {
@@ -631,6 +647,7 @@ const styles = StyleSheet.create({
   },
   deliveryText: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   feeContainer: {
@@ -640,10 +657,12 @@ const styles = StyleSheet.create({
   },
   feeText: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   minOrder: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
   },
 
@@ -654,10 +673,12 @@ const styles = StyleSheet.create({
   },
   emptyIcon: {
     fontSize: 60,
+    fontFamily: 'Cairo_400Regular',
     marginBottom: SPACING.lg,
   },
   emptyText: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     marginBottom: SPACING.sm,
@@ -665,6 +686,7 @@ const styles = StyleSheet.create({
   },
   emptySubtext: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'center',
   },
@@ -679,6 +701,7 @@ const styles = StyleSheet.create({
     color: COLORS.textWhite,
     fontWeight: '600',
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
   },
 
   // Modal Styles
@@ -703,6 +726,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
@@ -726,6 +750,7 @@ const styles = StyleSheet.create({
   },
   cityName: {
     fontSize: 17,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
   },
   cityNameSelected: {

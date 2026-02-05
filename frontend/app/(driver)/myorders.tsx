@@ -455,6 +455,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: SPACING.md,
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   header: {
@@ -472,11 +473,13 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 24,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textWhite,
   },
   headerSubtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.8)',
     marginTop: 4,
   },
@@ -512,6 +515,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.7)',
     fontWeight: '500',
   },
@@ -546,10 +550,12 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
   },
   orderId: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     fontWeight: '500',
   },
@@ -576,11 +582,13 @@ const styles = StyleSheet.create({
   },
   restaurantName: {
     fontSize: 17,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   restaurantSubtext: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 2,
   },
@@ -614,10 +622,12 @@ const styles = StyleSheet.create({
   },
   routeLabel: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   routeAddress: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     marginTop: 2,
     textAlign: 'right',
@@ -662,11 +672,13 @@ const styles = StyleSheet.create({
   },
   customerName: {
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
   customerPhone: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 2,
   },
@@ -697,6 +709,7 @@ const styles = StyleSheet.create({
   notesText: {
     flex: 1,
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'right',
     lineHeight: 20,
@@ -707,6 +720,7 @@ const styles = StyleSheet.create({
   },
   itemsTitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
     textAlign: 'right',
@@ -722,11 +736,13 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'right',
   },
   moreItems: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.primary,
     textAlign: 'right',
     marginTop: SPACING.xs,
@@ -755,6 +771,7 @@ const styles = StyleSheet.create({
   },
   paymentText: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
   },
   totalContainer: {
@@ -762,10 +779,12 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
   },
   totalValue: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.primary,
   },
@@ -783,6 +802,7 @@ const styles = StyleSheet.create({
   actionButtonText: {
     color: COLORS.textWhite,
     fontSize: 17,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
   },
   emptyContainer: {
@@ -801,11 +821,13 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   emptySubtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: SPACING.sm,
@@ -825,6 +847,7 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontWeight: '600',
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
   },
 
   // Modal styles
@@ -854,11 +877,13 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
+    fontFamily: 'Cairo_400Regular',
     fontWeight: 'bold',
     color: COLORS.textPrimary,
   },
   modalMessage: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: SPACING.sm,
@@ -875,5 +900,6 @@ const styles = StyleSheet.create({
     color: COLORS.textWhite,
     fontWeight: 'bold',
     fontSize: 16,
+    fontFamily: 'Cairo_400Regular',
   },
 });
