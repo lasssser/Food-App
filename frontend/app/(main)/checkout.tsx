@@ -559,9 +559,9 @@ export default function CheckoutScreen() {
             </View>
             <Text style={styles.alertTitle}>تم الطلب بنجاح! 🎉</Text>
             <Text style={styles.alertMessage}>
-              {paymentMethod === 'COD' 
+              {selectedPaymentMethod === 'cod' 
                 ? 'سيتم توصيل طلبك قريباً' 
-                : 'يرجى تحويل المبلغ عبر ShamCash'}
+                : 'طلبك بانتظار تأكيد الدفع من المطعم'}
             </Text>
             <TouchableOpacity 
               style={styles.alertButton} 
@@ -592,6 +592,31 @@ export default function CheckoutScreen() {
               activeOpacity={0.7}
             >
               <Text style={styles.alertButtonText}>حسناً</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* COD Info Modal */}
+      <Modal visible={showCodInfoModal} animationType="fade" transparent>
+        <View style={styles.alertModalOverlay}>
+          <View style={styles.alertModal}>
+            <View style={[styles.alertIconContainer, { backgroundColor: `${COLORS.warning}15` }]}>
+              <Ionicons name="shield-checkmark" size={50} color={COLORS.warning} />
+            </View>
+            <Text style={styles.alertTitle}>توثيق الحساب مطلوب</Text>
+            <Text style={styles.alertMessage}>
+              لتفعيل خيار الدفع عند الاستلام، يرجى إتمام طلب واحد على الأقل باستخدام إحدى طرق الدفع الإلكترونية (MTN Cash، Syriatel Cash، أو ShamCash).
+            </Text>
+            <Text style={[styles.alertMessage, { marginTop: 10, color: COLORS.textSecondary }]}>
+              بعد تأكيد المطعم للدفع، سيتم تفعيل الدفع عند الاستلام تلقائياً.
+            </Text>
+            <TouchableOpacity 
+              style={[styles.alertButton, { backgroundColor: COLORS.warning }]} 
+              onPress={() => setShowCodInfoModal(false)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.alertButtonText}>فهمت</Text>
             </TouchableOpacity>
           </View>
         </View>
