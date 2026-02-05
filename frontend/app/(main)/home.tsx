@@ -310,6 +310,48 @@ export default function HomeScreen() {
           ))}
         </ScrollView>
 
+        {/* Advertisements Slider */}
+        {advertisements.length > 0 && (
+          <View style={styles.adsContainer}>
+            <TouchableOpacity
+              style={styles.adCard}
+              activeOpacity={0.9}
+              onPress={() => {
+                const ad = advertisements[currentAdIndex];
+                if (ad?.link_type === 'restaurant' && ad?.link_value) {
+                  router.push(`/restaurant/${ad.link_value}`);
+                }
+              }}
+            >
+              <Image
+                source={{ uri: advertisements[currentAdIndex]?.image_url }}
+                style={styles.adImage}
+                resizeMode="cover"
+              />
+              <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.6)']}
+                style={styles.adOverlay}
+              >
+                <Text style={styles.adTitle}>{advertisements[currentAdIndex]?.title}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+            {/* Dots Indicator */}
+            {advertisements.length > 1 && (
+              <View style={styles.dotsContainer}>
+                {advertisements.map((_, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.dot,
+                      currentAdIndex === index && styles.dotActive,
+                    ]}
+                  />
+                ))}
+              </View>
+            )}
+          </View>
+        )}
+
         {/* Section Title */}
         <View style={styles.sectionHeader}>
           <TouchableOpacity>
