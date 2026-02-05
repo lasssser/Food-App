@@ -22,10 +22,12 @@ interface LocationState {
   isLocationSet: boolean;
   
   setCities: (cities: City[]) => void;
-  setLocation: (city: City, district?: District, lat?: number, lng?: number) => void;
+  setLocation: (city?: City, district?: District, lat?: number, lng?: number) => void;
+  setMapLocation: (lat: number, lng: number, address: string) => void;
   clearLocation: () => void;
   getCityName: () => string;
   getDistrictName: () => string;
+  mapAddress: string | null;
 }
 
 export const useLocationStore = create<LocationState>()((set, get) => ({
