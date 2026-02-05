@@ -760,8 +760,8 @@ const styles = StyleSheet.create({
   },
   headerGradient: {
     paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.lg,
-    paddingBottom: SPACING.xxl + 20,
+    paddingTop: SPACING.md,
+    paddingBottom: SPACING.xxl + 10,
     alignItems: 'center',
   },
   headerTitle: {
