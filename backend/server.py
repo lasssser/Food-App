@@ -2292,6 +2292,11 @@ async def test_push_notification(current_user: dict = Depends(get_current_user))
 async def seed_database():
     """Seed database with demo data including images and add-ons"""
     
+    # Check if seeding is disabled (admin cleared data)
+    settings = await db.settings.find_one({"id": "app_settings"})
+    if settings and settings.get("seed_disabled"):
+        return {"message": "Seeding is disabled by admin", "skipped": True}
+    
     # Check if already seeded
     existing_restaurants = await db.restaurants.count_documents({"id": {"$regex": "^rest-"}})
     if existing_restaurants > 0:
