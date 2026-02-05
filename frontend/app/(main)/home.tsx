@@ -426,7 +426,26 @@ export default function HomeScreen() {
             {/* City Selection */}
             {!selectedCityLocal ? (
               <ScrollView style={styles.locationScroll} showsVerticalScrollIndicator={false}>
-                <Text style={styles.locationHint}>أين تريد التوصيل؟</Text>
+                {/* Map button */}
+                <TouchableOpacity
+                  style={styles.mapPickerBtn}
+                  onPress={() => {
+                    setShowLocationModal(false);
+                    setTimeout(() => setShowMapPicker(true), 300);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.mapPickerIcon}>
+                    <Ionicons name="map" size={24} color="#fff" />
+                  </View>
+                  <View style={styles.mapPickerInfo}>
+                    <Text style={styles.mapPickerTitle}>حدد على الخريطة</Text>
+                    <Text style={styles.mapPickerSubtitle}>اختر موقعك بدقة من الخريطة</Text>
+                  </View>
+                  <Ionicons name="chevron-back" size={20} color="#999" />
+                </TouchableOpacity>
+
+                <Text style={styles.locationHint}>أو اختر مدينتك</Text>
                 <View style={styles.cityGrid}>
                   {cities.map((city) => {
                     const cityIcons: { [key: string]: string } = {
