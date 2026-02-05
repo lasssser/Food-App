@@ -236,14 +236,15 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     padding: SPACING.xl,
+    paddingTop: SPACING.md,
   },
 
   // Header
   header: {
     alignItems: 'center',
-    marginBottom: SPACING.xxl,
+    marginBottom: SPACING.lg,
   },
   logoContainer: {
     width: 100,
