@@ -571,25 +571,27 @@ const styles = StyleSheet.create({
 
   // Categories
   categoriesContainer: {
-    marginTop: -20,
-    marginBottom: SPACING.lg,
+    marginTop: 12,
+    marginBottom: 12,
   },
   categoriesContent: {
-    paddingHorizontal: SPACING.lg,
-    gap: SPACING.sm,
+    paddingHorizontal: 16,
+    gap: 8,
   },
   categoryChip: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderRadius: RADIUS.full,
-    marginRight: SPACING.sm,
-    ...SHADOWS.small,
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 25,
+    marginRight: 4,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
   },
   categoryChipActive: {
     backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
   },
   categoryIcon: {
     fontSize: 18,
