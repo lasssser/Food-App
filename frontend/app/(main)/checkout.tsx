@@ -422,9 +422,24 @@ export default function CheckoutScreen() {
           )}
         </View>
 
+        {/* Order Notes */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>📝 ملاحظات الطلب</Text>
+          <TextInput
+            style={styles.notesInput}
+            value={orderNotes}
+            onChangeText={setOrderNotes}
+            placeholder="أضف ملاحظات للطلب (اختياري)"
+            placeholderTextColor={COLORS.textLight}
+            textAlign="right"
+            multiline
+            numberOfLines={3}
+          />
+        </View>
+
         {/* Order Summary */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📝 ملخص الطلب</Text>
+          <Text style={styles.sectionTitle}>🧾 ملخص الطلب</Text>
           
           <View style={styles.summaryCard}>
             {items.map((item) => (
