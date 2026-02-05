@@ -759,8 +759,7 @@ const styles = StyleSheet.create({
   },
   headerGradient: {
     paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.sm,
-    paddingBottom: 45,
+    paddingBottom: 30,
     alignItems: 'center',
   },
   headerTitle: {
