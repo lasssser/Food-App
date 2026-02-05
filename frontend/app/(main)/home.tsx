@@ -20,7 +20,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { restaurantAPI, locationAPI, advertisementsAPI } from '../../src/services/api';
 import { useAuthStore } from '../../src/store/authStore';
 import { useLocationStore, City, District } from '../../src/store/locationStore';
-import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
+import MapLocationPicker from '../../src/components/MapLocationPicker';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 32;
