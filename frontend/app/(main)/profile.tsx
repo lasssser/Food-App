@@ -685,9 +685,8 @@ export default function ProfileScreen() {
                 <Text style={[styles.copyright, { fontFamily: 'Cairo_400Regular' }]}>© 2026 Wethaq Digital Solutions. All rights reserved.</Text>
               </View>
             </ScrollView>
-          </View>
-        </View>
-      </Modal>
+          </SafeAreaView>
+        </Modal>
 
       {/* Complaint Modal */}
       <Modal visible={showComplaintModal} animationType="slide" transparent>
