@@ -760,13 +760,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
   },
   headerSubtitle: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginTop: 4,
   },
@@ -794,7 +794,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
   },
   filterContainer: {
@@ -818,7 +818,7 @@ const styles = StyleSheet.create({
   filterText: {
     fontSize: 13,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '500',
   },
   filterTextActive: {
@@ -863,7 +863,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   userDetails: {
     alignItems: 'flex-end',
@@ -872,12 +872,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   userPhone: {
     fontSize: 13,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginTop: 2,
   },
   userMeta: {
@@ -891,7 +891,7 @@ const styles = StyleSheet.create({
   roleText: {
     fontSize: 12,
     fontWeight: '600',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   inactiveBadge: {
     backgroundColor: '#fee2e2',
@@ -913,7 +913,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: '#9ca3af',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginTop: 12,
   },
   modalOverlay: {
@@ -940,7 +940,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   modalBody: {
     padding: 20,
@@ -961,13 +961,13 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     color: '#fff',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   modalUserName: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginBottom: 8,
   },
   infoSection: {
@@ -987,13 +987,13 @@ const styles = StyleSheet.create({
   infoLabel: {
     fontSize: 14,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   infoValue: {
     fontSize: 14,
     fontWeight: '600',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   statusBadge: {
     paddingHorizontal: 12,
@@ -1014,7 +1014,7 @@ const styles = StyleSheet.create({
   actionBtnText: {
     fontSize: 15,
     fontWeight: '600',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   formSection: {
     padding: 20,
@@ -1023,7 +1023,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#374151',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginBottom: 8,
   },
@@ -1033,7 +1033,7 @@ const styles = StyleSheet.create({
     padding: 14,
     fontSize: 15,
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginBottom: 16,
     borderWidth: 1,
@@ -1050,7 +1050,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   deleteModalOverlay: {
     flex: 1,
@@ -1080,20 +1080,20 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginBottom: 12,
   },
   deleteModalText: {
     fontSize: 15,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'center',
     marginBottom: 8,
   },
   deleteModalWarning: {
     fontSize: 13,
     color: '#ef4444',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'center',
     marginBottom: 24,
     fontWeight: '600',
@@ -1114,7 +1114,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   confirmDeleteBtn: {
     flex: 1,
@@ -1127,7 +1127,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#fff',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   roleModalContent: {
     backgroundColor: '#fff',
@@ -1167,7 +1167,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#3b82f6',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   roleOptionTextSelected: {
     color: '#fff',

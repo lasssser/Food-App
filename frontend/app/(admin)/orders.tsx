@@ -307,13 +307,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
   },
   headerSubtitle: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginTop: 4,
   },
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
   filterText: {
     fontSize: 13,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '500',
   },
   filterTextActive: {
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   statusBadge: {
     paddingHorizontal: 10,
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: '600',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   orderInfo: {
     borderTopWidth: 1,
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
   infoValue: {
     fontSize: 14,
     color: '#374151',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginRight: 8,
   },
   orderFooter: {
@@ -415,13 +415,13 @@ const styles = StyleSheet.create({
   orderDate: {
     fontSize: 12,
     color: '#9ca3af',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   orderTotal: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#22c55e',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: '#9ca3af',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginTop: 12,
   },
   modalOverlay: {
@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   modalBody: {
     padding: 20,
@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   detailSection: {
     marginBottom: 20,
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginBottom: 12,
   },
@@ -496,13 +496,13 @@ const styles = StyleSheet.create({
   detailLabel: {
     fontSize: 14,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   detailValue: {
     fontSize: 14,
     fontWeight: '500',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   itemRow: {
     flexDirection: 'row',
@@ -515,13 +515,13 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 14,
     color: '#374151',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   itemPrice: {
     fontSize: 14,
     fontWeight: '500',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   totalSection: {
     backgroundColor: '#f8fafc',
@@ -537,12 +537,12 @@ const styles = StyleSheet.create({
   totalLabel: {
     fontSize: 14,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   totalValue: {
     fontSize: 14,
     color: '#374151',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   grandTotalRow: {
     borderTopWidth: 1,
@@ -555,12 +555,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   grandTotalValue: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#22c55e',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
 });

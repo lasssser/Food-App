@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   listContent: {
     padding: SPACING.lg,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.textPrimary,
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginLeft: SPACING.md,
   },
@@ -289,12 +289,12 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: '600',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   complaintMessage: {
     fontSize: 14,
     color: COLORS.textSecondary,
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     lineHeight: 20,
   },
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   complaintDate: {
     fontSize: 12,
     color: COLORS.textLight,
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   responseIndicator: {
     flexDirection: 'row',
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#22c55e',
     fontWeight: '600',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -332,13 +332,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: COLORS.textSecondary,
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginTop: SPACING.md,
   },
   emptySubtext: {
     fontSize: 14,
     color: COLORS.textLight,
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginTop: SPACING.xs,
   },
   modalOverlay: {
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: COLORS.textPrimary,
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   modalBody: {
     padding: SPACING.lg,
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: COLORS.textPrimary,
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginTop: SPACING.md,
   },
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: COLORS.textSecondary,
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginBottom: SPACING.sm,
   },
@@ -399,14 +399,14 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 15,
     color: COLORS.textPrimary,
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     lineHeight: 24,
   },
   dateText: {
     fontSize: 12,
     color: COLORS.textLight,
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginTop: SPACING.sm,
   },
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#166534',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   responseBox: {
     backgroundColor: '#fff',
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
   responseDateText: {
     fontSize: 12,
     color: '#166534',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginTop: SPACING.sm,
   },
@@ -455,6 +455,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#92400e',
     fontWeight: '500',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
 });

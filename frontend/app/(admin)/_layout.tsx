@@ -22,7 +22,7 @@ export default function AdminLayout() {
           borderTopColor: '#e5e7eb',
         },
         tabBarLabelStyle: {
-          fontFamily: 'System',
+          fontFamily: 'Cairo_400Regular',
           fontSize: 11,
           fontWeight: '600',
         },

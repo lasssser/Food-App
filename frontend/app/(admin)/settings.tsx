@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   profileInfo: {
     flex: 1,
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   adminBadge: {
     flexDirection: 'row',
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
   adminBadgeText: {
     fontSize: 12,
     color: '#fff',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginRight: 6,
   },
   scrollView: {
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginBottom: 12,
   },
@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
   },
   dangerText: {
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
   menuItemSubtitle: {
     fontSize: 13,
     color: '#9ca3af',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginTop: 2,
   },
@@ -567,12 +567,12 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 14,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   footerSubtext: {
     fontSize: 12,
     color: '#9ca3af',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginTop: 4,
   },
   modalOverlay: {
@@ -601,13 +601,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginBottom: 8,
   },
   confirmMessage: {
     fontSize: 15,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'center',
     marginBottom: 24,
   },
@@ -629,7 +629,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   dangerBtn: {
     backgroundColor: '#ef4444',
@@ -638,7 +638,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#fff',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   infoModal: {
     backgroundColor: '#fff',
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   aboutContent: {
     padding: 20,
@@ -683,19 +683,19 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginBottom: 4,
   },
   appVersion: {
     fontSize: 14,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginBottom: 16,
   },
   appDescription: {
     fontSize: 15,
     color: '#4b5563',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 20,
@@ -713,12 +713,12 @@ const styles = StyleSheet.create({
   featureText: {
     fontSize: 12,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   copyright: {
     fontSize: 12,
     color: '#9ca3af',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   policyContent: {
     padding: 20,
@@ -727,7 +727,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginBottom: 8,
     marginTop: 16,
@@ -735,7 +735,7 @@ const styles = StyleSheet.create({
   policyText: {
     fontSize: 14,
     color: '#4b5563',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     lineHeight: 22,
   },
@@ -746,7 +746,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#374151',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginBottom: 8,
   },
@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
     padding: 14,
     fontSize: 15,
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginBottom: 16,
     borderWidth: 1,
@@ -773,6 +773,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
 });

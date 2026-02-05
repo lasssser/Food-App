@@ -342,13 +342,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
   },
   headerSubtitle: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginTop: 4,
   },
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   filterText: {
     fontSize: 13,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     fontWeight: '500',
   },
   filterTextActive: {
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginLeft: 12,
   },
@@ -422,12 +422,12 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: '600',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   complaintDescription: {
     fontSize: 14,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     lineHeight: 20,
   },
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
   complaintDate: {
     fontSize: 12,
     color: '#9ca3af',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   userInfo: {
     flexDirection: 'row',
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 13,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginRight: 6,
   },
   orderTag: {
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#6366f1',
     fontWeight: '600',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: '#9ca3af',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     marginTop: 12,
   },
   modalOverlay: {
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   modalBody: {
     padding: 20,
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginTop: 12,
   },
@@ -535,13 +535,13 @@ const styles = StyleSheet.create({
   detailLabel: {
     fontSize: 14,
     color: '#6b7280',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   detailValue: {
     fontSize: 14,
     fontWeight: '500',
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   descriptionSection: {
     marginBottom: 20,
@@ -550,14 +550,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#374151',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginBottom: 8,
   },
   descriptionText: {
     fontSize: 14,
     color: '#4b5563',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     lineHeight: 22,
     backgroundColor: '#f8fafc',
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#374151',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginBottom: 8,
   },
@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
     padding: 16,
     fontSize: 14,
     color: '#1f2937',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     minHeight: 100,
     borderWidth: 1,
@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
   },
   previousResponseSection: {
     backgroundColor: '#f0fdf4',
@@ -615,14 +615,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#166534',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     marginBottom: 8,
   },
   previousResponseText: {
     fontSize: 14,
     color: '#166534',
-    fontFamily: 'System',
+    fontFamily: 'Cairo_400Regular',
     textAlign: 'right',
     lineHeight: 22,
   },
