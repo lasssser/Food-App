@@ -372,12 +372,13 @@ export default function AddOnsManagement() {
               <Text style={styles.inputLabel}>الخيارات *</Text>
               {formOptions.map((option, index) => (
                 <View key={index} style={styles.optionRow}>
-                  <TouchableOpacity
-                    style={styles.removeOptionButton}
-                    onPress={() => removeOption(index)}
-                  >
-                    <Ionicons name="close-circle" size={24} color={COLORS.error} />
-                  </TouchableOpacity>
+                  <TextInput
+                    style={[styles.input, styles.nameInput]}
+                    value={option.name}
+                    onChangeText={(val) => updateOption(index, 'name', val)}
+                    placeholder="اسم الخيار"
+                    textAlign="right"
+                  />
                   <TextInput
                     style={[styles.input, styles.priceInput]}
                     value={option.price > 0 ? option.price.toString() : ''}
@@ -386,13 +387,12 @@ export default function AddOnsManagement() {
                     keyboardType="numeric"
                     textAlign="right"
                   />
-                  <TextInput
-                    style={[styles.input, styles.nameInput]}
-                    value={option.name}
-                    onChangeText={(val) => updateOption(index, 'name', val)}
-                    placeholder="اسم الخيار"
-                    textAlign="right"
-                  />
+                  <TouchableOpacity
+                    style={styles.removeOptionButton}
+                    onPress={() => removeOption(index)}
+                  >
+                    <Ionicons name="close-circle" size={24} color={COLORS.error} />
+                  </TouchableOpacity>
                 </View>
               ))}
 
