@@ -246,9 +246,9 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xxl,
   },
   logoContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
     backgroundColor: 'rgba(255,255,255,0.15)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -258,8 +258,8 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   logoImage: {
-    width: 140,
-    height: 140,
+    width: 180,
+    height: 180,
   },
   logoEmoji: {
     fontSize: 50,
