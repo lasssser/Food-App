@@ -220,16 +220,14 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     padding: SPACING.lg,
-    paddingTop: SPACING.sm,
-    paddingBottom: SPACING.md,
   },
 
   // Header
   header: {
     alignItems: 'center',
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.md,
   },
   logoContainer: {
     width: 90,
