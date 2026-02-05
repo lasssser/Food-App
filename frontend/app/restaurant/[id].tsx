@@ -253,7 +253,7 @@ export default function RestaurantScreen() {
           style={styles.heroImage}
         />
         <LinearGradient
-          colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.85)']}
+          colors={['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.9)']}
           style={styles.heroOverlay}
         />
         
