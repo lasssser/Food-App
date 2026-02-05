@@ -931,13 +931,15 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface,
     borderTopLeftRadius: RADIUS.xl,
     borderTopRightRadius: RADIUS.xl,
-    padding: SPACING.xl,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.md,
+    paddingBottom: SPACING.lg,
     ...SHADOWS.large,
   },
   totalRow: {
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
-    marginBottom: SPACING.sm,
+    marginBottom: 4,
   },
   totalRowFinal: {
     marginTop: SPACING.sm,
