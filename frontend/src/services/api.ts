@@ -540,4 +540,54 @@ export const adminRoleRequestsAPI = {
   },
 };
 
+// Advertisements API
+export const advertisementsAPI = {
+  getAll: async (activeOnly: boolean = true) => {
+    const response = await api.get(`/advertisements?active_only=${activeOnly}`);
+    return response.data;
+  },
+  create: async (data: {
+    title: string;
+    image_url: string;
+    link_type?: string;
+    link_value?: string;
+    is_active?: boolean;
+    order?: number;
+  }) => {
+    const response = await api.post('/admin/advertisements', data);
+    return response.data;
+  },
+  update: async (adId: string, data: {
+    title: string;
+    image_url: string;
+    link_type?: string;
+    link_value?: string;
+    is_active?: boolean;
+    order?: number;
+  }) => {
+    const response = await api.put(`/admin/advertisements/${adId}`, data);
+    return response.data;
+  },
+  delete: async (adId: string) => {
+    const response = await api.delete(`/admin/advertisements/${adId}`);
+    return response.data;
+  },
+};
+
+// Admin Statistics API
+export const adminStatisticsAPI = {
+  getRestaurantStats: async () => {
+    const response = await api.get('/admin/statistics/restaurants');
+    return response.data;
+  },
+  getOverview: async () => {
+    const response = await api.get('/admin/statistics/overview');
+    return response.data;
+  },
+  toggleFeatured: async (restaurantId: string, isFeatured: boolean) => {
+    const response = await api.put(`/admin/restaurants/${restaurantId}/feature?is_featured=${isFeatured}`);
+    return response.data;
+  },
+};
+
 export default api;
