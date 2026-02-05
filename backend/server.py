@@ -2940,9 +2940,9 @@ async def change_user_role(
 ):
     """Change user role (admin)"""
     # Validate role
-    valid_roles = ["customer", "restaurant", "driver"]
+    valid_roles = ["customer", "restaurant", "driver", "moderator"]
     if request.role not in valid_roles:
-        raise HTTPException(status_code=400, detail="الدور غير صالح. الأدوار المتاحة: زبون، مطعم، سائق")
+        raise HTTPException(status_code=400, detail="الدور غير صالح. الأدوار المتاحة: زبون، مطعم، سائق، مشرف")
     
     user = await db.users.find_one({"id": user_id})
     if not user:
