@@ -126,6 +126,10 @@ export const restaurantAPI = {
     const response = await api.get(`/restaurants/${restaurantId}/menu/${menuItemId}/addons`);
     return response.data;
   },
+  getPaymentMethods: async (restaurantId: string) => {
+    const response = await api.get(`/restaurants/${restaurantId}/payment-methods`);
+    return response.data;
+  },
 };
 
 export const addressAPI = {
