@@ -248,6 +248,28 @@ export default function RestaurantOrders() {
     }
   };
 
+  const handleConfirmPayment = async (orderId: string) => {
+    try {
+      await restaurantPanelAPI.confirmOrderPayment(orderId);
+      fetchOrders();
+      alert('تم تأكيد الدفع بنجاح');
+    } catch (error: any) {
+      console.error('Error confirming payment:', error);
+      alert(error.response?.data?.detail || 'فشل في تأكيد الدفع');
+    }
+  };
+
+  const handleRejectPayment = async (orderId: string) => {
+    try {
+      await restaurantPanelAPI.rejectOrderPayment(orderId);
+      fetchOrders();
+      alert('تم رفض الدفع وإلغاء الطلب');
+    } catch (error: any) {
+      console.error('Error rejecting payment:', error);
+      alert(error.response?.data?.detail || 'فشل في رفض الدفع');
+    }
+  };
+
   const callNumber = (phone: string) => {
     Linking.openURL(`tel:${phone}`);
   };
