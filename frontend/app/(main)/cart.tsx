@@ -21,6 +21,8 @@ export default function CartScreen() {
   const router = useRouter();
   const { items, restaurant, updateQuantity, removeItem, clearCart, getSubtotal, getItemCount } = useCartStore();
   const { isGuest, isAuthenticated } = useAuthStore();
+  const [showNotes, setShowNotes] = useState(false);
+  const [orderNotes, setOrderNotes] = useState('');
 
   const subtotal = getSubtotal();
   const deliveryFee = restaurant?.delivery_fee || 5000;
