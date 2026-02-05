@@ -425,6 +425,52 @@ export default function RestaurantOrders() {
                 <Text style={styles.notesText}>{order.notes}</Text>
               </View>
             )}
+
+            {/* Payment Info - for pending verification orders */}
+            {order.payment_status === 'pending_verification' && (
+              <View style={styles.paymentVerificationSection}>
+                <View style={styles.paymentVerificationHeader}>
+                  <Ionicons name="time" size={20} color="#FF9800" />
+                  <Text style={styles.paymentVerificationTitle}>بانتظار تأكيد الدفع</Text>
+                </View>
+                
+                <View style={styles.paymentDetailsBox}>
+                  <View style={styles.paymentDetailRow}>
+                    <Text style={styles.paymentDetailValue}>
+                      {order.payment_method === 'mtn_cash' ? 'MTN Cash' : 
+                       order.payment_method === 'syriatel_cash' ? 'Syriatel Cash' : 
+                       order.payment_method === 'shamcash' ? 'ShamCash' : order.payment_method}
+                    </Text>
+                    <Text style={styles.paymentDetailLabel}>طريقة الدفع:</Text>
+                  </View>
+                  {(order as any).payment_transaction_id && (
+                    <View style={styles.paymentDetailRow}>
+                      <Text style={[styles.paymentDetailValue, styles.transactionIdText]}>
+                        {(order as any).payment_transaction_id}
+                      </Text>
+                      <Text style={styles.paymentDetailLabel}>رقم العملية:</Text>
+                    </View>
+                  )}
+                </View>
+
+                <View style={styles.paymentActionButtons}>
+                  <TouchableOpacity 
+                    style={[styles.paymentActionBtn, styles.rejectPaymentBtn]}
+                    onPress={() => handleRejectPayment(order.id)}
+                  >
+                    <Ionicons name="close-circle" size={20} color="#FFF" />
+                    <Text style={styles.paymentActionBtnText}>رفض</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[styles.paymentActionBtn, styles.confirmPaymentBtn]}
+                    onPress={() => handleConfirmPayment(order.id)}
+                  >
+                    <Ionicons name="checkmark-circle" size={20} color="#FFF" />
+                    <Text style={styles.paymentActionBtnText}>تأكيد الدفع</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
           </View>
         )}
 
