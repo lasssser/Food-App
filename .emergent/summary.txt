@@ -1,107 +1,117 @@
 <analysis>
 
-**original_problem_statement**: The user wants to build a food delivery mobile application, now named أكلة عالسريع (Akla Aalsaree). The initial goal was to finalize the Admin Panel functionality. Throughout the session, the user added numerous feature requests and provided UI/UX feedback.
+<original_problem_statement>
+The user initially requested to complete the Role Change Request feature, stating that all previous issues were resolved.
 
-The main requests implemented in this session were:
-1.  **Fix Admin Panel**: Resolve the non-functional Delete User button.
-2.  **UI/UX Overhaul**:
-    *   Redesign the registration page to match the login page.
-    *   Change the application-wide font to Cairo.
-    *   Rebrand the application with a new name (أكلة عالسريع), a new logo, and an icon.
-    *   Fix text contrast issues and polish the UI on several pages, especially the login and restaurant details screens.
-3.  **New Admin/Moderator Features**:
-    *   Add a tool for the admin to delete all test/seed data.
-    *   Allow admins to change a user's role (customer, driver, restaurant owner).
-    *   Introduce a new Moderator role with limited permissions (managing users and complaints only).
-    *   Allow the admin to set the customer support WhatsApp number dynamically from the admin panel.
-4.  **New Customer Features**:
-    *   Allow customers to specify their delivery address by selecting a location on a map.
-    *   Add an About page with the developer's (Wethaq Digital) information.
-5.  **General Maintenance**:
-    *   Remove all references to emergent from the codebase and project files.
-    *   Ensure user login sessions are persistent (Remember Me).
+Throughout the session, the user added several new feature requests and bug fixes:
+1.  **Bug:** A white screen appeared on iPhone devices after scanning the Expo Go QR code.
+2.  **Change Request:** Revert the payment system logic. Cash on Delivery (COD) should be available to all users by default, without requiring prior account verification. The default payment methods should be COD, ShamCash, Syriatel Cash, and MTN Cash.
+3.  **Bug:** The Add notes to order button on the checkout page was not working.
+4.  **Feature:** Improve the Select your location UI on the home page.
+5.  **Feature:** Implement an admin-controlled advertisement slider on the home page.
+6.  **Feature:** Allow the admin to feature a restaurant, making it appear first in the list.
+7.  **Feature (Iterative):** An admin page for statistics.
+    *   V1: Show total order count per restaurant.
+    *   V2: Show monthly order and revenue stats for all restaurants.
+    *   V3: Show only monthly order count (no revenue).
+    *   V4 (Current Requirement): Show a list of restaurants. When an admin clicks on a restaurant, display its monthly order statistics.
+
+PRODUCT REQUIREMENTS:
+1.  **Role Change Requests (Completed)**: A customer can apply for a 'driver' or 'restaurant_owner' role. The request is sent to the Admin for approval/rejection.
+2.  **Advertisement System (Completed)**: Admin can create, update, and delete image-based advertisements that are displayed in a slider on the customer's home page.
+3.  **Featured Restaurants (Completed)**: Admin can mark a restaurant as featured, which prioritizes it in the customer-facing list.
+4.  **Admin Statistics (In Progress)**: An admin dashboard to view order statistics. The current requirement is a restaurant-centric view showing monthly order counts for a selected restaurant.
+5.  **Simplified Payments (Completed)**: COD is a default payment option available to all users. The account verification flow for enabling COD has been removed.
+</original_problem_statement>
 
 **User's preferred language**: اللغة العربية (Arabic). The next agent MUST respond in Arabic.
 
 **what currently exists?**
-The application is a full-stack food delivery platform with Customer, Restaurant, Driver, Admin, and the newly added Moderator roles.
-
-Key additions/changes in this session:
--   **Branding**: The app is now named أكلة عالسريع, with a new logo and icon integrated into  and the login screen.
--   **Font**: The entire application has been updated to use the Cairo font, which is loaded in the root layout.
--   **Admin Panel**:
-    -   The Delete User button is now functional, using a confirmation modal.
-    -   Admins can change any user's role, including promoting a user to Moderator.
-    -   A Developer Tools section was added to the settings, allowing an admin to clear all seed data from the database.
-    -   A General Settings section was added for the admin to update the support WhatsApp number.
--   **Moderator Role**: A new moderator role was created in the backend with permissions limited to user and complaint management. Moderators can log in and see a restricted version of the admin panel.
--   **Persistent Login**: The JWT token duration is set to 7 days, providing a remember me functionality.
--   **UI/UX Polish**: The registration page has been redesigned. The login page logo has been significantly restyled per user feedback. Text contrast issues on the restaurant details page have been addressed. The About page now correctly displays the app logo and developer information.
--   **Code Cleanup**: The  folder and  library have been removed from the project.
+The application is a full-stack food delivery platform. In this session, the agent successfully implemented a complete Role Change Request workflow. A critical bug causing a white screen on iOS was diagnosed (React version mismatch, large image assets) and fixed. A major change was made to the payment system, removing the COD verification requirement and setting default payment methods. Additionally, several new features requested by the user were implemented: an admin-controlled ad slider on the home page, a system for featuring restaurants, and an admin statistics page that has gone through multiple UI/UX iterations.
 
 **Last working item**:
--   **Last item agent was working**: Fixing the poor text contrast on the restaurant details page (). The agent increased the gradient overlay's opacity and added a text shadow to the restaurant's name and stats to make them readable against the background image.
--   **Status**: USER VERIFICATION PENDING
--   **Agent Testing Done**: Y (by restarting the server and assuming the visual change is applied).
--   **Which testing method agent to use?**: screenshot tool. The agent should navigate to a restaurant detail page to visually confirm that the text is now clearly visible.
--   **User Testing Done**: N
+-   Last item agent was working: Refactoring the Admin Statistics page () for the third time to match the user's latest requirement. The new design should first display a list of all restaurants. Clicking on a restaurant should then show the monthly order statistics for only that selected restaurant.
+-   Status: IN PROGRESS
+-   Agent Testing Done: N
+-   Which testing method agent to use?: Frontend testing agent. The agent needs to verify the new UI flow on the statistics page:
+    1. Log in as admin ( / ).
+    2. Navigate to the statistics page.
+    3. Verify a list of restaurants is displayed.
+    4. Click on a restaurant.
+    5. Verify that a new view appears showing the monthly order count for that specific restaurant.
+-   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1**: Critical Bug: The Map-based location picking feature is completely broken. (P0)
--   **Issue 2**: Critical Bug: Driver action buttons disappear after accepting an order. (P0)
--   **Issue 3**: The new Moderator role has been implemented but has not been tested end-to-end. (P1)
+-   Issue 1: The backend API for statistics might need to be updated to support fetching data for a single restaurant. (P0)
+-   Issue 2: Critical Bug: Driver action buttons disappear after accepting an order. (P1 - RECURRING)
+-   Issue 3: The UI for restaurant owners to manage their own custom payment methods is still missing. (P1)
+-   Issue 4: The Map-based location picking feature is broken/disabled. (P2)
 
 **Issues Detail**:
 -   **Issue 1**:
-    -   **Description**: The user requested a feature for customers to pick their address from a map. The agent installed , which worked on native but crashed the web preview. To fix the preview, the agent uninstalled , effectively disabling the entire feature. The code to support it (, , and changes in ) exists but is non-functional.
-    -   **Attempted fixes**: The agent tried conditional imports but failed. The final action was to remove the library.
-    -   **Next debug checklist**:
-        1.  Re-install .
-        2.  In all files that import  (e.g., , ), wrap the map-related code in a platform check: .
-        3.  Ensure the components that *use*  and  (like  and ) handle the possibility of the map not rendering on the web.
-        4.  Verify that the app runs on web (showing the fallback text) and that the map functionality is testable on native.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is a key feature requested by the user to improve the address selection user experience.
-    -   **Status**: NOT STARTED
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: frontend
-    -   **Blocked on other issue**: None.
+    -   Description: The agent last modified the frontend file  to change the UI flow. However, the backend API  was designed to fetch stats for *all* restaurants. It may not support filtering by a single . When implementing the new UI, the agent did not modify the backend.
+    -   Attempted fixes: None. This is a potential issue with the last change.
+    -   Next debug checklist:
+        1.  Review the new implementation in .
+        2.  Check if the frontend is attempting to pass a  to the API.
+        3.  Review the backend implementation of  in .
+        4.  If needed, modify the backend endpoint to accept an optional  query parameter and add it to the MongoDB aggregation's  stage.
+    -   Why fix this issue and what will be achieved with the fix?: To complete the user's latest request for the statistics page.
+    -   Status: IN PROGRESS
+    -   Is recurring issue?: N
+    -   Should Test frontend/backend/both after fix?: both
+    -   Blocked on other issue: None.
 
 -   **Issue 2**:
-    -   **Description**: A critical bug reported in previous sessions remains unfixed. When a driver accepts an order, the action buttons (Picked up, Start Delivery, etc.) on the  screen do not render, blocking the entire delivery workflow.
-    -   **Attempted fixes**: None in this session. The agent has consistently overlooked this issue.
-    -   **Next debug checklist**:
+    -   Description: A critical, recurring bug from previous sessions. When a driver accepts an order, the action buttons (Picked up, Start Delivery, etc.) on the  screen do not render, blocking the entire delivery workflow. This was noted in the initial handover but was not addressed.
+    -   Attempted fixes: None in this session.
+    -   Next debug checklist:
         1.  Examine .
-        2.  Inside the  function, add  statements to check the value of  and the resolved  object from .
-        3.  Trace the state of an order from pending to driver_assigned and verify the status is updated correctly in the database and fetched correctly by the driver's app.
-        4.  Inspect the JSX for the action button to see why it might not be rendering for the  status.
-    -   **Why fix this issue and what will be achieved with the fix?**: This breaks the core functionality for drivers, making the app unusable for deliveries. It is a top-priority bug.
-    -   **Status**: NOT STARTED
-    -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: frontend
-    -   **Blocked on other issue**: None.
+        2.  Log the value of  and trace its lifecycle from pending to driver_assigned.
+        3.  Verify the component correctly maps the status to the corresponding action buttons.
+    -   Why fix this issue and what will be achieved with the fix?: This breaks the core driver workflow, making the app unusable for deliveries.
+    -   Status: NOT STARTED
+    -   Is recurring issue?: Y
+    -   Should Test frontend/backend/both after fix?: frontend
+    -   Blocked on other issue: None.
 
 -   **Issue 3**:
-    -   **Description**: The agent implemented the backend and frontend changes for a Moderator role, but there's no confirmation that it works as intended.
-    -   **Attempted fixes**: None.
-    -   **Next debug checklist**:
-        1.  Log in as admin.
-        2.  Create a new user or pick an existing one and change their role to moderator.
-        3.  Log out and log in with the new moderator's credentials.
-        4.  Verify the moderator is redirected to the .
-        5.  Verify the moderator can see and interact with the Users and Complaints tabs.
-        6.  Verify the moderator **cannot** see admin-only features like Developer Tools or General Settings in the settings tab.
-    -   **Why fix this issue and what will be achieved with the fix?**: To confirm that the new user role and its permissions are working correctly as requested.
-    -   **Status**: NOT STARTED
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: both
-    -   **Blocked on other issue**: None.
+    -   Description: The file  was created in a previous session but remains empty. While the user's recent change request made COD and other methods default, the original feature for a restaurant to define its own unique payment methods is still unimplemented and unusable.
+    -   Attempted fixes: None.
+    -   Next debug checklist: Implement the UI in  to allow restaurant owners to add, edit, and delete their payment methods, connecting it to the existing backend APIs.
+    -   Why fix this issue and what will be achieved with the fix?: This will complete the Flexible Payment System feature as originally intended.
+    -   Status: NOT STARTED
+    -   Is recurring issue?: N
+    -   Should Test frontend/backend/both after fix?: frontend
+    -   Blocked on other issue: None.
+
+-   **Issue 4**:
+    -   Description: The feature for customers to pick their address from a map is disabled because  was uninstalled due to web compatibility issues. The code exists but is non-functional.
+    -   Attempted fixes: None in this session. The agent improved the text-based location selector but did not restore map functionality.
+    -   Next debug checklist:
+        1.  Re-install a web-compatible maps library (e.g.,  for web and  for native, with platform-specific code).
+        2.  Re-enable the map feature in the UI.
+    -   Why fix this issue and what will be achieved with the fix?: Restores a key UX feature for accurate address selection.
+    -   Status: NOT STARTED
+    -   Is recurring issue?: N
+    -   Should Test frontend/backend/both after fix?: frontend
+    -   Blocked on other issue: None.
 
 **In progress Task List**:
--   None.
+-   **Task 1**: Finalize the implementation of the Admin Statistics page. (P0)
+
+**Task Detail**:
+-   **Task 1**:
+    -   Where to resume: The file  has been overwritten with a new structure. The agent must now verify the backend supports this new flow and test it end-to-end. See Pending/In progress Issue list - Issue 1 for the next steps.
+    -   What will be achieved with this?: Fulfills the user's latest, specific requirement for how statistics should be displayed.
+    -   Status: IN PROGRESS
+    -   Should Test frontend/backend/both after fix?: both
+    -   Blocked on something: None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks**:
-    -   **P1**: Implement the final app icon. The user provided a logo but mentioned they would provide the icon later. The current icon is a placeholder.
+    -   **P1**: Improve the Select your location UI/UX on the home page (the user requested improvement, but it might require more work).
+    -   **P2**: Implement the final app icon.
 -   **Future Tasks**:
     -   Add the ability to export reports as a PDF file.
     -   Link image uploads to a cloud storage service like S3.
@@ -110,117 +120,134 @@ Key additions/changes in this session:
     -   Integrate the official ShamCash API.
 
 **Completed work in this session**
--   **App Rebranding**: Changed the app name to أكلة عالسريع, updated the logo on the login screen, and set the new app icon in .
--   **Font Migration**: Changed the application-wide font from 'System' to 'Cairo' and updated all relevant style sheets.
--   **Admin/Moderator Features**:
-    -   Implemented a new Moderator role with limited permissions.
-    -   Gave Admins the ability to change any user's role.
-    -   Created a tool for Admins to clear all seed/test data.
-    -   Created a setting for Admins to change the support WhatsApp number.
--   **UI/UX Fixes**:
-    -   Fixed the Delete User button in the admin panel using a proper confirmation modal.
-    -   Redesigned the  page to match the  page's aesthetic.
-    -   Fixed text contrast on the restaurant detail page hero image.
-    -   Fixed the About modal to display the correct app and developer logos.
-    -   Iteratively adjusted the login screen logo size and layout to the user's satisfaction.
--   **Code Cleanup**: Removed all emergent references, including the  directory and the  python package.
+-   **Role Change Request Feature**: Fully implemented and tested. Includes backend APIs, a customer application modal in their profile, and an admin management page.
+-   **iOS White Screen Bug Fix**: Resolved a critical crash on iOS by upgrading the React version to resolve inconsistencies and compressing oversized image assets that were causing memory issues.
+-   **Payment System Rework**: Modified the checkout flow to remove the COD verification requirement. COD, ShamCash, Syriatel Cash, and MTN Cash are now default payment options for all users.
+-   **Advertisement System**: Implemented a full-featured ad system. Admin can manage ads (image, title, order, status) which are displayed in an auto-playing slider on the customer home page.
+-   **Featured Restaurants System**: Implemented a feature for admins to mark restaurants as featured, causing them to appear first in the main restaurant list with a special badge.
+-   **Bug Fix**: Fixed the non-functional Add notes to order button on the checkout page by adding appropriate props to the TextInput.
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue 1**: Driver action buttons disappear after accepting an order.
-    -   **Debug checklist**: See Issues Detail, Issue #2.
-    -   **Why to solve this issue and what will be achieved with this?**: This is a critical, multi-session bug that breaks the core driver workflow.
-    -   **Should Test frontend/backend/both after fix**: frontend
-    -   **Is recurring issue?**: Y
+-   **Issue 1**: Driver action buttons disappear after accepting an order. (See **All Pending/In progress Issue list** - Issue 2).
+-   **Issue 2**: Map-based location picking is broken. (See **All Pending/In progress Issue list** - Issue 4).
+-   **Issue 3**: The restaurant-specific payment method management page () is empty. (See **All Pending/In progress Issue list** - Issue 3).
 
 **Known issue recurrence from previous fork**
 -   **Issue recurrence in previous fork**: The Driver action buttons disappear bug.
--   **Recurrence count**: 3+
+-   **Recurrence count**: 5+
 -   **Status**: NOT STARTED
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Font Loading**: Using  and  in the root  to load and apply a custom font globally.
--   **Role-Based Access Control (RBAC)**: Using FastAPI's dependency injection to create layered permissions (, ) for API endpoints.
--   **Platform Compatibility**: Encountered and failed to properly resolve a critical issue with  not being compatible with the web preview, leading to the feature being disabled.
--   **Dynamic Configuration**: Implemented a  collection in MongoDB and corresponding APIs to allow admins to change app behavior (like the support number) without a code change.
+-   **MongoDB Aggregation Pipeline**: Used in  to efficiently calculate monthly order statistics per restaurant by grouping by year, month, and restaurant ID.
+-   **Iterative UI/UX Development**: The  page was rapidly prototyped and refactored multiple times in one session based on precise user feedback.
+-   **React Native Debugging (iOS)**: Diagnosed and fixed a critical white screen crash by identifying a React version mismatch and memory issues from large image assets.
+-   **Asset Optimization**: Used  to compress large PNG files, improving app performance and stability on mobile.
+-   **Feature Flagging (Implicit)**: The  boolean field on the  collection acts as a feature flag to control restaurant visibility.
+-   **Dynamic API Sorting**: The  endpoint was modified to use a multi-key sort  to always return featured items first.
 
 **key DB schema**
--   **settings**:  (NEW) - Stores global application settings.
--   **users**: The  field can now be .
+-   **restaurants**: Contains a new boolean field .
+-   **role_change_requests**:  - Stores user requests to change their role.
+-   **advertisements**: (NEW)  - Stores data for the home page ad slider.
 
 **changes in tech stack**
--   : Added for custom font.
--   : Added for map feature (currently broken).
--   : Added and then removed due to web compatibility issues.
--   : Removed.
+-    was installed via apt 2.6.1 (arm64)
+Usage: apt-get [options] command
+       apt-get [options] install|remove pkg1 [pkg2 ...]
+       apt-get [options] source pkg1 [pkg2 ...]
+
+apt-get is a command line interface for retrieval of packages
+and information about them from authenticated sources and
+for installation, upgrade and removal of packages together
+with their dependencies.
+
+Most used commands:
+  update - Retrieve new lists of packages
+  upgrade - Perform an upgrade
+  install - Install new packages (pkg is libc6 not libc6.deb)
+  reinstall - Reinstall packages (pkg is libc6 not libc6.deb)
+  remove - Remove packages
+  purge - Remove packages and config files
+  autoremove - Remove automatically all unused packages
+  dist-upgrade - Distribution upgrade, see apt-get(8)
+  dselect-upgrade - Follow dselect selections
+  build-dep - Configure build-dependencies for source packages
+  satisfy - Satisfy dependency strings
+  clean - Erase downloaded archive files
+  autoclean - Erase old downloaded archive files
+  check - Verify that there are no broken dependencies
+  source - Download source archives
+  download - Download the binary package into the current directory
+  changelog - Download and display the changelog for the given package
+
+See apt-get(8) for more information about the available commands.
+Configuration options and syntax is detailed in apt.conf(5).
+Information about how to configure sources can be found in sources.list(5).
+Package and version choices can be expressed via apt_preferences(5).
+Security details are available in apt-secure(8).
+                                        This APT has Super Cow Powers. for server-side image compression.
+-    and  versions were updated to  to resolve dependency conflicts.
 
 **All files of reference**
--   **/app/backend/server.py**: Major updates for new roles and admin features.
--   **/app/frontend/app/(admin)/users.tsx**: Core file for new role management.
--   **/app/frontend/app/(admin)/settings.tsx**: Core file for new admin tools.
--   **/app/frontend/app/(auth)/login.tsx**: Heavily modified for UI/UX.
--   **/app/frontend/app/_layout.tsx**: Foundational change for the new font.
--   **/app/frontend/app/restaurant/[id].tsx**: Multiple UI fixes for text contrast.
--   **/app/frontend/src/components/LocationPicker.tsx**: New, but non-functional file.
-
-**Areas that need refactoring**:
--   The implementation of the map feature needs to be redone with proper platform-specific handling () to avoid crashing the web preview.
--   The repeated application of  in many stylesheets could potentially be simplified by creating a global  component that uses the font by default, or by ensuring the root  override is sufficient.
-
-**key api endpoints**
--    (POST): **NEW** - Deletes all non-admin user-generated content.
--    (PUT): **NEW** - Changes a user's role.
--    (GET): **NEW** - Fetches global app settings.
--    (PUT): **NEW** - Updates global app settings.
+-   **/app/frontend/app/(admin)/statistics.tsx**: The file currently being worked on. It needs to be finished and tested.
+-   **/app/backend/server.py**: Contains all the new backend logic, including the statistics aggregation pipeline.
+-   **/app/frontend/app/(main)/home.tsx**: Contains the new advertisement slider.
+-   **/app/frontend/app/(main)/checkout.tsx**: Contains the reworked, simplified payment logic.
+-   **/app/frontend/app/(main)/profile.tsx**: Contains the customer-facing part of the role-request feature.
 
 **Critical Info for New Agent**
--   **Highest Priorities**:
-    1.  **Fix Broken Map Feature (P0)**: The location picking feature is completely disabled because  was uninstalled. You must re-implement this with a proper web fallback.
-    2.  **Fix Critical Driver Bug (P0)**: The session-old bug where driver action buttons disappear after accepting an order is **STILL NOT FIXED**. This breaks the app's core loop and must be addressed immediately.
-    3.  **Test Moderator Role (P1)**: The new moderator role is implemented but untested. You must perform a full login and permission check.
--   **Admin Credentials**: Phone: , Password: . Note that login is via phone, not email.
+-   **IMMEDIATE TASK**: You must complete the  page. The user wants a list of restaurants that, when clicked, shows monthly stats for that restaurant. You need to **verify if the backend API supports this** and modify it if necessary before testing the frontend.
+-   **USER INTERACTION PATTERN**: The user provides very specific, iterative feedback, especially on UI/UX. Be prepared to refactor your work based on their comments. Show them screenshots frequently.
+-   **UNFIXED CRITICAL BUGS**: The user has previously said all issues are fixed but critical, recurring bugs like the **disappearing driver buttons** and the **broken map picker** remain. These were not addressed in this session and are high-priority technical debt. Be prepared for the user to report them again.
 
 **documents created in this job**
--   
--   
+-   /app/frontend/app/(admin)/role-requests.tsx
+-   /app/frontend/app/(admin)/advertisements.tsx
+-   /app/frontend/app/(admin)/statistics.tsx
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (latest)**: Unfortunately, it wasnt applied to all pages, roles, and tabs!!! Look:" - Reporting that the Cairo font was not globally applied. **Status: RESOLVED**
-2.  **User**: "Okay, now apply the Cairo font to all pages and tabs of the app." - Requesting a global font change. **Status: RESOLVED**
-3.  **User**: "Make it a bit bigger, then restart expo to apply the changes." - Fine-tuning the login screen logo size. **Status: RESOLVED**
-4.  **User**: "Okay, now make the logo bigger so it goes outside the red circle, while keeping the red circles place and size... then restart expo... - Specific instructions for the login screen logo. **Status: RESOLVED**
-5.  **User**: Restart expo to apply the changes. - User asking for a restart. **Status: RESOLVED**
-6.  **User**: I dont want it to be scrollable, I want it to be exactly the screen size." - Feedback on the login screen layout. **Status: RESOLVED**
-7.  **User**: "Why dont you understand???? Look at the image below, things are hidden because you enlarged the screen size!!! - Frustrated feedback that the agent's layout fix broke the view. **Status: RESOLVED**
-8.  **User**: Unfortunately, its still small, look:" - More feedback on the login logo size. **Status: RESOLVED**
-9.  **User**: "It should be a bit bigger, and it would be nicer if it came out of the circle ;)" - Initial feedback on the login logo size. **Status: RESOLVED**
-10. **User**: "This is the correct logo for the application. Ill give you the icon later, okay? Change it now. - Providing the final logo. **Status: RESOLVED**
+1.  **User (latest)**: I dont want it displayed this way! I want to see a list of restaurant names, and when I click on a restaurant name, I see the statistics tabs for the orders for each month. Do you understand me now?" - Requesting a complete redesign of the statistics page. **Status: IN PROGRESS**
+2.  **User**: "When I click here it takes me to a white screen, and I dont care about the restaurants revenue, I only care about knowing the number of orders for each restaurant for each month, and each restaurant is separate from the other. Do you understand me?" - Reporting a bug and clarifying the stats requirement. **Status: RESOLVED (but new requirement given)**
+3.  **User**: "I mean I want statistics for each restaurant separately each month about the number of orders they had through our application, meaning this month, there were this many orders for this restaurant... do you understand me?" - Clarifying the monthly statistics feature. **Status: IN PROGRESS**
+4.  **User**: "Okay, please continue with: testing the ads section on mobile, adding more ads from the admin panel, featuring favorite restaurants." - Approving the plan to test the new features. **Status: RESOLVED**
+5.  **User**: "Okay, excellent. When I press the add notes to order button, it doesnt work. Also, on the main page, can you improve Deliver to: Choose your location? And I want an ads section on the main page that the admin controls. And I want to be able to feature a restaurant so it appears first. Finally, the admin should be able to see the number of orders for each restaurant. Got it? - A large set of new feature requests and a bug report. **Status: Mostly RESOLVED**
+6.  **User**: We need to make a change, the payment must be optional for the user, meaning we have to go back to the user being able to pay cash without verification, and also Sham Cash, Syriatel Cash, and MTN Cash, do you understand me? - Requesting a major change to the payment logic. **Status: RESOLVED**
+7.  **User**: After I scan the QR code on my iPhone, the application loads but then the screen becomes completely white. - Reporting a critical bug. **Status: RESOLVED**
+8.  **User**: Provides an image of the  error on their phone. **Status: RESOLVED**
+9.  **User**: All problems have been solved and only this remains to be completed: Phase 2 - Complete the role change request feature... - Initial request for the session. **Status: RESOLVED**
+10. **Agent Summary**: A summary from the agent.
 
 **Project Health Check:**
--   **Working**: Core app flows (customer, restaurant), Admin/Moderator login, User/Complaint management, Branding, Fonts.
+-   **Working**: Core user flows (customer registration, ordering), Admin panel, Role change requests, Advertisement system, Restaurant featuring, Simplified payment flow.
 -   **Broken**:
+    -   **Critical**: Driver workflow is blocked due to missing action buttons ().
     -   **Critical**: Customer's ability to specify an address via map is non-existent.
-    -   **Critical**: Driver's ability to update order status after accepting an order is broken.
--   **Mocked**: Image storage (local), PDF generation, Payments (ShamCash).
+-   **Incomplete**:
+    -   Admin statistics page is in the middle of a refactor.
+    -   The feature for restaurants to manage their own payment methods is not implemented (UI file is empty).
 
 **3rd Party Integrations**
--   No new integrations.
+-   None new.
 
 **Testing status**
--   **Testing agent used after significant changes**: NO. Agent relied on manual  commands for the backend and visual inspection/restarts for the frontend.
+-   **Testing agent used after significant changes**: NO. The agent relied heavily on  for backend testing and the  for frontend testing.
 -   **Troubleshoot agent used after agent stuck in loop**: NO.
 -   **Test files created**: None.
--   **Known regressions**: The  feature was implemented and then removed, which is a major regression. The driver workflow bug persists.
+-   **Known regressions**: The map feature remains a regression.
 
 **Credentials to test flow:**
 -   **Admin**: Phone: , Password: 
+-   **Customer**: Phone: , Password: 
 -   **Restaurant Owner**: Phone: , Password: 
 -   **Driver**: Phone: , Password: 
--   **Customer**: Phone: , Password: 
 
 **What agent forgot to execute**
--   **CRITICAL**: The agent has now ignored the critical, multi-session driver action buttons disappear bug for the entire session, despite it being highlighted in the initial handover summary. This must be the absolute top priority for the next agent.
+-   **CRITICAL**: The agent did not address the long-standing, recurring bug with the **driver action buttons disappearing**.
+-   **CRITICAL**: The agent did not address the broken **map-based location picker**.
+-   **CRITICAL**: The agent never implemented the UI for restaurants to manage their own payment methods in the empty file .
+-   The agent did not perform end-to-end testing of the Moderator role, an item carried over from the previous session's handover.
 
 </analysis>
