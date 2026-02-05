@@ -119,10 +119,14 @@ export default function ProfileScreen() {
   };
 
   const handleContactSupport = () => {
+    // Clean the phone number (remove + and spaces)
+    const cleanNumber = supportWhatsapp.replace(/[^0-9]/g, '');
+    const whatsappUrl = `https://wa.me/${cleanNumber}`;
+    
     if (Platform.OS === 'web') {
-      window.open('https://wa.me/963999999999', '_blank');
+      window.open(whatsappUrl, '_blank');
     } else {
-      Linking.openURL('https://wa.me/963999999999');
+      Linking.openURL(whatsappUrl);
     }
   };
 
