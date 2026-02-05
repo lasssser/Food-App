@@ -147,6 +147,13 @@ export const addressAPI = {
   },
 };
 
+export const customerAPI = {
+  getVerificationStatus: async () => {
+    const response = await api.get('/customer/verification-status');
+    return response.data;
+  },
+};
+
 export const orderAPI = {
   create: async (data: {
     restaurant_id: string;
