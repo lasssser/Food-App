@@ -1095,10 +1095,10 @@ const styles = StyleSheet.create({
 
   // Guest Container
   guestContainer: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: SPACING.xl,
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.xxl,
+    paddingBottom: SPACING.lg,
   },
   guestIconContainer: {
     width: 120,
@@ -1108,7 +1108,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.xl,
-    ...SHADOWS.medium,
   },
   guestTitle: {
     fontSize: 22,
