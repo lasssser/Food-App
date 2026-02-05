@@ -548,7 +548,7 @@ export default function HomeScreen() {
         visible={showMapPicker}
         onClose={() => setShowMapPicker(false)}
         onLocationSelected={(location) => {
-          setLocation(undefined, undefined, location.latitude, location.longitude);
+          setMapLocation(location.latitude, location.longitude, location.address);
           setShowMapPicker(false);
         }}
       />
