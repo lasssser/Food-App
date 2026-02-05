@@ -258,7 +258,11 @@ export default function ProfileScreen() {
               <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.aboutContent}>
                   <View style={styles.aboutLogo}>
-                    <Text style={styles.aboutEmoji}>🍔</Text>
+                    <Image 
+                      source={require('../../assets/images/logo.png')} 
+                      style={styles.aboutLogoImage}
+                      resizeMode="contain"
+                    />
                   </View>
                   <Text style={styles.aboutName}>أكلة عالسريع</Text>
                   <Text style={styles.aboutVersion}>الإصدار 1.0.0</Text>
@@ -273,7 +277,11 @@ export default function ProfileScreen() {
                   <Text style={styles.developerTitle}>تم التطوير بواسطة</Text>
                   
                   <View style={styles.developerLogo}>
-                    <Ionicons name="code-slash" size={40} color={COLORS.primary} />
+                    <Image 
+                      source={require('../../assets/images/wethaq-logo.png')} 
+                      style={styles.developerLogoImage}
+                      resizeMode="contain"
+                    />
                   </View>
                   <Text style={styles.developerName}>Wethaq Digital Solutions</Text>
                   
