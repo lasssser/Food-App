@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xs,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: 'rgba(255,255,255,0.8)',
   },
 
@@ -281,24 +281,24 @@ const styles = StyleSheet.create({
   formCard: {
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.xl,
-    padding: SPACING.xl,
+    padding: SPACING.lg,
     ...SHADOWS.large,
   },
   formTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: COLORS.textPrimary,
     textAlign: 'center',
-    marginBottom: SPACING.xl,
+    marginBottom: SPACING.md,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.background,
     borderRadius: RADIUS.md,
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.sm,
     paddingHorizontal: SPACING.md,
-    height: 56,
+    height: 50,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
