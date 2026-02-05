@@ -242,8 +242,8 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   logoImage: {
-    width: 130,
-    height: 130,
+    width: 150,
+    height: 150,
   },
   logoEmoji: {
     fontSize: 50,
