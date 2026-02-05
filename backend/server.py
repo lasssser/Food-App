@@ -195,7 +195,8 @@ class OrderCreate(BaseModel):
     restaurant_id: str
     items: List[OrderItemCreate]
     address_id: str
-    payment_method: str  # COD or SHAMCASH
+    payment_method: str  # cod, mtn_cash, syriatel_cash, shamcash
+    payment_info: Optional[OrderPaymentInfo] = None  # معلومات الدفع للطرق الإلكترونية
     notes: Optional[str] = None
 
 class OrderItem(BaseModel):
