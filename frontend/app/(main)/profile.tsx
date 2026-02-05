@@ -247,13 +247,15 @@ export default function ProfileScreen() {
         <Modal visible={showAboutModal} animationType="slide" transparent>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <TouchableOpacity onPress={() => setShowAboutModal(false)} activeOpacity={0.7}>
-                  <Ionicons name="close" size={24} color={COLORS.textPrimary} />
-                </TouchableOpacity>
-                <Text style={styles.modalTitle}>عن التطبيق</Text>
-                <View style={{ width: 24 }} />
-              </View>
+              <SafeAreaView edges={['top']}>
+                <View style={styles.modalHeader}>
+                  <TouchableOpacity onPress={() => setShowAboutModal(false)} activeOpacity={0.7}>
+                    <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+                  </TouchableOpacity>
+                  <Text style={styles.modalTitle}>عن التطبيق</Text>
+                  <View style={{ width: 24 }} />
+                </View>
+              </SafeAreaView>
 
               <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.aboutContent}>
