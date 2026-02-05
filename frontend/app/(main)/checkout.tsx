@@ -18,12 +18,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCartStore } from '../../src/store/cartStore';
 import { addressAPI, orderAPI } from '../../src/services/api';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+import LocationPicker from '../../src/components/LocationPicker';
 
 interface Address {
   id: string;
   label: string;
   address_line: string;
   area?: string;
+  lat?: number;
+  lng?: number;
 }
 
 export default function CheckoutScreen() {
@@ -39,7 +42,8 @@ export default function CheckoutScreen() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [newAddress, setNewAddress] = useState({ label: '', address_line: '', area: '' });
+  const [newAddress, setNewAddress] = useState({ label: '', address_line: '', area: '', lat: 0, lng: 0 });
+  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   const subtotal = getSubtotal();
   const deliveryFee = restaurant?.delivery_fee || 5000;
