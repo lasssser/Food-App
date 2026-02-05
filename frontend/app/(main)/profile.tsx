@@ -492,6 +492,58 @@ export default function ProfileScreen() {
           )}
         </View>
 
+        {/* Role Request Section - Show only for customers */}
+        {user?.role === 'customer' && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitleRow}>
+                <Text style={styles.sectionTitle}>انضم إلينا</Text>
+                <Ionicons name="rocket" size={20} color={COLORS.primary} />
+              </View>
+            </View>
+
+            {hasPendingRequest ? (
+              <View style={styles.pendingRequestCard}>
+                <View style={styles.pendingRequestIcon}>
+                  <Ionicons name="time" size={24} color={COLORS.warning} />
+                </View>
+                <View style={styles.pendingRequestInfo}>
+                  <Text style={styles.pendingRequestTitle}>طلبك قيد المراجعة</Text>
+                  <Text style={styles.pendingRequestDesc}>
+                    سيتم إعلامك عند الموافقة على طلبك
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.roleOptionsContainer}>
+                <TouchableOpacity
+                  style={styles.roleOptionCard}
+                  onPress={() => handleOpenRoleRequestModal('driver')}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.roleOptionIcon, { backgroundColor: `${COLORS.info}15` }]}>
+                    <Ionicons name="car" size={28} color={COLORS.info} />
+                  </View>
+                  <Text style={styles.roleOptionTitle}>التقدم كسائق</Text>
+                  <Text style={styles.roleOptionDesc}>اربح المال من توصيل الطلبات</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.roleOptionCard}
+                  onPress={() => handleOpenRoleRequestModal('restaurant')}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.roleOptionIcon, { backgroundColor: `${COLORS.success}15` }]}>
+                    <Ionicons name="restaurant" size={28} color={COLORS.success} />
+                  </View>
+                  <Text style={styles.roleOptionTitle}>التقدم كصاحب مطعم</Text>
+                  <Text style={styles.roleOptionDesc}>أضف مطعمك وابدأ البيع</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )}
+
         {/* Menu Items */}
         <View style={styles.menuSection}>
           <TouchableOpacity style={styles.menuItem} onPress={handleNotifications} activeOpacity={0.7}>
