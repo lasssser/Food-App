@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     marginHorizontal: SPACING.lg,
     marginTop: SPACING.lg,
     borderRadius: RADIUS.lg,
-    ...SHADOWS.small,
+    borderWidth: 1, borderColor: "#f0f0f0",
   },
   restaurantIcon: {
     width: 50,
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     marginBottom: SPACING.md,
-    ...SHADOWS.small,
+    borderWidth: 1, borderColor: "#f0f0f0",
   },
   itemImage: {
     width: 70,
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: RADIUS.xl,
     borderTopRightRadius: RADIUS.xl,
     padding: SPACING.xl,
-    ...SHADOWS.large,
+    borderWidth: 1, borderColor: "#e0e0e0",
   },
   summaryRow: {
     flexDirection: 'row-reverse',
