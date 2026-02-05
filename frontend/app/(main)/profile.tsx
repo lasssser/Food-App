@@ -1177,10 +1177,12 @@ const styles = StyleSheet.create({
   helpTitle: {
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: 'Cairo_600SemiBold',
     color: COLORS.textPrimary,
   },
   helpDesc: {
     fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginTop: 2,
   },
