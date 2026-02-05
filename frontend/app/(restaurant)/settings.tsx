@@ -440,7 +440,7 @@ export default function RestaurantSettings() {
               <View style={styles.aboutContent}>
                 <View style={styles.aboutLogoContainer}>
                   <Image 
-                    source={require('../../assets/images/logo_food2.png')} 
+                    source={require('../../assets/images/logo_food2_small.png')} 
                     style={styles.aboutLogoImage}
                     resizeMode="contain"
                   />
