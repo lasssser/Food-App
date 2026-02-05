@@ -3630,6 +3630,208 @@ async def update_app_settings(
     
     return {"message": "تم تحديث الإعدادات بنجاح"}
 
+# ==================== Role Change Requests ====================
+
+@api_router.post("/role-requests")
+async def create_role_request(
+    request_data: RoleRequestCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Submit a role change request (customer only)"""
+    # Only customers can request role changes
+    if current_user.get("role") != "customer":
+        raise HTTPException(status_code=403, detail="فقط الزبائن يمكنهم تقديم طلب تغيير الدور")
+    
+    # Validate requested role
+    if request_data.requested_role not in ["driver", "restaurant"]:
+        raise HTTPException(status_code=400, detail="الدور المطلوب غير صالح. يمكنك التقدم كسائق أو صاحب مطعم")
+    
+    # Check for pending requests
+    existing_request = await db.role_requests.find_one({
+        "user_id": current_user["id"],
+        "status": "pending"
+    })
+    if existing_request:
+        raise HTTPException(status_code=400, detail="لديك طلب قيد المراجعة بالفعل")
+    
+    # Create the request
+    role_request = RoleRequest(
+        user_id=current_user["id"],
+        user_name=current_user.get("name", ""),
+        user_phone=current_user.get("phone", ""),
+        requested_role=request_data.requested_role,
+        full_name=request_data.full_name,
+        phone=request_data.phone,
+        restaurant_name=request_data.restaurant_name,
+        restaurant_address=request_data.restaurant_address,
+        restaurant_area=request_data.restaurant_area,
+        vehicle_type=request_data.vehicle_type,
+        license_number=request_data.license_number,
+        notes=request_data.notes
+    )
+    
+    await db.role_requests.insert_one(role_request.dict())
+    
+    # Create notification for admins
+    admins = await db.users.find({"role": {"$in": ["admin", "moderator"]}}).to_list(50)
+    for admin in admins:
+        await create_notification(
+            admin["id"],
+            "طلب تغيير دور جديد 📋",
+            f"{current_user.get('name', 'مستخدم')} يريد التقدم كـ {'سائق' if request_data.requested_role == 'driver' else 'صاحب مطعم'}",
+            "role_request",
+            {"request_id": role_request.id}
+        )
+    
+    return {"message": "تم إرسال طلبك بنجاح، سيتم مراجعته من قبل الإدارة", "request_id": role_request.id}
+
+@api_router.get("/role-requests/my")
+async def get_my_role_requests(current_user: dict = Depends(get_current_user)):
+    """Get user's role change requests"""
+    requests = await db.role_requests.find({"user_id": current_user["id"]}).sort("created_at", -1).to_list(10)
+    for r in requests:
+        r.pop("_id", None)
+    return requests
+
+@api_router.get("/admin/role-requests")
+async def get_role_requests(
+    status: str = None,
+    skip: int = 0,
+    limit: int = 50,
+    admin: dict = Depends(require_admin_or_moderator)
+):
+    """Get all role change requests (admin)"""
+    query = {}
+    if status:
+        query["status"] = status
+    
+    requests = await db.role_requests.find(query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.role_requests.count_documents(query)
+    
+    for r in requests:
+        r.pop("_id", None)
+    
+    # Get pending count
+    pending_count = await db.role_requests.count_documents({"status": "pending"})
+    
+    return {"requests": requests, "total": total, "pending_count": pending_count}
+
+@api_router.put("/admin/role-requests/{request_id}/approve")
+async def approve_role_request(
+    request_id: str,
+    admin: dict = Depends(require_admin)
+):
+    """Approve a role change request (admin only)"""
+    role_request = await db.role_requests.find_one({"id": request_id})
+    if not role_request:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    if role_request.get("status") != "pending":
+        raise HTTPException(status_code=400, detail="هذا الطلب تمت معالجته مسبقاً")
+    
+    # Get the user
+    user = await db.users.find_one({"id": role_request["user_id"]})
+    if not user:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    requested_role = role_request["requested_role"]
+    
+    # Update user role
+    update_data = {
+        "role": requested_role,
+        "updated_at": datetime.utcnow()
+    }
+    
+    # If becoming restaurant owner, create a restaurant
+    if requested_role == "restaurant":
+        restaurant_id = f"rest-{uuid.uuid4().hex[:8]}"
+        restaurant_data = {
+            "id": restaurant_id,
+            "owner_id": user["id"],
+            "name": role_request.get("restaurant_name", f"مطعم {user.get('name', 'جديد')}"),
+            "description": "مطعم جديد",
+            "cuisine_type": "متنوع",
+            "address": role_request.get("restaurant_address", ""),
+            "area": role_request.get("restaurant_area", ""),
+            "city_id": "damascus",
+            "phone": role_request.get("phone", user.get("phone", "")),
+            "rating": 0,
+            "review_count": 0,
+            "is_open": False,
+            "delivery_fee": 5000,
+            "min_order": 10000,
+            "delivery_time": "30-45 دقيقة",
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        await db.restaurants.insert_one(restaurant_data)
+        update_data["restaurant_id"] = restaurant_id
+    
+    # If becoming driver, set driver fields
+    if requested_role == "driver":
+        update_data["is_online"] = False
+        update_data["vehicle_type"] = role_request.get("vehicle_type", "دراجة نارية")
+        update_data["license_number"] = role_request.get("license_number", "")
+    
+    await db.users.update_one({"id": user["id"]}, {"$set": update_data})
+    
+    # Update request status
+    await db.role_requests.update_one(
+        {"id": request_id},
+        {"$set": {
+            "status": "approved",
+            "admin_notes": f"تمت الموافقة بواسطة {admin.get('name', 'المدير')}",
+            "updated_at": datetime.utcnow()
+        }}
+    )
+    
+    # Notify user
+    role_name = "سائق" if requested_role == "driver" else "صاحب مطعم"
+    await create_notification(
+        user["id"],
+        "تمت الموافقة على طلبك! 🎉",
+        f"تم قبول طلبك لتصبح {role_name}. يمكنك الآن تسجيل الدخول مجدداً للوصول للميزات الجديدة",
+        "role_approved",
+        {"new_role": requested_role}
+    )
+    
+    return {"message": f"تمت الموافقة على الطلب، أصبح المستخدم {role_name}"}
+
+@api_router.put("/admin/role-requests/{request_id}/reject")
+async def reject_role_request(
+    request_id: str,
+    admin: dict = Depends(require_admin)
+):
+    """Reject a role change request (admin only)"""
+    role_request = await db.role_requests.find_one({"id": request_id})
+    if not role_request:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    if role_request.get("status") != "pending":
+        raise HTTPException(status_code=400, detail="هذا الطلب تمت معالجته مسبقاً")
+    
+    # Update request status
+    await db.role_requests.update_one(
+        {"id": request_id},
+        {"$set": {
+            "status": "rejected",
+            "admin_notes": f"تم الرفض بواسطة {admin.get('name', 'المدير')}",
+            "updated_at": datetime.utcnow()
+        }}
+    )
+    
+    # Notify user
+    role_name = "سائق" if role_request["requested_role"] == "driver" else "صاحب مطعم"
+    await create_notification(
+        role_request["user_id"],
+        "تم رفض طلبك ❌",
+        f"للأسف، تم رفض طلبك لتصبح {role_name}. يمكنك التواصل مع الدعم لمزيد من المعلومات",
+        "role_rejected",
+        {"requested_role": role_request["requested_role"]}
+    )
+    
+    return {"message": "تم رفض الطلب"}
+
 # ==================== Health Check ====================
 
 @api_router.get("/")
