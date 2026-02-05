@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { restaurantAPI, locationAPI } from '../../src/services/api';
+import { restaurantAPI, locationAPI, advertisementsAPI } from '../../src/services/api';
 import { useAuthStore } from '../../src/store/authStore';
 import { useLocationStore, City, District } from '../../src/store/locationStore';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
