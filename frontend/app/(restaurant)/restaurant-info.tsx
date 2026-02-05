@@ -131,6 +131,7 @@ export default function RestaurantInfoEdit() {
         opening_time: openingTime || undefined,
         closing_time: closingTime || undefined,
         working_days: workingDays.length > 0 ? workingDays : undefined,
+        image: restaurantImage || undefined,
       });
 
       Alert.alert('نجاح', 'تم تحديث بيانات المطعم بنجاح', [
