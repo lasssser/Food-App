@@ -3269,6 +3269,13 @@ async def clear_test_data(admin: dict = Depends(require_admin)):
         # Delete all reviews
         reviews_result = await db.reviews.delete_many({})
         
+        # Set flag to prevent auto-seeding
+        await db.settings.update_one(
+            {"id": "app_settings"},
+            {"$set": {"seed_disabled": True}},
+            upsert=True
+        )
+        
         return {
             "message": "تم حذف البيانات التجريبية بنجاح",
             "deleted": {
