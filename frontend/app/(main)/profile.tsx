@@ -608,7 +608,11 @@ export default function ProfileScreen() {
             <ScrollView showsVerticalScrollIndicator={false}>
               <View style={styles.aboutContent}>
                 <View style={styles.aboutLogo}>
-                  <Text style={styles.aboutEmoji}>🍔</Text>
+                  <Image 
+                    source={require('../../assets/images/logo_food2.png')} 
+                    style={styles.aboutLogoImage}
+                    resizeMode="contain"
+                  />
                 </View>
                 <Text style={styles.aboutName}>أكلة عالسريع</Text>
                 <Text style={styles.aboutVersion}>الإصدار 1.0.0</Text>
