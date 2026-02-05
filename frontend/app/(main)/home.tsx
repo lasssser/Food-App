@@ -228,59 +228,58 @@ export default function HomeScreen() {
           />
         }
       >
-        {/* Header with Gradient */}
-        <LinearGradient
-          colors={[COLORS.primary, COLORS.primaryDark]}
-          style={styles.header}
-        >
+        {/* Header */}
+        <View style={styles.header}>
           {/* Location Bar */}
           <TouchableOpacity 
             style={styles.locationBar}
             onPress={() => setShowLocationModal(true)}
+            activeOpacity={0.8}
           >
-            <Ionicons name="chevron-down" size={20} color={COLORS.textWhite} />
+            <Ionicons name="chevron-down" size={18} color="#fff" />
             <View style={styles.locationInfo}>
               <Text style={styles.locationLabel}>التوصيل إلى</Text>
-              <Text style={styles.locationText}>
-                {selectedCity?.name || 'اختر موقعك'}
-                {selectedDistrict && ` - ${selectedDistrict.name}`}
+              <Text style={styles.locationText} numberOfLines={1}>
+                {selectedCity?.name 
+                  ? `${selectedCity.name}${selectedDistrict ? ` - ${selectedDistrict.name}` : ''}`
+                  : 'اختر موقعك'}
               </Text>
             </View>
-            <Ionicons name="location" size={24} color={COLORS.textWhite} />
+            <View style={styles.locationIcon}>
+              <Ionicons name="location" size={18} color={COLORS.primary} />
+            </View>
           </TouchableOpacity>
 
-          <View style={styles.headerContent}>
-            <View style={styles.headerTextContainer}>
-              <Text style={styles.headerGreeting}>شو ناكل اليوم؟ 😋</Text>
-              <Text style={styles.headerSubtitle}>
+          {/* Greeting */}
+          <View style={styles.greetingRow}>
+            <View style={styles.greetingTextBox}>
+              <Text style={styles.greetingTitle}>شو ناكل اليوم؟ 😋</Text>
+              <Text style={styles.greetingSubtitle}>
                 {selectedCity 
-                  ? `${restaurants.length} مطعم في ${selectedCity.name}` 
+                  ? `${restaurants.length} مطعم متوفر في ${selectedCity.name}` 
                   : 'اختر موقعك لعرض المطاعم'}
               </Text>
-            </View>
-            <View style={styles.headerIcon}>
-              <Text style={styles.headerEmoji}>🍽️</Text>
             </View>
           </View>
 
           {/* Search Bar */}
           <View style={styles.searchContainer}>
-            <Ionicons name="search" size={22} color={COLORS.textLight} />
+            <Ionicons name="search" size={20} color="#999" />
             <TextInput
               style={styles.searchInput}
               placeholder="دور على مطعم أو أكلة..."
-              placeholderTextColor={COLORS.textLight}
+              placeholderTextColor="#bbb"
               value={searchQuery}
               onChangeText={setSearchQuery}
               textAlign="right"
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Ionicons name="close-circle" size={20} color={COLORS.textLight} />
+                <Ionicons name="close-circle" size={20} color="#bbb" />
               </TouchableOpacity>
             )}
           </View>
-        </LinearGradient>
+        </View>
 
         {/* Categories */}
         <ScrollView
