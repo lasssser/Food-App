@@ -47,6 +47,21 @@ export default function ProfileScreen() {
     }
   }, [isGuest]);
 
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      const settings = await settingsAPI.get();
+      if (settings.whatsapp_number) {
+        setSupportWhatsapp(settings.whatsapp_number);
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    }
+  };
+
   const fetchAddresses = async () => {
     try {
       const data = await addressAPI.getAll();
