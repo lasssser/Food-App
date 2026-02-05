@@ -3157,9 +3157,9 @@ async def get_all_complaints(
     type: str = None,
     skip: int = 0,
     limit: int = 50,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
-    """Get all complaints (admin)"""
+    """Get all complaints (admin/moderator)"""
     query = {}
     if status:
         query["status"] = status
