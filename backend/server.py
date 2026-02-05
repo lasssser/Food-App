@@ -96,6 +96,8 @@ class Restaurant(BaseModel):
     rating: float = 4.0
     review_count: int = 0
     is_open: bool = True
+    is_featured: bool = False  # تمييز المطعم
+    featured_at: Optional[datetime] = None
     delivery_fee: float = 5000
     min_order: float = 10000
     delivery_time: str = "30-45 دقيقة"
