@@ -1103,11 +1103,13 @@ const styles = StyleSheet.create({
   guestTitle: {
     fontSize: 22,
     fontWeight: 'bold',
+    fontFamily: 'Cairo_700Bold',
     color: COLORS.textPrimary,
     marginBottom: SPACING.sm,
   },
   guestSubtitle: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     marginBottom: SPACING.xxl,
     textAlign: 'center',
