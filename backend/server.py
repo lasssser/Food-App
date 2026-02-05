@@ -3277,6 +3277,47 @@ async def clear_test_data(admin: dict = Depends(require_admin)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"فشل في حذف البيانات: {str(e)}")
 
+# ==================== App Settings ====================
+
+class AppSettingsUpdate(BaseModel):
+    whatsapp_number: Optional[str] = None
+    support_email: Optional[str] = None
+    support_phone: Optional[str] = None
+
+@api_router.get("/settings")
+async def get_app_settings():
+    """Get app settings (public)"""
+    settings = await db.settings.find_one({"id": "app_settings"})
+    if not settings:
+        # Default settings
+        settings = {
+            "id": "app_settings",
+            "whatsapp_number": "+963981401274",
+            "support_email": "info@wethaqdigital.com",
+            "support_phone": "+963981401274",
+        }
+        await db.settings.insert_one(settings)
+    
+    settings.pop("_id", None)
+    return settings
+
+@api_router.put("/admin/settings")
+async def update_app_settings(
+    settings_data: AppSettingsUpdate,
+    admin: dict = Depends(require_admin)
+):
+    """Update app settings (admin only)"""
+    update_data = {k: v for k, v in settings_data.dict().items() if v is not None}
+    update_data["updated_at"] = datetime.utcnow()
+    
+    result = await db.settings.update_one(
+        {"id": "app_settings"},
+        {"$set": update_data},
+        upsert=True
+    )
+    
+    return {"message": "تم تحديث الإعدادات بنجاح"}
+
 # ==================== Health Check ====================
 
 @api_router.get("/")
