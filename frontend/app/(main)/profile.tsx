@@ -752,10 +752,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.divider,
   },
+  headerGradient: {
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.lg,
+    paddingBottom: SPACING.xxl + 20,
+    alignItems: 'center',
+  },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: COLORS.textPrimary,
+    fontFamily: 'Cairo_700Bold',
+    color: '#FFFFFF',
     textAlign: 'center',
   },
   content: {
