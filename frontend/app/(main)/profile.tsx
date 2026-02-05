@@ -328,14 +328,11 @@ export default function ProfileScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      {/* Header with Gradient */}
-      <LinearGradient
-        colors={[COLORS.primary, COLORS.primaryDark]}
-        style={[styles.headerGradient, { paddingTop: insets.top + 10 }]}
-      >
+    <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Simple Header */}
+      <View style={styles.header}>
         <Text style={styles.headerTitle}>حسابي</Text>
-      </LinearGradient>
+      </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* User Info Card */}
@@ -349,10 +346,6 @@ export default function ProfileScreen() {
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{user?.name}</Text>
             <Text style={styles.userPhone}>{user?.phone}</Text>
-          </View>
-          <View style={styles.userBadge}>
-            <Ionicons name="checkmark-circle" size={16} color={COLORS.success} />
-            <Text style={styles.userBadgeText}>حساب موثق</Text>
           </View>
         </View>
 
