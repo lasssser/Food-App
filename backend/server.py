@@ -2908,6 +2908,35 @@ async def update_user_info(
 class ResetPasswordRequest(BaseModel):
     new_password: str
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+@api_router.put("/auth/change-password")
+async def change_own_password(
+    request: ChangePasswordRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Change current user's password"""
+    user = await db.users.find_one({"id": current_user["id"]})
+    if not user:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    # Verify current password
+    if not verify_password(request.current_password, user["password_hash"]):
+        raise HTTPException(status_code=400, detail="كلمة المرور الحالية غير صحيحة")
+    
+    if len(request.new_password) < 6:
+        raise HTTPException(status_code=400, detail="كلمة المرور يجب أن تكون 6 أحرف على الأقل")
+    
+    hashed = hash_password(request.new_password)
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$set": {"password_hash": hashed, "updated_at": datetime.utcnow()}}
+    )
+    
+    return {"message": "تم تغيير كلمة المرور بنجاح"}
+
 @api_router.put("/admin/users/{user_id}/reset-password")
 async def reset_user_password(
     user_id: str,
