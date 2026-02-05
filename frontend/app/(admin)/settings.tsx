@@ -86,23 +86,55 @@ export default function AdminSettings() {
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
+      if (Platform.OS === 'web') {
+        alert('يرجى ملء جميع الحقول');
+      } else {
+        Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
+      }
       return;
     }
     if (newPassword !== confirmPassword) {
+      if (Platform.OS === 'web') {
+        alert('كلمة المرور الجديدة غير متطابقة');
+      } else {
+        Alert.alert('خطأ', 'كلمة المرور الجديدة غير متطابقة');
+      }
       return;
     }
     if (newPassword.length < 6) {
+      if (Platform.OS === 'web') {
+        alert('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      } else {
+        Alert.alert('خطأ', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      }
       return;
     }
     setChangingPassword(true);
-    // TODO: Implement password change API
-    setTimeout(() => {
-      setChangingPassword(false);
+    try {
+      await api.put('/auth/change-password', {
+        current_password: currentPassword,
+        new_password: newPassword
+      });
+      if (Platform.OS === 'web') {
+        alert('تم تغيير كلمة المرور بنجاح!');
+      } else {
+        Alert.alert('نجاح', 'تم تغيير كلمة المرور بنجاح!');
+      }
       setShowPasswordModal(false);
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-    }, 1000);
+    } catch (error: any) {
+      console.error('Error changing password:', error);
+      const msg = error.response?.data?.detail || 'فشل في تغيير كلمة المرور';
+      if (Platform.OS === 'web') {
+        alert(msg);
+      } else {
+        Alert.alert('خطأ', msg);
+      }
+    } finally {
+      setChangingPassword(false);
+    }
   };
 
   const handleClearTestData = async () => {
