@@ -332,11 +332,9 @@ export default function ProfileScreen() {
       {/* Header with Gradient */}
       <LinearGradient
         colors={[COLORS.primary, COLORS.primaryDark]}
-        style={styles.headerGradient}
+        style={[styles.headerGradient, { paddingTop: insets.top + 10 }]}
       >
-        <SafeAreaView edges={['top']}>
-          <Text style={styles.headerTitle}>حسابي</Text>
-        </SafeAreaView>
+        <Text style={styles.headerTitle}>حسابي</Text>
       </LinearGradient>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
