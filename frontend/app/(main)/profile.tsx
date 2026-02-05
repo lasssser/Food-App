@@ -1144,6 +1144,7 @@ const styles = StyleSheet.create({
   },
   registerButton: {
     paddingVertical: SPACING.md,
+    marginBottom: SPACING.sm,
   },
   registerButtonText: {
     color: COLORS.primary,
