@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useAuthStore } from '../../src/store/authStore';
-import api from '../../src/services/api';
+import api, { settingsAPI } from '../../src/services/api';
 
 export default function AdminSettings() {
   const { user, logout } = useAuthStore();
@@ -27,11 +27,57 @@ export default function AdminSettings() {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showClearDataModal, setShowClearDataModal] = useState(false);
+  const [showSupportSettingsModal, setShowSupportSettingsModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
   const [clearingData, setClearingData] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState('');
+  const [supportEmail, setSupportEmail] = useState('');
+  const [supportPhone, setSupportPhone] = useState('');
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      const settings = await settingsAPI.get();
+      setWhatsappNumber(settings.whatsapp_number || '');
+      setSupportEmail(settings.support_email || '');
+      setSupportPhone(settings.support_phone || '');
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    setSavingSettings(true);
+    try {
+      await settingsAPI.update({
+        whatsapp_number: whatsappNumber,
+        support_email: supportEmail,
+        support_phone: supportPhone,
+      });
+      setShowSupportSettingsModal(false);
+      if (Platform.OS === 'web') {
+        alert('تم حفظ الإعدادات بنجاح');
+      } else {
+        Alert.alert('نجاح', 'تم حفظ الإعدادات بنجاح');
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      if (Platform.OS === 'web') {
+        alert('فشل في حفظ الإعدادات');
+      } else {
+        Alert.alert('خطأ', 'فشل في حفظ الإعدادات');
+      }
+    } finally {
+      setSavingSettings(false);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
