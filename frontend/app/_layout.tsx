@@ -95,7 +95,7 @@ export default function RootLayout() {
     // Authenticated user in auth group - redirect based on role
     else if (isAuthenticated && inAuthGroup) {
       const role = user?.role || 'customer';
-      if (role === 'admin') {
+      if (role === 'admin' || role === 'moderator') {
         router.replace('/(admin)/dashboard');
       } else if (role === 'restaurant') {
         router.replace('/(restaurant)/dashboard');
