@@ -243,9 +243,11 @@ export default function HomeScreen() {
             <View style={styles.locationInfo}>
               <Text style={styles.locationLabel}>التوصيل إلى</Text>
               <Text style={styles.locationText} numberOfLines={1}>
-                {selectedCity?.name 
-                  ? `${selectedCity.name}${selectedDistrict ? ` - ${selectedDistrict.name}` : ''}`
-                  : 'اختر موقعك'}
+                {mapAddress 
+                  ? mapAddress
+                  : selectedCity?.name 
+                    ? `${selectedCity.name}${selectedDistrict ? ` - ${selectedDistrict.name}` : ''}`
+                    : 'اختر موقعك'}
               </Text>
             </View>
             <View style={styles.locationIcon}>
