@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -28,17 +29,10 @@ interface RestaurantStat {
   total_revenue: number;
 }
 
-interface MonthlyRestaurantStat {
-  restaurant_id: string;
-  restaurant_name: string;
-  total_orders: number;
-}
-
-interface MonthData {
+interface MonthlyData {
   month: number;
   month_name: string;
-  year: number;
-  restaurants: MonthlyRestaurantStat[];
+  orders: number;
 }
 
 interface OverviewStats {
@@ -54,16 +48,21 @@ interface OverviewStats {
 
 export default function StatisticsScreen() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'overview' | 'monthly'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'restaurants'>('overview');
   const [restaurantStats, setRestaurantStats] = useState<RestaurantStat[]>([]);
-  const [monthlyStats, setMonthlyStats] = useState<MonthData[]>([]);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [overview, setOverview] = useState<OverviewStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [togglingFeatured, setTogglingFeatured] = useState<string | null>(null);
+  
+  // Restaurant details modal
+  const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantStat | null>(null);
+  const [showRestaurantModal, setShowRestaurantModal] = useState(false);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
+  const [loadingMonthly, setLoadingMonthly] = useState(false);
 
-  const fetchOverviewStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const [restaurantData, overviewData] = await Promise.all([
         adminStatisticsAPI.getRestaurantStats(),
@@ -72,37 +71,76 @@ export default function StatisticsScreen() {
       setRestaurantStats(restaurantData || []);
       setOverview(overviewData);
     } catch (error) {
-      console.error('Error fetching overview stats:', error);
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-  };
-
-  const fetchMonthlyStats = async () => {
-    try {
-      const data = await adminStatisticsAPI.getMonthlyStats(selectedYear);
-      setMonthlyStats(data?.months || []);
-    } catch (error) {
-      console.error('Error fetching monthly stats:', error);
-      setMonthlyStats([]);
-    }
-  };
+  }, []);
 
   useEffect(() => {
-    setLoading(true);
-    if (activeTab === 'overview') {
-      fetchOverviewStats().finally(() => setLoading(false));
-    } else {
-      fetchMonthlyStats().finally(() => setLoading(false));
-    }
-  }, [activeTab, selectedYear]);
+    fetchStats();
+  }, [fetchStats]);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    if (activeTab === 'overview') {
-      await fetchOverviewStats();
-    } else {
-      await fetchMonthlyStats();
+    await fetchStats();
+  };
+
+  const fetchRestaurantMonthlyStats = async (restaurantId: string, year: number) => {
+    setLoadingMonthly(true);
+    try {
+      const data = await adminStatisticsAPI.getMonthlyStats(year);
+      const months = data?.months || [];
+      
+      // Extract data for selected restaurant
+      const monthlyOrders: MonthlyData[] = [];
+      const monthNames: { [key: number]: string } = {
+        1: "يناير", 2: "فبراير", 3: "مارس", 4: "أبريل",
+        5: "مايو", 6: "يونيو", 7: "يوليو", 8: "أغسطس",
+        9: "سبتمبر", 10: "أكتوبر", 11: "نوفمبر", 12: "ديسمبر"
+      };
+      
+      // Initialize all months with 0
+      for (let i = 1; i <= 12; i++) {
+        monthlyOrders.push({
+          month: i,
+          month_name: monthNames[i],
+          orders: 0
+        });
+      }
+      
+      // Fill in actual data
+      months.forEach((monthData: any) => {
+        const restaurant = monthData.restaurants?.find((r: any) => r.restaurant_id === restaurantId);
+        if (restaurant) {
+          const monthIndex = monthData.month - 1;
+          if (monthIndex >= 0 && monthIndex < 12) {
+            monthlyOrders[monthIndex].orders = restaurant.total_orders;
+          }
+        }
+      });
+      
+      setMonthlyData(monthlyOrders);
+    } catch (error) {
+      console.error('Error fetching monthly stats:', error);
+      setMonthlyData([]);
+    } finally {
+      setLoadingMonthly(false);
     }
-    setRefreshing(false);
+  };
+
+  const openRestaurantDetails = (restaurant: RestaurantStat) => {
+    setSelectedRestaurant(restaurant);
+    setShowRestaurantModal(true);
+    fetchRestaurantMonthlyStats(restaurant.restaurant_id, selectedYear);
+  };
+
+  const changeYear = (year: number) => {
+    setSelectedYear(year);
+    if (selectedRestaurant) {
+      fetchRestaurantMonthlyStats(selectedRestaurant.restaurant_id, year);
+    }
   };
 
   const toggleFeatured = async (restaurantId: string, currentStatus: boolean) => {
@@ -141,133 +179,172 @@ export default function StatisticsScreen() {
     </View>
   );
 
-  const renderRestaurantCard = (stat: RestaurantStat, index: number) => (
-    <View key={stat.restaurant_id} style={styles.restaurantCard}>
-      <View style={styles.rankBadge}>
-        <Text style={styles.rankText}>#{index + 1}</Text>
+  // Simple restaurant list item for "المطاعم" tab
+  const renderRestaurantListItem = (restaurant: RestaurantStat, index: number) => (
+    <TouchableOpacity
+      key={restaurant.restaurant_id}
+      style={styles.restaurantListItem}
+      onPress={() => openRestaurantDetails(restaurant)}
+      activeOpacity={0.7}
+    >
+      <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+      
+      <View style={styles.restaurantListInfo}>
+        <View style={styles.restaurantListNameRow}>
+          {restaurant.is_featured && (
+            <Ionicons name="star" size={14} color={COLORS.warning} style={{ marginLeft: 4 }} />
+          )}
+          <Text style={styles.restaurantListName}>{restaurant.restaurant_name}</Text>
+        </View>
+        <Text style={styles.restaurantListOrders}>
+          إجمالي الطلبات: <Text style={{ color: COLORS.primary, fontWeight: 'bold' }}>{restaurant.total_orders}</Text>
+        </Text>
+      </View>
+
+      <View style={styles.restaurantListRank}>
+        <Text style={styles.restaurantListRankText}>{index + 1}</Text>
       </View>
       
-      <View style={styles.restaurantHeader}>
-        <View style={styles.restaurantInfo}>
-          {stat.restaurant_image ? (
-            <Image source={{ uri: stat.restaurant_image }} style={styles.restaurantImage} />
-          ) : (
-            <View style={[styles.restaurantImage, styles.restaurantImagePlaceholder]}>
-              <Ionicons name="restaurant" size={24} color={COLORS.textLight} />
-            </View>
-          )}
-          <View style={styles.restaurantNameContainer}>
-            <View style={styles.nameRow}>
-              {stat.is_featured && (
-                <View style={styles.featuredBadge}>
-                  <Ionicons name="star" size={12} color={COLORS.warning} />
-                </View>
-              )}
-              <Text style={styles.restaurantName}>{stat.restaurant_name}</Text>
-            </View>
-            <TouchableOpacity
-              style={[styles.featureButton, stat.is_featured && styles.featureButtonActive]}
-              onPress={() => toggleFeatured(stat.restaurant_id, stat.is_featured)}
-              disabled={togglingFeatured === stat.restaurant_id}
-            >
-              {togglingFeatured === stat.restaurant_id ? (
-                <ActivityIndicator size="small" color={COLORS.primary} />
-              ) : (
-                <Text style={[styles.featureButtonText, stat.is_featured && styles.featureButtonTextActive]}>
-                  {stat.is_featured ? 'إلغاء التمييز' : 'تمييز المطعم'}
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
+      {restaurant.restaurant_image ? (
+        <Image source={{ uri: restaurant.restaurant_image }} style={styles.restaurantListImage} />
+      ) : (
+        <View style={[styles.restaurantListImage, styles.restaurantListImagePlaceholder]}>
+          <Ionicons name="restaurant" size={20} color={COLORS.textLight} />
         </View>
-      </View>
-
-      <View style={styles.statsGrid}>
-        <View style={styles.statItem}>
-          <Text style={styles.statValue}>{stat.total_orders}</Text>
-          <Text style={styles.statLabel}>إجمالي الطلبات</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: COLORS.success }]}>{stat.completed_orders}</Text>
-          <Text style={styles.statLabel}>مكتملة</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: COLORS.error }]}>{stat.cancelled_orders}</Text>
-          <Text style={styles.statLabel}>ملغاة</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: COLORS.primary, fontSize: 13 }]}>{formatCurrency(stat.total_revenue)}</Text>
-          <Text style={styles.statLabel}>الإيرادات</Text>
-        </View>
-      </View>
-    </View>
+      )}
+    </TouchableOpacity>
   );
 
-  // Render Monthly Tab Content
-  const renderMonthlyContent = () => {
+  // Restaurant details modal with monthly stats
+  const renderRestaurantModal = () => {
     const currentYear = new Date().getFullYear();
     const years = [currentYear, currentYear - 1, currentYear - 2];
+    const totalYearOrders = monthlyData.reduce((sum, m) => sum + m.orders, 0);
 
     return (
-      <>
-        <Text style={styles.sectionTitle}>الإحصائيات الشهرية</Text>
-        
-        {/* Year Selector */}
-        <View style={styles.yearSelector}>
-          {years.map((year) => (
+      <Modal visible={showRestaurantModal} animationType="slide" transparent={false}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.background }}>
+          {/* Modal Header */}
+          <View style={styles.modalHeader}>
             <TouchableOpacity
-              key={year}
-              style={[styles.yearButton, selectedYear === year && styles.yearButtonActive]}
-              onPress={() => setSelectedYear(year)}
+              onPress={() => setShowRestaurantModal(false)}
+              style={styles.modalCloseButton}
             >
-              <Text style={[styles.yearButtonText, selectedYear === year && styles.yearButtonTextActive]}>
-                {year}
-              </Text>
+              <Ionicons name="close" size={24} color={COLORS.textPrimary} />
             </TouchableOpacity>
-          ))}
-        </View>
-
-        {monthlyStats.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Ionicons name="calendar-outline" size={60} color={COLORS.textLight} />
-            <Text style={styles.emptyText}>لا توجد طلبات في سنة {selectedYear}</Text>
+            <Text style={styles.modalTitle}>إحصائيات المطعم</Text>
+            <TouchableOpacity
+              style={[
+                styles.featureButtonSmall,
+                selectedRestaurant?.is_featured && styles.featureButtonSmallActive
+              ]}
+              onPress={() => {
+                if (selectedRestaurant) {
+                  toggleFeatured(selectedRestaurant.restaurant_id, selectedRestaurant.is_featured);
+                  setSelectedRestaurant({
+                    ...selectedRestaurant,
+                    is_featured: !selectedRestaurant.is_featured
+                  });
+                }
+              }}
+            >
+              <Ionicons
+                name="star"
+                size={18}
+                color={selectedRestaurant?.is_featured ? COLORS.warning : COLORS.textLight}
+              />
+            </TouchableOpacity>
           </View>
-        ) : (
-          monthlyStats.map((monthData) => (
-            <View key={`${monthData.year}-${monthData.month}`} style={styles.monthCard}>
-              {/* Month Header */}
-              <View style={styles.monthHeader}>
-                <View style={[styles.monthIcon, { backgroundColor: `${COLORS.primary}15` }]}>
-                  <Ionicons name="calendar" size={24} color={COLORS.primary} />
-                </View>
-                <Text style={styles.monthName}>{monthData.month_name} {monthData.year}</Text>
-              </View>
 
-              {/* Restaurants List */}
-              <View style={styles.monthRestaurantsList}>
-                {monthData.restaurants.length === 0 ? (
-                  <Text style={styles.noDataText}>لا توجد طلبات</Text>
-                ) : (
-                  monthData.restaurants.map((restaurant, index) => (
-                    <View key={restaurant.restaurant_id} style={styles.monthRestaurantItem}>
-                      <View style={styles.ordersBadge}>
-                        <Text style={styles.ordersBadgeText}>{restaurant.total_orders}</Text>
-                        <Text style={styles.ordersBadgeLabel}>طلب</Text>
-                      </View>
-                      <View style={styles.monthRestaurantInfo}>
-                        <View style={styles.monthRestaurantRank}>
-                          <Text style={styles.monthRestaurantRankText}>{index + 1}</Text>
-                        </View>
-                        <Text style={styles.monthRestaurantName}>{restaurant.restaurant_name}</Text>
-                      </View>
-                    </View>
-                  ))
-                )}
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: SPACING.lg }}>
+            {/* Restaurant Info */}
+            <View style={styles.restaurantInfoCard}>
+              {selectedRestaurant?.restaurant_image ? (
+                <Image
+                  source={{ uri: selectedRestaurant.restaurant_image }}
+                  style={styles.restaurantInfoImage}
+                />
+              ) : (
+                <View style={[styles.restaurantInfoImage, styles.restaurantInfoImagePlaceholder]}>
+                  <Ionicons name="restaurant" size={40} color={COLORS.textLight} />
+                </View>
+              )}
+              <Text style={styles.restaurantInfoName}>{selectedRestaurant?.restaurant_name}</Text>
+              <View style={styles.restaurantInfoStats}>
+                <View style={styles.restaurantInfoStatItem}>
+                  <Text style={styles.restaurantInfoStatValue}>{selectedRestaurant?.total_orders || 0}</Text>
+                  <Text style={styles.restaurantInfoStatLabel}>إجمالي الطلبات</Text>
+                </View>
+                <View style={styles.restaurantInfoStatDivider} />
+                <View style={styles.restaurantInfoStatItem}>
+                  <Text style={[styles.restaurantInfoStatValue, { color: COLORS.success }]}>
+                    {selectedRestaurant?.completed_orders || 0}
+                  </Text>
+                  <Text style={styles.restaurantInfoStatLabel}>مكتملة</Text>
+                </View>
+                <View style={styles.restaurantInfoStatDivider} />
+                <View style={styles.restaurantInfoStatItem}>
+                  <Text style={[styles.restaurantInfoStatValue, { color: COLORS.error }]}>
+                    {selectedRestaurant?.cancelled_orders || 0}
+                  </Text>
+                  <Text style={styles.restaurantInfoStatLabel}>ملغاة</Text>
+                </View>
               </View>
             </View>
-          ))
-        )}
-      </>
+
+            {/* Year Selector */}
+            <Text style={styles.sectionTitleSmall}>الإحصائيات الشهرية</Text>
+            <View style={styles.yearSelector}>
+              {years.map((year) => (
+                <TouchableOpacity
+                  key={year}
+                  style={[styles.yearButton, selectedYear === year && styles.yearButtonActive]}
+                  onPress={() => changeYear(year)}
+                >
+                  <Text style={[styles.yearButtonText, selectedYear === year && styles.yearButtonTextActive]}>
+                    {year}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Year Total */}
+            <View style={styles.yearTotalCard}>
+              <Ionicons name="receipt-outline" size={24} color={COLORS.primary} />
+              <Text style={styles.yearTotalLabel}>إجمالي طلبات {selectedYear}</Text>
+              <Text style={styles.yearTotalValue}>{totalYearOrders}</Text>
+            </View>
+
+            {/* Monthly Stats */}
+            {loadingMonthly ? (
+              <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 20 }} />
+            ) : (
+              <View style={styles.monthlyGrid}>
+                {monthlyData.map((month) => (
+                  <View
+                    key={month.month}
+                    style={[
+                      styles.monthCard,
+                      month.orders > 0 && styles.monthCardActive
+                    ]}
+                  >
+                    <Text style={styles.monthName}>{month.month_name}</Text>
+                    <Text style={[
+                      styles.monthOrders,
+                      month.orders > 0 && styles.monthOrdersActive
+                    ]}>
+                      {month.orders}
+                    </Text>
+                    <Text style={styles.monthOrdersLabel}>طلب</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            <View style={{ height: 40 }} />
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
     );
   };
 
@@ -298,16 +375,16 @@ export default function StatisticsScreen() {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'monthly' && styles.tabActive]}
-          onPress={() => setActiveTab('monthly')}
+          style={[styles.tab, activeTab === 'restaurants' && styles.tabActive]}
+          onPress={() => setActiveTab('restaurants')}
         >
           <Ionicons
-            name="calendar"
+            name="restaurant"
             size={18}
-            color={activeTab === 'monthly' ? COLORS.primary : COLORS.textSecondary}
+            color={activeTab === 'restaurants' ? COLORS.primary : COLORS.textSecondary}
           />
-          <Text style={[styles.tabText, activeTab === 'monthly' && styles.tabTextActive]}>
-            شهري
+          <Text style={[styles.tabText, activeTab === 'restaurants' && styles.tabTextActive]}>
+            المطاعم
           </Text>
         </TouchableOpacity>
       </View>
@@ -345,29 +422,30 @@ export default function StatisticsScreen() {
                 <Text style={styles.revenueLabel}>إجمالي الإيرادات</Text>
                 <Text style={styles.revenueValue}>{formatCurrency(overview?.total_revenue || 0)}</Text>
               </LinearGradient>
-
-              {/* Restaurant Statistics */}
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>إحصائيات المطاعم</Text>
-                <Text style={styles.sectionSubtitle}>{restaurantStats.length} مطعم</Text>
-              </View>
-
-              {restaurantStats.length === 0 ? (
-                <View style={styles.emptyContainer}>
-                  <Ionicons name="analytics-outline" size={60} color={COLORS.textLight} />
-                  <Text style={styles.emptyText}>لا توجد بيانات</Text>
-                </View>
-              ) : (
-                restaurantStats.map((stat, index) => renderRestaurantCard(stat, index))
-              )}
             </>
           ) : (
-            renderMonthlyContent()
+            <>
+              {/* Restaurants List */}
+              <Text style={styles.sectionTitle}>المطاعم</Text>
+              <Text style={styles.sectionSubtitleText}>اضغط على المطعم لعرض الإحصائيات الشهرية</Text>
+              
+              {restaurantStats.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                  <Ionicons name="restaurant-outline" size={60} color={COLORS.textLight} />
+                  <Text style={styles.emptyText}>لا توجد مطاعم</Text>
+                </View>
+              ) : (
+                restaurantStats.map((restaurant, index) => renderRestaurantListItem(restaurant, index))
+              )}
+            </>
           )}
 
           <View style={{ height: 40 }} />
         </ScrollView>
       )}
+
+      {/* Restaurant Details Modal */}
+      {renderRestaurantModal()}
     </SafeAreaView>
   );
 }
@@ -442,20 +520,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontFamily: 'Cairo_700Bold',
     color: COLORS.textPrimary,
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.sm,
     textAlign: 'right',
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: SPACING.lg,
+  sectionTitleSmall: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'Cairo_700Bold',
+    color: COLORS.textPrimary,
     marginBottom: SPACING.md,
+    marginTop: SPACING.lg,
+    textAlign: 'right',
   },
-  sectionSubtitle: {
-    fontSize: 14,
+  sectionSubtitleText: {
+    fontSize: 13,
     fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
+    marginBottom: SPACING.lg,
+    textAlign: 'right',
   },
   overviewGrid: {
     flexDirection: 'row',
@@ -519,110 +601,6 @@ const styles = StyleSheet.create({
     color: COLORS.textWhite,
     marginTop: SPACING.xs,
   },
-  restaurantCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.lg,
-    marginBottom: SPACING.md,
-    ...SHADOWS.small,
-  },
-  rankBadge: {
-    position: 'absolute',
-    top: SPACING.md,
-    left: SPACING.md,
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 2,
-    borderRadius: RADIUS.sm,
-  },
-  rankText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    fontFamily: 'Cairo_700Bold',
-    color: COLORS.textWhite,
-  },
-  restaurantHeader: {
-    marginBottom: SPACING.md,
-  },
-  restaurantInfo: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-  },
-  restaurantImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
-  restaurantImagePlaceholder: {
-    backgroundColor: COLORS.background,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  restaurantNameContainer: {
-    flex: 1,
-    marginRight: SPACING.md,
-    alignItems: 'flex-end',
-  },
-  nameRow: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: SPACING.xs,
-  },
-  restaurantName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    fontFamily: 'Cairo_700Bold',
-    color: COLORS.textPrimary,
-  },
-  featuredBadge: {
-    backgroundColor: `${COLORS.warning}20`,
-    padding: 4,
-    borderRadius: 10,
-  },
-  featureButton: {
-    marginTop: SPACING.xs,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: 4,
-    borderRadius: RADIUS.sm,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  featureButtonActive: {
-    borderColor: COLORS.warning,
-    backgroundColor: `${COLORS.warning}10`,
-  },
-  featureButtonText: {
-    fontSize: 12,
-    fontFamily: 'Cairo_400Regular',
-    color: COLORS.textSecondary,
-  },
-  featureButtonTextActive: {
-    color: COLORS.warning,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    borderTopWidth: 1,
-    borderTopColor: COLORS.divider,
-    paddingTop: SPACING.md,
-  },
-  statItem: {
-    width: '50%',
-    paddingVertical: SPACING.sm,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    fontFamily: 'Cairo_700Bold',
-    color: COLORS.textPrimary,
-  },
-  statLabel: {
-    fontSize: 12,
-    fontFamily: 'Cairo_400Regular',
-    color: COLORS.textSecondary,
-    marginTop: 2,
-  },
   emptyContainer: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -635,11 +613,152 @@ const styles = StyleSheet.create({
     marginTop: SPACING.md,
   },
 
+  // Restaurant List Item
+  restaurantListItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
+    marginBottom: SPACING.md,
+    ...SHADOWS.small,
+  },
+  restaurantListImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  restaurantListImagePlaceholder: {
+    backgroundColor: COLORS.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  restaurantListRank: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SPACING.sm,
+    marginLeft: SPACING.sm,
+  },
+  restaurantListRankText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    fontFamily: 'Cairo_700Bold',
+    color: COLORS.textWhite,
+  },
+  restaurantListInfo: {
+    flex: 1,
+    alignItems: 'flex-end',
+    marginRight: SPACING.sm,
+  },
+  restaurantListNameRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+  },
+  restaurantListName: {
+    fontSize: 15,
+    fontWeight: '600',
+    fontFamily: 'Cairo_600SemiBold',
+    color: COLORS.textPrimary,
+  },
+  restaurantListOrders: {
+    fontSize: 13,
+    fontFamily: 'Cairo_400Regular',
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+
+  // Modal Styles
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.divider,
+  },
+  modalCloseButton: {
+    padding: 8,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    fontFamily: 'Cairo_700Bold',
+    color: COLORS.textPrimary,
+  },
+  featureButtonSmall: {
+    padding: 8,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 20,
+  },
+  featureButtonSmallActive: {
+    backgroundColor: `${COLORS.warning}20`,
+  },
+
+  // Restaurant Info Card
+  restaurantInfoCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xl,
+    alignItems: 'center',
+    ...SHADOWS.small,
+  },
+  restaurantInfoImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: SPACING.md,
+  },
+  restaurantInfoImagePlaceholder: {
+    backgroundColor: COLORS.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  restaurantInfoName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontFamily: 'Cairo_700Bold',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.md,
+  },
+  restaurantInfoStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  restaurantInfoStatItem: {
+    alignItems: 'center',
+    paddingHorizontal: SPACING.lg,
+  },
+  restaurantInfoStatValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontFamily: 'Cairo_700Bold',
+    color: COLORS.textPrimary,
+  },
+  restaurantInfoStatLabel: {
+    fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  restaurantInfoStatDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: COLORS.divider,
+  },
+
   // Year Selector
   yearSelector: {
     flexDirection: 'row',
     gap: SPACING.sm,
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.md,
   },
   yearButton: {
     flex: 1,
@@ -663,100 +782,67 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
 
-  // Monthly Cards - Simple Design
-  monthCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.lg,
-    marginBottom: SPACING.md,
-    overflow: 'hidden',
-    ...SHADOWS.small,
-  },
-  monthHeader: {
+  // Year Total Card
+  yearTotalCard: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
+    backgroundColor: `${COLORS.primary}10`,
+    borderRadius: RADIUS.lg,
     padding: SPACING.lg,
-    backgroundColor: `${COLORS.primary}08`,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.divider,
+    marginBottom: SPACING.lg,
+    gap: SPACING.md,
   },
-  monthIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  monthName: {
+  yearTotalLabel: {
     flex: 1,
-    fontSize: 16,
-    fontWeight: 'bold',
-    fontFamily: 'Cairo_700Bold',
-    color: COLORS.textPrimary,
-    marginRight: SPACING.md,
-    textAlign: 'right',
-  },
-  monthRestaurantsList: {
-    padding: SPACING.md,
-  },
-  noDataText: {
     fontSize: 14,
     fontFamily: 'Cairo_400Regular',
-    color: COLORS.textLight,
-    textAlign: 'center',
-    paddingVertical: SPACING.md,
+    color: COLORS.textSecondary,
+    textAlign: 'right',
   },
-  monthRestaurantItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.divider,
-  },
-  monthRestaurantInfo: {
-    flex: 1,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-  },
-  monthRestaurantRank: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: `${COLORS.primary}15`,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: SPACING.sm,
-  },
-  monthRestaurantRankText: {
-    fontSize: 12,
+  yearTotalValue: {
+    fontSize: 24,
     fontWeight: 'bold',
     fontFamily: 'Cairo_700Bold',
     color: COLORS.primary,
   },
-  monthRestaurantName: {
-    fontSize: 14,
-    fontWeight: '600',
-    fontFamily: 'Cairo_600SemiBold',
-    color: COLORS.textPrimary,
-    textAlign: 'right',
+
+  // Monthly Grid
+  monthlyGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.sm,
   },
-  ordersBadge: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
+  monthCard: {
+    width: '31%',
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
+    padding: SPACING.md,
     alignItems: 'center',
-    minWidth: 60,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  ordersBadgeText: {
-    fontSize: 18,
+  monthCardActive: {
+    borderColor: COLORS.primary,
+    backgroundColor: `${COLORS.primary}08`,
+  },
+  monthName: {
+    fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xs,
+  },
+  monthOrders: {
+    fontSize: 22,
     fontWeight: 'bold',
     fontFamily: 'Cairo_700Bold',
-    color: COLORS.textWhite,
+    color: COLORS.textLight,
   },
-  ordersBadgeLabel: {
+  monthOrdersActive: {
+    color: COLORS.primary,
+  },
+  monthOrdersLabel: {
     fontSize: 10,
     fontFamily: 'Cairo_400Regular',
-    color: COLORS.textWhite,
-    opacity: 0.9,
+    color: COLORS.textLight,
   },
 });
