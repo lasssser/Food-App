@@ -619,7 +619,6 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     marginBottom: SPACING.md,
-    ...SHADOWS.small,
   },
   restaurantListImage: {
     width: 50,
