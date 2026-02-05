@@ -1,21 +1,44 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator, StyleSheet, I18nManager } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, I18nManager, Text } from 'react-native';
 import { useAuthStore } from '../src/store/authStore';
 import { seedAPI } from '../src/services/api';
 import { COLORS } from '../src/constants/theme';
 import { usePushNotifications } from '../src/hooks/usePushNotifications';
+import * as SplashScreen from 'expo-splash-screen';
+import { useFonts, Cairo_300Light, Cairo_400Regular, Cairo_500Medium, Cairo_600SemiBold, Cairo_700Bold } from '@expo-google-fonts/cairo';
+
+// Keep splash screen visible while fonts load
+SplashScreen.preventAutoHideAsync();
 
 // Force RTL for Arabic
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
+
+// Set default font for all Text components
+const originalRender = Text.render;
+Text.render = function (...args: any[]) {
+  const origin = originalRender.call(this, ...args);
+  return React.cloneElement(origin, {
+    style: [{ fontFamily: 'Cairo_400Regular' }, origin.props.style],
+  });
+};
 
 export default function RootLayout() {
   const { isLoading, isAuthenticated, isGuest, user, checkAuth } = useAuthStore();
   const router = useRouter();
   const segments = useSegments();
   const [isReady, setIsReady] = useState(false);
+  
+  // Load Cairo fonts
+  const [fontsLoaded] = useFonts({
+    Cairo_300Light,
+    Cairo_400Regular,
+    Cairo_500Medium,
+    Cairo_600SemiBold,
+    Cairo_700Bold,
+  });
   
   // Initialize push notifications
   const { expoPushToken, notification, loading: pushLoading, error: pushError } = usePushNotifications();
@@ -43,8 +66,15 @@ export default function RootLayout() {
     init();
   }, []);
 
+  // Hide splash screen when fonts are loaded
   useEffect(() => {
-    if (!isReady || isLoading) return;
+    if (fontsLoaded && isReady) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, isReady]);
+
+  useEffect(() => {
+    if (!isReady || isLoading || !fontsLoaded) return;
 
     const inAuthGroup = segments[0] === '(auth)';
     const inMainGroup = segments[0] === '(main)';
@@ -75,9 +105,9 @@ export default function RootLayout() {
         router.replace('/(main)/home');
       }
     }
-  }, [isAuthenticated, isGuest, segments, isLoading, isReady, user]);
+  }, [isAuthenticated, isGuest, segments, isLoading, isReady, user, fontsLoaded]);
 
-  if (!isReady || isLoading) {
+  if (!fontsLoaded || !isReady || isLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={COLORS.primary} />
