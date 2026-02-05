@@ -7,7 +7,6 @@ import {
   Linking,
   Platform,
 } from 'react-native';
-import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../constants/theme';
 
@@ -38,35 +37,23 @@ export default function LocationViewer({
     Linking.openURL(url as string);
   };
 
+  const openInMaps = () => {
+    const { lat, lng } = location;
+    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    Linking.openURL(url);
+  };
+
   return (
     <View style={styles.container}>
-      {/* Map */}
+      {/* Map placeholder */}
       <View style={[styles.mapContainer, { height }]}>
-        <MapView
-          style={styles.map}
-          provider={PROVIDER_DEFAULT}
-          initialRegion={{
-            latitude: location.lat,
-            longitude: location.lng,
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
-          }}
-          scrollEnabled={false}
-          zoomEnabled={false}
-          rotateEnabled={false}
-          pitchEnabled={false}
-        >
-          <Marker
-            coordinate={{
-              latitude: location.lat,
-              longitude: location.lng,
-            }}
-          >
-            <View style={styles.markerContainer}>
-              <Ionicons name="location" size={32} color={COLORS.primary} />
-            </View>
-          </Marker>
-        </MapView>
+        <View style={styles.mapPlaceholder}>
+          <Ionicons name="location" size={40} color={COLORS.primary} />
+          <Text style={styles.locationText}>موقع التوصيل</Text>
+          <Text style={styles.coordsText}>
+            {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
+          </Text>
+        </View>
 
         {/* Navigate button overlay */}
         {showNavigateButton && (
@@ -75,6 +62,12 @@ export default function LocationViewer({
             <Text style={styles.navigateBtnText}>ابدأ التنقل</Text>
           </TouchableOpacity>
         )}
+
+        {/* View on map button */}
+        <TouchableOpacity style={styles.viewMapBtn} onPress={openInMaps}>
+          <Ionicons name="map" size={18} color={COLORS.primary} />
+          <Text style={styles.viewMapBtnText}>عرض على الخريطة</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Address text */}
@@ -98,12 +91,25 @@ const styles = StyleSheet.create({
   mapContainer: {
     position: 'relative',
   },
-  map: {
+  mapPlaceholder: {
     flex: 1,
-  },
-  markerContainer: {
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#e5e7eb',
+    padding: SPACING.lg,
+  },
+  locationText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+    marginTop: SPACING.sm,
+    fontFamily: 'Cairo_600SemiBold',
+  },
+  coordsText: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+    fontFamily: 'Cairo_400Regular',
   },
   navigateBtn: {
     position: 'absolute',
@@ -122,6 +128,24 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'Cairo_600SemiBold',
     color: '#fff',
+  },
+  viewMapBtn: {
+    position: 'absolute',
+    bottom: SPACING.sm,
+    left: SPACING.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.md,
+    gap: 6,
+    ...SHADOWS.small,
+  },
+  viewMapBtnText: {
+    fontSize: 13,
+    fontFamily: 'Cairo_600SemiBold',
+    color: COLORS.primary,
   },
   addressContainer: {
     flexDirection: 'row',
