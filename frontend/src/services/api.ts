@@ -254,6 +254,23 @@ export const restaurantPanelAPI = {
     const response = await api.delete(`/restaurant/addons/${groupId}`);
     return response.data;
   },
+  // Payment Methods Management
+  getPaymentMethods: async () => {
+    const response = await api.get('/restaurant/payment-methods');
+    return response.data;
+  },
+  updatePaymentMethods: async (methods: any[]) => {
+    const response = await api.put('/restaurant/payment-methods', { methods });
+    return response.data;
+  },
+  confirmOrderPayment: async (orderId: string) => {
+    const response = await api.put(`/restaurant/orders/${orderId}/confirm-payment`);
+    return response.data;
+  },
+  rejectOrderPayment: async (orderId: string) => {
+    const response = await api.put(`/restaurant/orders/${orderId}/reject-payment`);
+    return response.data;
+  },
   // Restaurant Drivers Management
   getDrivers: async () => {
     const response = await api.get('/restaurant/drivers');
