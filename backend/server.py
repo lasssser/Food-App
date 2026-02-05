@@ -812,8 +812,13 @@ async def get_restaurants(
     if is_open is not None:
         query["is_open"] = is_open
     
-    restaurants = await db.restaurants.find(query).to_list(100)
-    return [Restaurant(**r) for r in restaurants]
+    # Sort by featured first, then by created_at
+    restaurants = await db.restaurants.find(query).sort([("is_featured", -1), ("featured_at", -1), ("created_at", -1)]).to_list(100)
+    result = []
+    for r in restaurants:
+        r["is_featured"] = r.get("is_featured", False)
+        result.append(Restaurant(**r))
+    return result
 
 @api_router.get("/restaurants/{restaurant_id}", response_model=Restaurant)
 async def get_restaurant(restaurant_id: str):
