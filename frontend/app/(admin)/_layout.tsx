@@ -70,6 +70,24 @@ export default function AdminLayout() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="statistics"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="advertisements"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="role-requests"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
