@@ -600,6 +600,8 @@ export default function ProfileScreen() {
         </TouchableOpacity>
 
         <Text style={styles.version}>أكلة عالسريع v1.0.0</Text>
+        <Text style={styles.poweredBy}>Powered by Wethaq Digital Solutions</Text>
+        <Text style={styles.rightsText}>All rights reserved.</Text>
       </ScrollView>
 
       {/* Add Address Modal */}
