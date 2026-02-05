@@ -10,13 +10,16 @@ import {
   Modal,
   KeyboardAvoidingView,
   Platform,
+  Image,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as ImagePicker from 'expo-image-picker';
 import { useCartStore } from '../../src/store/cartStore';
-import { addressAPI, orderAPI } from '../../src/services/api';
+import { addressAPI, orderAPI, restaurantAPI, customerAPI } from '../../src/services/api';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 import LocationPicker from '../../src/components/LocationPicker';
 
@@ -29,18 +32,46 @@ interface Address {
   lng?: number;
 }
 
+interface PaymentMethod {
+  method: string;
+  is_enabled: boolean;
+  display_name: string;
+  payment_info: string;
+  instructions: string;
+}
+
+const METHOD_ICONS: { [key: string]: string } = {
+  cod: 'cash-outline',
+  mtn_cash: 'phone-portrait-outline',
+  syriatel_cash: 'phone-portrait-outline',
+  shamcash: 'wallet-outline',
+};
+
+const METHOD_COLORS: { [key: string]: string } = {
+  cod: '#4CAF50',
+  mtn_cash: '#FFEB3B',
+  syriatel_cash: '#E91E63',
+  shamcash: '#2196F3',
+};
+
 export default function CheckoutScreen() {
   const router = useRouter();
   const { items, restaurant, getSubtotal, clearCart } = useCartStore();
   
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'SHAMCASH'>('COD');
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
+  const [isCustomerVerified, setIsCustomerVerified] = useState(false);
+  const [transactionId, setTransactionId] = useState('');
+  const [paymentScreenshot, setPaymentScreenshot] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showCodInfoModal, setShowCodInfoModal] = useState(false);
+  const [showPaymentInfoModal, setShowPaymentInfoModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [newAddress, setNewAddress] = useState({ label: '', address_line: '', area: '', lat: 0, lng: 0 });
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -50,18 +81,39 @@ export default function CheckoutScreen() {
   const total = subtotal + deliveryFee;
 
   useEffect(() => {
-    fetchAddresses();
+    fetchData();
   }, []);
 
-  const fetchAddresses = async () => {
+  const fetchData = async () => {
     try {
-      const data = await addressAPI.getAll();
-      setAddresses(data);
-      if (data.length > 0) {
-        setSelectedAddress(data[0].id);
+      // Fetch addresses
+      const addressData = await addressAPI.getAll();
+      setAddresses(addressData);
+      if (addressData.length > 0) {
+        setSelectedAddress(addressData[0].id);
+      }
+
+      // Fetch payment methods
+      if (restaurant?.id) {
+        const paymentData = await restaurantAPI.getPaymentMethods(restaurant.id);
+        setPaymentMethods(paymentData.methods || []);
+        // Set first enabled method as default
+        const firstEnabled = paymentData.methods?.find((m: PaymentMethod) => m.is_enabled);
+        if (firstEnabled) {
+          setSelectedPaymentMethod(firstEnabled.method);
+        }
+      }
+
+      // Check customer verification status
+      try {
+        const verificationData = await customerAPI.getVerificationStatus();
+        setIsCustomerVerified(verificationData.is_verified);
+      } catch (e) {
+        // Not logged in or error
+        setIsCustomerVerified(false);
       }
     } catch (error) {
-      console.error('Error fetching addresses:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
