@@ -749,6 +749,26 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
+  mapLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
+    textAlign: 'right',
+  },
+  locationConfirmed: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 6,
+    marginTop: SPACING.sm,
+    marginBottom: SPACING.md,
+  },
+  locationConfirmedText: {
+    fontSize: 13,
+    color: COLORS.success,
+    fontWeight: '600',
+  },
   modalButton: {
     marginTop: SPACING.md,
     borderRadius: RADIUS.md,
