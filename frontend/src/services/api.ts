@@ -498,4 +498,46 @@ export const settingsAPI = {
   },
 };
 
+// Role Requests API
+export const roleRequestsAPI = {
+  create: async (data: {
+    requested_role: string;
+    full_name: string;
+    phone: string;
+    restaurant_name?: string;
+    restaurant_address?: string;
+    restaurant_area?: string;
+    vehicle_type?: string;
+    license_number?: string;
+    notes?: string;
+  }) => {
+    const response = await api.post('/role-requests', data);
+    return response.data;
+  },
+  getMyRequests: async () => {
+    const response = await api.get('/role-requests/my');
+    return response.data;
+  },
+};
+
+// Admin Role Requests API
+export const adminRoleRequestsAPI = {
+  getAll: async (status?: string, skip: number = 0, limit: number = 50) => {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    params.append('skip', skip.toString());
+    params.append('limit', limit.toString());
+    const response = await api.get(`/admin/role-requests?${params.toString()}`);
+    return response.data;
+  },
+  approve: async (requestId: string) => {
+    const response = await api.put(`/admin/role-requests/${requestId}/approve`);
+    return response.data;
+  },
+  reject: async (requestId: string) => {
+    const response = await api.put(`/admin/role-requests/${requestId}/reject`);
+    return response.data;
+  },
+};
+
 export default api;
