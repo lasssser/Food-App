@@ -1152,13 +1152,18 @@ const styles = StyleSheet.create({
     fontFamily: 'Cairo_400Regular',
   },
   developerLogo: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 100,
+    height: 100,
+    borderRadius: 20,
     backgroundColor: COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.sm,
+    overflow: 'hidden',
+  },
+  developerLogoImage: {
+    width: 90,
+    height: 90,
   },
   developerName: {
     fontSize: 16,
