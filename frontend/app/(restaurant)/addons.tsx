@@ -717,9 +717,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: SPACING.sm,
     marginBottom: SPACING.sm,
+    width: '100%',
   },
   nameInput: {
-    flex: 2,
+    flex: 1.5,
     marginBottom: 0,
   },
   priceInput: {
@@ -728,6 +729,7 @@ const styles = StyleSheet.create({
   },
   removeOptionButton: {
     padding: 4,
+    minWidth: 32,
   },
   addOptionButton: {
     flexDirection: 'row-reverse',
