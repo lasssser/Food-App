@@ -150,9 +150,55 @@ export default function CheckoutScreen() {
     }
   };
 
+  const handleSelectPaymentMethod = (method: string) => {
+    // If COD and not verified, show info modal
+    if (method === 'cod' && !isCustomerVerified) {
+      setShowCodInfoModal(true);
+      return;
+    }
+    setSelectedPaymentMethod(method);
+    // If electronic payment, show payment info modal
+    if (method !== 'cod') {
+      setShowPaymentInfoModal(true);
+    }
+  };
+
+  const pickPaymentScreenshot = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('خطأ', 'يرجى السماح بالوصول إلى الصور');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.5,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets[0].base64) {
+      setPaymentScreenshot(`data:image/jpeg;base64,${result.assets[0].base64}`);
+    }
+  };
+
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
       setErrorMessage('يرجى اختيار عنوان التوصيل');
+      setShowErrorModal(true);
+      return;
+    }
+
+    if (!selectedPaymentMethod) {
+      setErrorMessage('يرجى اختيار طريقة الدفع');
+      setShowErrorModal(true);
+      return;
+    }
+
+    // For electronic payments, require transaction ID
+    if (selectedPaymentMethod !== 'cod' && !transactionId.trim()) {
+      setErrorMessage('يرجى إدخال رقم العملية');
       setShowErrorModal(true);
       return;
     }
@@ -166,15 +212,23 @@ export default function CheckoutScreen() {
     setSubmitting(true);
 
     try {
-      const orderData = {
+      const orderData: any = {
         restaurant_id: restaurant.id,
         items: items.map((item) => ({
           menu_item_id: item.menuItem.id,
           quantity: item.quantity,
         })),
         address_id: selectedAddress,
-        payment_method: paymentMethod,
+        payment_method: selectedPaymentMethod,
       };
+
+      // Add payment info for electronic payments
+      if (selectedPaymentMethod !== 'cod') {
+        orderData.payment_info = {
+          transaction_id: transactionId.trim(),
+          payment_screenshot: paymentScreenshot || null,
+        };
+      }
 
       console.log('Sending order:', orderData);
       const order = await orderAPI.create(orderData);
