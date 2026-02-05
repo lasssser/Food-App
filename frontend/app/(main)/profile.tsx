@@ -259,7 +259,7 @@ export default function ProfileScreen() {
                 <View style={styles.aboutContent}>
                   <View style={styles.aboutLogo}>
                     <Image 
-                      source={require('../../assets/images/logo.png')} 
+                      source={require('../../assets/images/logo_food2.png')} 
                       style={styles.aboutLogoImage}
                       resizeMode="contain"
                     />
@@ -609,7 +609,7 @@ export default function ProfileScreen() {
               <View style={styles.aboutContent}>
                 <View style={styles.aboutLogo}>
                   <Image 
-                    source={require('../../assets/images/logo.png')} 
+                    source={require('../../assets/images/logo_food2.png')} 
                     style={styles.aboutLogoImage}
                     resizeMode="contain"
                   />
