@@ -750,16 +750,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.divider,
   },
-  headerGradient: {
-    paddingHorizontal: SPACING.lg,
-    paddingBottom: 30,
-    alignItems: 'center',
-  },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
     fontFamily: 'Cairo_700Bold',
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     textAlign: 'center',
   },
   content: {
