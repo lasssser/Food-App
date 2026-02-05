@@ -17,7 +17,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../src/store/authStore';
-import { addressAPI, complaintsAPI } from '../../src/services/api';
+import { addressAPI, complaintsAPI, settingsAPI } from '../../src/services/api';
 import { Address } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
@@ -33,6 +33,7 @@ export default function ProfileScreen() {
   const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
   const [newAddressLabel, setNewAddressLabel] = useState('');
   const [newAddressLine, setNewAddressLine] = useState('');
+  const [supportWhatsapp, setSupportWhatsapp] = useState('+963981401274');
   const [newAddressArea, setNewAddressArea] = useState('');
   // Complaint states
   const [showComplaintModal, setShowComplaintModal] = useState(false);
