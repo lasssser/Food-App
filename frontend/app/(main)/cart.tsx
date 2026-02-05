@@ -160,10 +160,35 @@ export default function CartScreen() {
         })}
 
         {/* Add Notes */}
-        <TouchableOpacity style={styles.notesButton}>
-          <Text style={styles.notesText}>إضافة ملاحظات للطلب</Text>
-          <Ionicons name="create-outline" size={20} color={COLORS.primary} />
+        <TouchableOpacity 
+          style={styles.notesButton}
+          onPress={() => setShowNotes(!showNotes)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.notesText}>
+            {showNotes ? 'إخفاء الملاحظات' : 'إضافة ملاحظات للطلب'}
+          </Text>
+          <Ionicons name={showNotes ? "chevron-up" : "create-outline"} size={20} color={COLORS.primary} />
         </TouchableOpacity>
+        
+        {showNotes && (
+          <View style={styles.notesInputContainer}>
+            <TextInput
+              style={styles.notesInput}
+              placeholder="اكتب ملاحظاتك هنا... مثلاً: بدون بصل، زيادة صوص"
+              placeholderTextColor="#bbb"
+              value={orderNotes}
+              onChangeText={setOrderNotes}
+              multiline
+              numberOfLines={3}
+              textAlign="right"
+              textAlignVertical="top"
+            />
+            {orderNotes.length > 0 && (
+              <Text style={styles.notesCount}>{orderNotes.length} حرف</Text>
+            )}
+          </View>
+        )}
       </ScrollView>
 
       {/* Order Summary Card */}
