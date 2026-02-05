@@ -164,9 +164,9 @@ export default function HomeScreen() {
               <Text style={styles.badgeText}>🔴 مغلق</Text>
             </View>
           )}
-          {index === 0 && (
-            <View style={[styles.badge, styles.badgeDiscount]}>
-              <Text style={styles.badgeText}>🔥 الأكثر طلباً</Text>
+          {restaurant.is_featured && (
+            <View style={[styles.badge, styles.badgeFeatured]}>
+              <Text style={styles.badgeText}>⭐ مميز</Text>
             </View>
           )}
         </View>
