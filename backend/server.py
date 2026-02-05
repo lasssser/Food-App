@@ -1229,6 +1229,186 @@ async def toggle_restaurant_status(current_user: dict = Depends(get_current_user
         "is_open": new_status
     }
 
+# ==================== Restaurant Payment Methods ====================
+
+@api_router.get("/restaurant/payment-methods")
+async def get_restaurant_payment_methods(
+    current_user: dict = Depends(get_current_user)
+):
+    """Get restaurant's configured payment methods"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    # Get payment methods from restaurant or return defaults
+    payment_methods = restaurant.get("payment_methods", [
+        {
+            "method": "cod",
+            "is_enabled": True,
+            "display_name": "الدفع عند الاستلام",
+            "payment_info": "",
+            "instructions": "ادفع للسائق عند استلام الطلب"
+        }
+    ])
+    
+    return {"methods": payment_methods}
+
+@api_router.put("/restaurant/payment-methods")
+async def update_restaurant_payment_methods(
+    update_data: PaymentMethodUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update restaurant's payment methods"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    # Convert to dict format for storage
+    methods_list = [m.dict() for m in update_data.methods]
+    
+    await db.restaurants.update_one(
+        {"id": restaurant["id"]},
+        {"$set": {"payment_methods": methods_list, "updated_at": datetime.utcnow()}}
+    )
+    
+    return {"message": "تم تحديث طرق الدفع بنجاح", "methods": methods_list}
+
+@api_router.get("/restaurants/{restaurant_id}/payment-methods")
+async def get_public_restaurant_payment_methods(restaurant_id: str):
+    """Get restaurant's payment methods for customers"""
+    restaurant = await db.restaurants.find_one({"id": restaurant_id})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="المطعم غير موجود")
+    
+    # Get only enabled payment methods
+    all_methods = restaurant.get("payment_methods", [
+        {
+            "method": "cod",
+            "is_enabled": True,
+            "display_name": "الدفع عند الاستلام",
+            "payment_info": "",
+            "instructions": "ادفع للسائق عند استلام الطلب"
+        }
+    ])
+    
+    enabled_methods = [m for m in all_methods if m.get("is_enabled", True)]
+    
+    return {"methods": enabled_methods}
+
+# Check if customer is verified (has completed a paid order)
+@api_router.get("/customer/verification-status")
+async def get_customer_verification_status(
+    current_user: dict = Depends(get_current_user)
+):
+    """Check if customer has completed at least one paid electronic order"""
+    if current_user.get("role") != "customer":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    # Check if customer has at least one delivered order with electronic payment
+    verified_order = await db.orders.find_one({
+        "user_id": current_user["id"],
+        "order_status": "delivered",
+        "payment_method": {"$in": ["mtn_cash", "syriatel_cash", "shamcash"]},
+        "payment_status": "paid"
+    })
+    
+    is_verified = verified_order is not None
+    
+    return {"is_verified": is_verified}
+
+# Confirm payment by restaurant
+@api_router.put("/restaurant/orders/{order_id}/confirm-payment")
+async def confirm_order_payment(
+    order_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Restaurant confirms payment for an order"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    order = await db.orders.find_one({"id": order_id, "restaurant_id": restaurant["id"]})
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    if order.get("payment_status") != "pending_verification":
+        raise HTTPException(status_code=400, detail="الطلب ليس بانتظار تأكيد الدفع")
+    
+    await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {
+            "payment_status": "paid",
+            "updated_at": datetime.utcnow()
+        }}
+    )
+    
+    # Create notification for customer
+    notification = {
+        "id": str(uuid.uuid4()),
+        "user_id": order["user_id"],
+        "title": "تم تأكيد الدفع",
+        "message": f"تم تأكيد دفعك لطلب #{order_id[:8]}",
+        "type": "payment_confirmed",
+        "is_read": False,
+        "created_at": datetime.utcnow()
+    }
+    await db.notifications.insert_one(notification)
+    
+    return {"message": "تم تأكيد الدفع بنجاح"}
+
+# Reject payment by restaurant
+@api_router.put("/restaurant/orders/{order_id}/reject-payment")
+async def reject_order_payment(
+    order_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Restaurant rejects payment for an order"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    order = await db.orders.find_one({"id": order_id, "restaurant_id": restaurant["id"]})
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    if order.get("payment_status") != "pending_verification":
+        raise HTTPException(status_code=400, detail="الطلب ليس بانتظار تأكيد الدفع")
+    
+    await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {
+            "payment_status": "failed",
+            "order_status": "cancelled",
+            "updated_at": datetime.utcnow()
+        }}
+    )
+    
+    # Create notification for customer
+    notification = {
+        "id": str(uuid.uuid4()),
+        "user_id": order["user_id"],
+        "title": "رُفض الدفع",
+        "message": f"لم يتم التحقق من دفعك لطلب #{order_id[:8]}. يرجى التواصل مع المطعم.",
+        "type": "payment_rejected",
+        "is_read": False,
+        "created_at": datetime.utcnow()
+    }
+    await db.notifications.insert_one(notification)
+    
+    return {"message": "تم رفض الدفع وإلغاء الطلب"}
+
 # ==================== Restaurant Drivers Management ====================
 
 def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
