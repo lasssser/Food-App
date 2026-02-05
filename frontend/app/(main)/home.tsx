@@ -56,16 +56,19 @@ export default function HomeScreen() {
   const { user } = useAuthStore();
   const { selectedCity, selectedDistrict, cities, setCities, setLocation, isLocationSet } = useLocationStore();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [advertisements, setAdvertisements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [selectedCityLocal, setSelectedCityLocal] = useState<City | null>(null);
+  const [currentAdIndex, setCurrentAdIndex] = useState(0);
 
-  // Fetch cities on mount
+  // Fetch cities and advertisements on mount
   useEffect(() => {
-    const loadCities = async () => {
+    const loadData = async () => {
+      // Load cities
       if (cities.length === 0) {
         try {
           const data = await locationAPI.getCities();
@@ -74,9 +77,26 @@ export default function HomeScreen() {
           console.error('Error loading cities:', error);
         }
       }
+      // Load advertisements
+      try {
+        const ads = await advertisementsAPI.getAll();
+        setAdvertisements(ads);
+      } catch (error) {
+        console.error('Error loading advertisements:', error);
+      }
     };
-    loadCities();
+    loadData();
   }, []);
+
+  // Auto-rotate advertisements
+  useEffect(() => {
+    if (advertisements.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentAdIndex((prev) => (prev + 1) % advertisements.length);
+      }, 4000);
+      return () => clearInterval(interval);
+    }
+  }, [advertisements.length]);
 
   const fetchRestaurants = async () => {
     try {
