@@ -54,6 +54,38 @@ const METHOD_COLORS: { [key: string]: string } = {
   shamcash: '#2196F3',
 };
 
+// Default payment methods available for all customers
+const DEFAULT_PAYMENT_METHODS: PaymentMethod[] = [
+  {
+    method: 'cod',
+    is_enabled: true,
+    display_name: 'الدفع نقداً عند الاستلام',
+    payment_info: '',
+    instructions: 'ادفع نقداً للسائق عند استلام طلبك',
+  },
+  {
+    method: 'shamcash',
+    is_enabled: true,
+    display_name: 'شام كاش',
+    payment_info: '',
+    instructions: 'قم بتحويل المبلغ عبر شام كاش ثم أدخل رقم العملية',
+  },
+  {
+    method: 'syriatel_cash',
+    is_enabled: true,
+    display_name: 'سيرياتيل كاش',
+    payment_info: '',
+    instructions: 'قم بتحويل المبلغ عبر سيرياتيل كاش ثم أدخل رقم العملية',
+  },
+  {
+    method: 'mtn_cash',
+    is_enabled: true,
+    display_name: 'MTN كاش',
+    payment_info: '',
+    instructions: 'قم بتحويل المبلغ عبر MTN كاش ثم أدخل رقم العملية',
+  },
+];
+
 export default function CheckoutScreen() {
   const router = useRouter();
   const { items, restaurant, getSubtotal, clearCart } = useCartStore();
