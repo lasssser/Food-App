@@ -597,20 +597,20 @@ export default function RestaurantOrders() {
                   <Text style={styles.orderSummaryLabel}>العنوان</Text>
                 </View>
               </View>
+            )}
 
-              {/* Customer Location Map */}
-              {selectedOrder?.address?.lat && selectedOrder?.address?.lng && (
-                <View style={styles.mapSection}>
-                  <Text style={styles.mapSectionTitle}>📍 موقع العميل على الخريطة</Text>
-                  <LocationViewer
-                    location={{ lat: selectedOrder.address.lat, lng: selectedOrder.address.lng }}
-                    addressText={selectedOrder.address.address_line}
-                    height={160}
-                    showNavigateButton={true}
-                  />
-                </View>
-              )}
-            </View>
+            {/* Customer Location Map */}
+            {selectedOrder?.address?.lat && selectedOrder?.address?.lng && (
+              <View style={styles.mapSection}>
+                <Text style={styles.mapSectionTitle}>📍 موقع العميل على الخريطة</Text>
+                <LocationViewer
+                  location={{ lat: selectedOrder.address.lat, lng: selectedOrder.address.lng }}
+                  addressText={selectedOrder.address.address_line}
+                  height={160}
+                  showNavigateButton={true}
+                />
+              </View>
+            )}
 
             <ScrollView style={styles.driversSection}>
               {/* My Drivers Section */}
