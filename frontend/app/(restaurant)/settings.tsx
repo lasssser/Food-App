@@ -144,6 +144,14 @@ export default function RestaurantSettings() {
       onPress: () => router.push('/(restaurant)/drivers'),
     },
     {
+      id: 'payment-methods',
+      title: 'طرق الدفع',
+      subtitle: 'إدارة طرق الدفع المتاحة',
+      icon: 'card' as const,
+      color: '#2196F3',
+      onPress: () => router.push('/(restaurant)/payment-methods'),
+    },
+    {
       id: 'reports',
       title: 'التقارير والإحصائيات',
       subtitle: 'المبيعات والأداء',
