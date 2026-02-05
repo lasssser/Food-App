@@ -667,7 +667,7 @@ export default function ProfileScreen() {
                     style={styles.contactItem}
                     onPress={() => Linking.openURL('mailto:info@wethaqdigital.com')}
                   >
-                    <Text style={styles.contactText}>info@wethaqdigital.com</Text>
+                    <Text style={[styles.contactText, { fontFamily: 'Cairo_400Regular' }]}>info@wethaqdigital.com</Text>
                     <Ionicons name="mail-outline" size={20} color={COLORS.primary} />
                   </TouchableOpacity>
                   
@@ -675,12 +675,12 @@ export default function ProfileScreen() {
                     style={styles.contactItem}
                     onPress={() => Linking.openURL('tel:+963981401274')}
                   >
-                    <Text style={styles.contactText}>+963 981 401 274</Text>
+                    <Text style={[styles.contactText, { fontFamily: 'Cairo_400Regular' }]}>+963 981 401 274</Text>
                     <Ionicons name="call-outline" size={20} color={COLORS.primary} />
                   </TouchableOpacity>
                 </View>
                 
-                <Text style={styles.copyright}>© 2026 Wethaq Digital Solutions. All rights reserved.</Text>
+                <Text style={[styles.copyright, { fontFamily: 'Cairo_400Regular' }]}>© 2026 Wethaq Digital Solutions. All rights reserved.</Text>
               </View>
             </ScrollView>
           </View>
