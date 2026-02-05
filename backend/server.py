@@ -224,8 +224,10 @@ class Order(BaseModel):
     subtotal: float
     delivery_fee: float
     total: float
-    payment_method: str
-    payment_status: str = "unpaid"  # unpaid, pending, paid, failed, cod
+    payment_method: str  # cod, mtn_cash, syriatel_cash, shamcash
+    payment_status: str = "unpaid"  # unpaid, pending_verification, paid, failed, cod
+    payment_transaction_id: Optional[str] = None  # رقم العملية من الزبون
+    payment_screenshot: Optional[str] = None  # صورة الدفع (base64)
     order_status: str = "pending"  # pending, accepted, preparing, ready, driver_assigned, picked_up, out_for_delivery, delivered, cancelled
     address: dict
     notes: Optional[str] = None
