@@ -347,23 +347,23 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
   },
   dividerText: {
-    marginHorizontal: SPACING.md,
+    marginHorizontal: SPACING.sm,
     color: COLORS.textLight,
-    fontSize: 14,
+    fontSize: 12,
   },
 
   // Guest Button
   guestButton: {
     backgroundColor: COLORS.background,
     borderRadius: RADIUS.md,
-    paddingVertical: SPACING.lg,
+    paddingVertical: SPACING.md,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: COLORS.border,
   },
   guestButtonText: {
     color: COLORS.textPrimary,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
   },
 
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   registerContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: SPACING.xl,
+    marginTop: SPACING.md,
   },
   registerText: {
     fontSize: 14,
