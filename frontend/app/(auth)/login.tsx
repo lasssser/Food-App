@@ -255,6 +255,11 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
     borderWidth: 3,
     borderColor: COLORS.primary,
+    overflow: 'hidden',
+  },
+  logoImage: {
+    width: 80,
+    height: 80,
   },
   logoEmoji: {
     fontSize: 50,
