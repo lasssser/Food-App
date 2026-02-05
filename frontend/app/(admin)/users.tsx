@@ -718,6 +718,25 @@ export default function AdminUsers() {
                   { color: newUserRole === 'driver' ? '#fff' : '#f59e0b' },
                 ]}>سائق</Text>
               </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.roleOption,
+                  newUserRole === 'moderator' && styles.roleOptionSelected,
+                  { backgroundColor: newUserRole === 'moderator' ? '#8b5cf6' : '#ede9fe' }
+                ]}
+                onPress={() => setNewUserRole('moderator')}
+              >
+                <Ionicons 
+                  name="shield-checkmark" 
+                  size={24} 
+                  color={newUserRole === 'moderator' ? '#fff' : '#8b5cf6'} 
+                />
+                <Text style={[
+                  styles.roleOptionText,
+                  { color: newUserRole === 'moderator' ? '#fff' : '#8b5cf6' },
+                ]}>مشرف</Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.deleteModalButtons}>
