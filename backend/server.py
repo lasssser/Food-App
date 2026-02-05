@@ -3980,6 +3980,100 @@ async def get_restaurant_statistics(
     
     return result
 
+@api_router.get("/admin/statistics/restaurants/monthly")
+async def get_restaurant_monthly_statistics(
+    year: int = None,
+    admin: dict = Depends(require_admin_or_moderator)
+):
+    """Get monthly order statistics per restaurant (admin)"""
+    # Default to current year if not specified
+    if year is None:
+        year = datetime.utcnow().year
+    
+    # Aggregate orders by restaurant and month
+    pipeline = [
+        {
+            "$match": {
+                "created_at": {
+                    "$gte": datetime(year, 1, 1),
+                    "$lt": datetime(year + 1, 1, 1)
+                }
+            }
+        },
+        {
+            "$group": {
+                "_id": {
+                    "restaurant_id": "$restaurant_id",
+                    "month": {"$month": "$created_at"}
+                },
+                "total_orders": {"$sum": 1},
+                "total_revenue": {"$sum": "$total"},
+                "completed_orders": {
+                    "$sum": {"$cond": [{"$eq": ["$order_status", "delivered"]}, 1, 0]}
+                },
+                "cancelled_orders": {
+                    "$sum": {"$cond": [{"$eq": ["$order_status", "cancelled"]}, 1, 0]}
+                }
+            }
+        },
+        {"$sort": {"_id.month": 1, "total_orders": -1}}
+    ]
+    
+    stats = await db.orders.aggregate(pipeline).to_list(500)
+    
+    # Get all restaurants
+    restaurants = {}
+    all_restaurants = await db.restaurants.find().to_list(100)
+    for r in all_restaurants:
+        restaurants[r["id"]] = {
+            "name": r.get("name", "غير معروف"),
+            "image": r.get("image"),
+            "is_featured": r.get("is_featured", False)
+        }
+    
+    # Month names in Arabic
+    month_names = {
+        1: "يناير", 2: "فبراير", 3: "مارس", 4: "أبريل",
+        5: "مايو", 6: "يونيو", 7: "يوليو", 8: "أغسطس",
+        9: "سبتمبر", 10: "أكتوبر", 11: "نوفمبر", 12: "ديسمبر"
+    }
+    
+    # Organize data by month
+    monthly_data = {}
+    for stat in stats:
+        month = stat["_id"]["month"]
+        restaurant_id = stat["_id"]["restaurant_id"]
+        
+        if month not in monthly_data:
+            monthly_data[month] = {
+                "month": month,
+                "month_name": month_names.get(month, str(month)),
+                "year": year,
+                "restaurants": []
+            }
+        
+        restaurant_info = restaurants.get(restaurant_id, {"name": "غير معروف"})
+        monthly_data[month]["restaurants"].append({
+            "restaurant_id": restaurant_id,
+            "restaurant_name": restaurant_info.get("name"),
+            "restaurant_image": restaurant_info.get("image"),
+            "is_featured": restaurant_info.get("is_featured", False),
+            "total_orders": stat["total_orders"],
+            "completed_orders": stat["completed_orders"],
+            "cancelled_orders": stat["cancelled_orders"],
+            "total_revenue": stat["total_revenue"]
+        })
+    
+    # Sort restaurants within each month by total_orders
+    for month in monthly_data:
+        monthly_data[month]["restaurants"].sort(key=lambda x: x["total_orders"], reverse=True)
+    
+    # Convert to list and sort by month
+    result = list(monthly_data.values())
+    result.sort(key=lambda x: x["month"], reverse=True)  # Most recent first
+    
+    return {"year": year, "months": result}
+
 @api_router.get("/admin/statistics/overview")
 async def get_admin_overview_statistics(
     admin: dict = Depends(require_admin_or_moderator)
