@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,6 @@ import {
   Platform,
   Linking,
 } from 'react-native';
-import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../constants/theme';
@@ -24,10 +23,8 @@ interface LocationPickerProps {
 
 // Default location: Damascus, Syria
 const DEFAULT_LOCATION = {
-  latitude: 33.5138,
-  longitude: 36.2765,
-  latitudeDelta: 0.01,
-  longitudeDelta: 0.01,
+  lat: 33.5138,
+  lng: 36.2765,
 };
 
 export default function LocationPicker({
@@ -37,26 +34,12 @@ export default function LocationPicker({
   showOpenInMaps = false,
   height = 250,
 }: LocationPickerProps) {
-  const mapRef = useRef<MapView>(null);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(
-    initialLocation
-      ? { latitude: initialLocation.lat, longitude: initialLocation.lng }
-      : null
-  );
-  const [region, setRegion] = useState({
-    ...DEFAULT_LOCATION,
-    ...(initialLocation
-      ? {
-          latitude: initialLocation.lat,
-          longitude: initialLocation.lng,
-        }
-      : {}),
-  });
+    lat: number;
+    lng: number;
+  } | null>(initialLocation || null);
 
   // Get current location
   const getCurrentLocation = async () => {
@@ -88,28 +71,12 @@ export default function LocationPicker({
       });
 
       const newLocation = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+        lat: location.coords.latitude,
+        lng: location.coords.longitude,
       };
 
       setSelectedLocation(newLocation);
-      setRegion({
-        ...newLocation,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      });
-
-      // Animate to new location
-      mapRef.current?.animateToRegion({
-        ...newLocation,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      });
-
-      onLocationSelect({
-        lat: newLocation.latitude,
-        lng: newLocation.longitude,
-      });
+      onLocationSelect(newLocation);
     } catch (error) {
       console.error('Error getting location:', error);
       setErrorMsg('فشل في تحديد الموقع');
@@ -118,60 +85,47 @@ export default function LocationPicker({
     }
   };
 
-  // Handle map press
-  const handleMapPress = (event: any) => {
-    if (!editable) return;
-
-    const { latitude, longitude } = event.nativeEvent.coordinate;
-    setSelectedLocation({ latitude, longitude });
-    onLocationSelect({ lat: latitude, lng: longitude });
-  };
-
   // Open location in external maps app
   const openInMaps = () => {
     if (!selectedLocation) return;
 
-    const { latitude, longitude } = selectedLocation;
+    const { lat, lng } = selectedLocation;
     const label = 'موقع التوصيل';
 
     const url = Platform.select({
-      ios: `maps:0,0?q=${label}@${latitude},${longitude}`,
-      android: `geo:0,0?q=${latitude},${longitude}(${label})`,
-      default: `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`,
+      ios: `maps:0,0?q=${label}@${lat},${lng}`,
+      android: `geo:0,0?q=${lat},${lng}(${label})`,
+      default: `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`,
     });
 
     Linking.openURL(url as string);
   };
 
+  // Generate OpenStreetMap embed URL
+  const getMapUrl = () => {
+    const loc = selectedLocation || DEFAULT_LOCATION;
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${loc.lng - 0.01},${loc.lat - 0.01},${loc.lng + 0.01},${loc.lat + 0.01}&layer=mapnik&marker=${loc.lat},${loc.lng}`;
+  };
+
   return (
     <View style={[styles.container, { height }]}>
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        provider={PROVIDER_DEFAULT}
-        initialRegion={region}
-        onPress={handleMapPress}
-        showsUserLocation={true}
-        showsMyLocationButton={false}
-        mapType="standard"
-      >
-        {selectedLocation && (
-          <Marker
-            coordinate={selectedLocation}
-            title="موقع التوصيل"
-            draggable={editable}
-            onDragEnd={(e) => {
-              const { latitude, longitude } = e.nativeEvent.coordinate;
-              setSelectedLocation({ latitude, longitude });
-              onLocationSelect({ lat: latitude, lng: longitude });
-            }}
-          >
-            <View style={styles.markerContainer}>
-              <Ionicons name="location" size={36} color={COLORS.primary} />
-            </View>
-          </Marker>
+      {/* Map placeholder with location info */}
+      <View style={styles.mapPlaceholder}>
+        {selectedLocation ? (
+          <>
+            <Ionicons name="location" size={48} color={COLORS.primary} />
+            <Text style={styles.locationText}>تم تحديد الموقع ✓</Text>
+            <Text style={styles.coordsText}>
+              {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
+            </Text>
+          </>
+        ) : (
+          <>
+            <Ionicons name="map-outline" size={48} color={COLORS.textLight} />
+            <Text style={styles.placeholderText}>اضغط على "موقعي الحالي" لتحديد موقعك</Text>
+          </>
         )}
-      </MapView>
+      </View>
 
       {/* Controls overlay */}
       <View style={styles.controlsOverlay}>
@@ -192,7 +146,7 @@ export default function LocationPicker({
           </TouchableOpacity>
         )}
 
-        {showOpenInMaps && selectedLocation && (
+        {(showOpenInMaps || selectedLocation) && selectedLocation && (
           <TouchableOpacity style={styles.openMapsBtn} onPress={openInMaps}>
             <Ionicons name="navigate" size={20} color="#fff" />
             <Text style={styles.openMapsText}>فتح في الخرائط</Text>
@@ -207,15 +161,6 @@ export default function LocationPicker({
           <Text style={styles.errorText}>{errorMsg}</Text>
         </View>
       )}
-
-      {/* Instructions */}
-      {editable && !selectedLocation && (
-        <View style={styles.instructionContainer}>
-          <Text style={styles.instructionText}>
-            اضغط على "موقعي الحالي" أو حدد موقعك على الخريطة
-          </Text>
-        </View>
-      )}
     </View>
   );
 }
@@ -227,12 +172,32 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     ...SHADOWS.small,
   },
-  map: {
+  mapPlaceholder: {
     flex: 1,
-  },
-  markerContainer: {
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#e5e7eb',
+    padding: SPACING.lg,
+  },
+  locationText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.success,
+    marginTop: SPACING.sm,
+    fontFamily: 'Cairo_600SemiBold',
+  },
+  coordsText: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+    fontFamily: 'Cairo_400Regular',
+  },
+  placeholderText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.sm,
+    textAlign: 'center',
+    fontFamily: 'Cairo_400Regular',
   },
   controlsOverlay: {
     position: 'absolute',
@@ -288,20 +253,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Cairo_400Regular',
     color: COLORS.error,
-  },
-  instructionContainer: {
-    position: 'absolute',
-    bottom: SPACING.sm,
-    left: SPACING.sm,
-    right: SPACING.sm,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    padding: SPACING.sm,
-    borderRadius: RADIUS.sm,
-  },
-  instructionText: {
-    fontSize: 12,
-    fontFamily: 'Cairo_400Regular',
-    color: '#fff',
-    textAlign: 'center',
   },
 });
