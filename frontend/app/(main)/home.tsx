@@ -37,6 +37,7 @@ interface Restaurant {
   rating: number;
   review_count: number;
   is_open: boolean;
+  is_featured?: boolean;
   delivery_fee: number;
   min_order: number;
   delivery_time: string;
