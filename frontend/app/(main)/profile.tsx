@@ -253,64 +253,70 @@ export default function ProfileScreen() {
           <Text style={styles.headerTitle}>حسابي</Text>
         </View>
 
-        <View style={styles.guestContainer}>
-          <View style={styles.guestIconContainer}>
-            <Ionicons name="person-outline" size={60} color={COLORS.textLight} />
-          </View>
-          <Text style={styles.guestTitle}>أنت تتصفح كضيف</Text>
-          <Text style={styles.guestSubtitle}>سجل دخولك للاستفادة من جميع الميزات</Text>
-          
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() => {
-              setGuestMode(false);
-              router.replace('/(auth)/login');
-            }}
-            activeOpacity={0.7}
-          >
-            <LinearGradient
-              colors={[COLORS.primary, COLORS.primaryDark]}
-              style={styles.loginButtonGradient}
+        <ScrollView 
+          style={{ flex: 1 }} 
+          contentContainerStyle={{ paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.guestContainer}>
+            <View style={styles.guestIconContainer}>
+              <Ionicons name="person-outline" size={60} color={COLORS.textLight} />
+            </View>
+            <Text style={styles.guestTitle}>أنت تتصفح كضيف</Text>
+            <Text style={styles.guestSubtitle}>سجل دخولك للاستفادة من جميع الميزات</Text>
+            
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={() => {
+                setGuestMode(false);
+                router.replace('/(auth)/login');
+              }}
+              activeOpacity={0.7}
             >
-              <Ionicons name="log-in-outline" size={22} color={COLORS.textWhite} />
-              <Text style={styles.loginButtonText}>تسجيل الدخول</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <LinearGradient
+                colors={[COLORS.primary, COLORS.primaryDark]}
+                style={styles.loginButtonGradient}
+              >
+                <Ionicons name="log-in-outline" size={22} color={COLORS.textWhite} />
+                <Text style={styles.loginButtonText}>تسجيل الدخول</Text>
+              </LinearGradient>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.registerButton}
-            onPress={() => {
-              setGuestMode(false);
-              router.push('/(auth)/register');
-            }}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.registerButtonText}>إنشاء حساب جديد</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={styles.registerButton}
+              onPress={() => {
+                setGuestMode(false);
+                router.push('/(auth)/register');
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.registerButtonText}>إنشاء حساب جديد</Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* Menu Items for Guest */}
-        <View style={styles.menuSection}>
-          <TouchableOpacity style={styles.menuItem} onPress={() => setShowHelpModal(true)} activeOpacity={0.7}>
-            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
-            <View style={styles.menuItemContent}>
-              <Text style={styles.menuItemText}>المساعدة والدعم</Text>
-              <Ionicons name="help-circle-outline" size={22} color={COLORS.textSecondary} />
-            </View>
-          </TouchableOpacity>
+          {/* Menu Items for Guest */}
+          <View style={styles.menuSection}>
+            <TouchableOpacity style={styles.menuItem} onPress={() => setShowHelpModal(true)} activeOpacity={0.7}>
+              <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+              <View style={styles.menuItemContent}>
+                <Text style={styles.menuItemText}>المساعدة والدعم</Text>
+                <Ionicons name="help-circle-outline" size={22} color={COLORS.textSecondary} />
+              </View>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={() => setShowAboutModal(true)} activeOpacity={0.7}>
-            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
-            <View style={styles.menuItemContent}>
-              <Text style={styles.menuItemText}>عن التطبيق</Text>
-              <Ionicons name="information-circle-outline" size={22} color={COLORS.textSecondary} />
-            </View>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity style={styles.menuItem} onPress={() => setShowAboutModal(true)} activeOpacity={0.7}>
+              <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+              <View style={styles.menuItemContent}>
+                <Text style={styles.menuItemText}>عن التطبيق</Text>
+                <Ionicons name="information-circle-outline" size={22} color={COLORS.textSecondary} />
+              </View>
+            </TouchableOpacity>
+          </View>
 
-        <Text style={styles.version}>أكلة عالسريع v1.0.0</Text>
-        <Text style={styles.poweredBy}>Powered by Wethaq Digital Solutions</Text>
-        <Text style={styles.rightsText}>All rights reserved.</Text>
+          <Text style={styles.version}>أكلة عالسريع v1.0.0</Text>
+          <Text style={styles.poweredBy}>Powered by Wethaq Digital Solutions</Text>
+          <Text style={styles.rightsText}>All rights reserved.</Text>
+        </ScrollView>
 
         {/* Help Modal */}
         <Modal visible={showHelpModal} animationType="slide" transparent>
