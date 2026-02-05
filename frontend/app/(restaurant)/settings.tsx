@@ -424,99 +424,101 @@ export default function RestaurantSettings() {
       </Modal>
 
       {/* About Modal */}
-      <Modal visible={showAboutModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHandle} />
-            <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={() => setShowAboutModal(false)} activeOpacity={0.7}>
-                <Ionicons name="close-circle" size={28} color={COLORS.textLight} />
-              </TouchableOpacity>
-              <Text style={styles.modalTitle}>عن التطبيق</Text>
-              <View style={{ width: 28 }} />
-            </View>
+      <Modal visible={showAboutModal} animationType="slide" transparent={false}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.surface }}>
+          {/* Fixed Header */}
+          <View style={[styles.modalHeader, { paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md, borderBottomWidth: 1, borderBottomColor: COLORS.divider }]}>
+            <TouchableOpacity 
+              onPress={() => setShowAboutModal(false)} 
+              activeOpacity={0.7}
+              style={{ padding: 8, backgroundColor: '#f0f0f0', borderRadius: 20 }}
+            >
+              <Ionicons name="close" size={22} color={COLORS.textPrimary} />
+            </TouchableOpacity>
+            <Text style={[styles.modalTitle, { fontFamily: 'Cairo_700Bold' }]}>عن التطبيق</Text>
+            <View style={{ width: 38 }} />
+          </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <View style={styles.aboutContent}>
-                <View style={styles.aboutLogoContainer}>
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: SPACING.lg }}>
+            <View style={styles.aboutContent}>
+              <View style={styles.aboutLogoContainer}>
+                <Image 
+                  source={require('../../assets/images/logo_food2_small.png')} 
+                  style={styles.aboutLogoImage}
+                  resizeMode="contain"
+                />
+              </View>
+              <Text style={[styles.aboutName, { fontFamily: 'Cairo_700Bold' }]}>أكلة عالسريع</Text>
+              <Text style={[styles.aboutTagline, { fontFamily: 'Cairo_400Regular' }]}>اطلب أشهى المأكولات بضغطة زر</Text>
+              
+              <View style={styles.versionBadge}>
+                <Text style={[styles.versionBadgeText, { fontFamily: 'Cairo_400Regular' }]}>لوحة المطعم - v1.0.0</Text>
+              </View>
+
+              <Text style={[styles.aboutDesc, { fontFamily: 'Cairo_400Regular' }]}>
+                لوحة تحكم متكاملة لأصحاب المطاعم لإدارة الطلبات والقوائم والسائقين وتتبع الإحصائيات.
+              </Text>
+
+              <View style={styles.featuresList}>
+                <View style={styles.featureItem}>
+                  <Ionicons name="checkmark-circle" size={18} color={COLORS.success} />
+                  <Text style={[styles.featureText, { fontFamily: 'Cairo_400Regular' }]}>إدارة الطلبات في الوقت الحقيقي</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <Ionicons name="checkmark-circle" size={18} color={COLORS.success} />
+                  <Text style={[styles.featureText, { fontFamily: 'Cairo_400Regular' }]}>تعيين السائقين بسهولة</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <Ionicons name="checkmark-circle" size={18} color={COLORS.success} />
+                  <Text style={[styles.featureText, { fontFamily: 'Cairo_400Regular' }]}>إشعارات فورية للطلبات</Text>
+                </View>
+              </View>
+
+              {/* Developer Info */}
+              <View style={styles.developerSection}>
+                <View style={styles.developerDivider} />
+                <Text style={[styles.developerTitle, { fontFamily: 'Cairo_400Regular' }]}>تم التطوير بواسطة</Text>
+                
+                <View style={styles.developerLogo}>
                   <Image 
-                    source={require('../../assets/images/logo_food2_small.png')} 
-                    style={styles.aboutLogoImage}
+                    source={require('../../assets/images/wethaq-logo.png')} 
+                    style={styles.developerLogoImage}
                     resizeMode="contain"
                   />
                 </View>
-                <Text style={styles.aboutName}>أكلة عالسريع</Text>
-                <Text style={styles.aboutTagline}>اطلب أشهى المأكولات بضغطة زر</Text>
+                <Text style={[styles.developerName, { fontFamily: 'Cairo_600SemiBold' }]}>Wethaq Digital Solutions</Text>
                 
-                <View style={styles.versionBadge}>
-                  <Text style={styles.versionBadgeText}>لوحة المطعم - v1.0.0</Text>
-                </View>
-
-                <Text style={styles.aboutDesc}>
-                  لوحة تحكم متكاملة لأصحاب المطاعم لإدارة الطلبات والقوائم والسائقين وتتبع الإحصائيات.
-                </Text>
-
-                <View style={styles.featuresList}>
-                  <View style={styles.featureItem}>
-                    <Ionicons name="checkmark-circle" size={18} color={COLORS.success} />
-                    <Text style={styles.featureText}>إدارة الطلبات في الوقت الحقيقي</Text>
-                  </View>
-                  <View style={styles.featureItem}>
-                    <Ionicons name="checkmark-circle" size={18} color={COLORS.success} />
-                    <Text style={styles.featureText}>تعيين السائقين بسهولة</Text>
-                  </View>
-                  <View style={styles.featureItem}>
-                    <Ionicons name="checkmark-circle" size={18} color={COLORS.success} />
-                    <Text style={styles.featureText}>إشعارات فورية للطلبات</Text>
-                  </View>
-                </View>
-
-                {/* Developer Info */}
-                <View style={styles.developerSection}>
-                  <View style={styles.developerDivider} />
-                  <Text style={styles.developerTitle}>تم التطوير بواسطة</Text>
+                <View style={styles.developerContacts}>
+                  <TouchableOpacity 
+                    style={styles.contactItem}
+                    onPress={() => Linking.openURL('https://www.wethaqdigital.com')}
+                  >
+                    <Text style={[styles.contactText, { fontFamily: 'Cairo_400Regular' }]}>www.wethaqdigital.com</Text>
+                    <Ionicons name="globe-outline" size={18} color={COLORS.primary} />
+                  </TouchableOpacity>
                   
-                  <View style={styles.developerLogo}>
-                    <Image 
-                      source={require('../../assets/images/wethaq-logo.png')} 
-                      style={styles.developerLogoImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                  <Text style={styles.developerName}>Wethaq Digital Solutions</Text>
+                  <TouchableOpacity 
+                    style={styles.contactItem}
+                    onPress={() => Linking.openURL('mailto:info@wethaqdigital.com')}
+                  >
+                    <Text style={[styles.contactText, { fontFamily: 'Cairo_400Regular' }]}>info@wethaqdigital.com</Text>
+                    <Ionicons name="mail-outline" size={18} color={COLORS.primary} />
+                  </TouchableOpacity>
                   
-                  <View style={styles.developerContacts}>
-                    <TouchableOpacity 
-                      style={styles.contactItem}
-                      onPress={() => Linking.openURL('https://www.wethaqdigital.com')}
-                    >
-                      <Text style={styles.contactText}>www.wethaqdigital.com</Text>
-                      <Ionicons name="globe-outline" size={18} color={COLORS.primary} />
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity 
-                      style={styles.contactItem}
-                      onPress={() => Linking.openURL('mailto:info@wethaqdigital.com')}
-                    >
-                      <Text style={styles.contactText}>info@wethaqdigital.com</Text>
-                      <Ionicons name="mail-outline" size={18} color={COLORS.primary} />
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity 
-                      style={styles.contactItem}
-                      onPress={() => Linking.openURL('tel:+963981401274')}
-                    >
-                      <Text style={styles.contactText}>+963 981 401 274</Text>
-                      <Ionicons name="call-outline" size={18} color={COLORS.primary} />
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity 
+                    style={styles.contactItem}
+                    onPress={() => Linking.openURL('tel:+963981401274')}
+                  >
+                    <Text style={[styles.contactText, { fontFamily: 'Cairo_400Regular' }]}>+963 981 401 274</Text>
+                    <Ionicons name="call-outline" size={18} color={COLORS.primary} />
+                  </TouchableOpacity>
                 </View>
-
-                <Text style={styles.aboutCopyright}>© 2026 Wethaq Digital Solutions. All rights reserved.</Text>
               </View>
-            </ScrollView>
-          </View>
-        </View>
+
+              <Text style={[styles.aboutCopyright, { fontFamily: 'Cairo_400Regular' }]}>© 2026 Wethaq Digital Solutions. All rights reserved.</Text>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
       </Modal>
 
       {/* Logout Confirmation Modal */}
