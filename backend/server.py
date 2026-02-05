@@ -287,6 +287,7 @@ class RestaurantUpdate(BaseModel):
     name: Optional[str] = None
     name_en: Optional[str] = None
     description: Optional[str] = None
+    image: Optional[str] = None
     address: Optional[str] = None
     area: Optional[str] = None
     cuisine_type: Optional[str] = None
