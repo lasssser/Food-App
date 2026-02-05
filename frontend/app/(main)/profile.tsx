@@ -65,6 +65,7 @@ export default function ProfileScreen() {
   useEffect(() => {
     if (!isGuest) {
       fetchAddresses();
+      fetchMyRoleRequests();
     }
   }, [isGuest]);
 
@@ -80,6 +81,18 @@ export default function ProfileScreen() {
       }
     } catch (error) {
       console.error('Error loading settings:', error);
+    }
+  };
+
+  const fetchMyRoleRequests = async () => {
+    try {
+      const requests = await roleRequestsAPI.getMyRequests();
+      setMyRoleRequests(requests);
+      // Check if there's a pending request
+      const pending = requests.find((r: any) => r.status === 'pending');
+      setHasPendingRequest(!!pending);
+    } catch (error) {
+      console.error('Error fetching role requests:', error);
     }
   };
 
