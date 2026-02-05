@@ -249,21 +249,13 @@ export default function StatisticsScreen() {
 
         {/* Restaurant header */}
         <View style={styles.detailHeader}>
-          <View style={styles.detailHeaderTop}>
-            <TouchableOpacity
-              onPress={() =>
-                toggleFeatured(selectedRestaurant.restaurant_id, selectedRestaurant.is_featured)
-              }
-              style={styles.starBtn}
-            >
-              <Ionicons
-                name="star"
-                size={20}
-                color={selectedRestaurant.is_featured ? '#FF9800' : '#ccc'}
-              />
-            </TouchableOpacity>
-            <Text style={styles.detailName}>{selectedRestaurant.restaurant_name}</Text>
-          </View>
+          <Text style={styles.detailName}>{selectedRestaurant.restaurant_name}</Text>
+          {selectedRestaurant.is_featured && (
+            <View style={styles.featuredBadge}>
+              <Ionicons name="star" size={14} color="#FF9800" />
+              <Text style={styles.featuredBadgeText}>مطعم مميز</Text>
+            </View>
+          )}
 
           <View style={styles.detailStats}>
             <View style={styles.detailStatItem}>
@@ -285,6 +277,32 @@ export default function StatisticsScreen() {
               <Text style={styles.detailStatLabel}>ملغاة</Text>
             </View>
           </View>
+
+          {/* Feature toggle button - CLEAR AND VISIBLE */}
+          <TouchableOpacity
+            onPress={() =>
+              toggleFeatured(selectedRestaurant.restaurant_id, selectedRestaurant.is_featured)
+            }
+            style={[
+              styles.featureToggleBtn,
+              selectedRestaurant.is_featured && styles.featureToggleBtnActive,
+            ]}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name={selectedRestaurant.is_featured ? 'star' : 'star-outline'}
+              size={20}
+              color={selectedRestaurant.is_featured ? '#FF9800' : '#999'}
+            />
+            <Text
+              style={[
+                styles.featureToggleText,
+                selectedRestaurant.is_featured && styles.featureToggleTextActive,
+              ]}
+            >
+              {selectedRestaurant.is_featured ? 'إلغاء التمييز' : 'تمييز المطعم'}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Year selector */}
