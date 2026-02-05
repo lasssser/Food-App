@@ -1016,11 +1016,13 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     fontSize: 16,
+    fontFamily: 'Cairo_600SemiBold',
     color: COLORS.error,
     fontWeight: '600',
   },
   version: {
     fontSize: 12,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textLight,
     textAlign: 'center',
     paddingBottom: 100,
@@ -1048,6 +1050,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'Cairo_700Bold',
     color: COLORS.textPrimary,
   },
   modalInput: {
@@ -1055,10 +1058,12 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     padding: SPACING.lg,
     fontSize: 15,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textPrimary,
     marginBottom: SPACING.md,
     borderWidth: 1,
     borderColor: COLORS.border,
+    textAlign: 'right',
   },
   saveButton: {
     borderRadius: RADIUS.md,
@@ -1072,6 +1077,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: COLORS.textWhite,
     fontSize: 16,
+    fontFamily: 'Cairo_700Bold',
     fontWeight: 'bold',
   },
 
@@ -1102,11 +1108,13 @@ const styles = StyleSheet.create({
   confirmTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    fontFamily: 'Cairo_700Bold',
     color: COLORS.textPrimary,
     marginBottom: SPACING.sm,
   },
   confirmMessage: {
     fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginBottom: SPACING.xl,
@@ -1126,6 +1134,7 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: 'Cairo_600SemiBold',
     color: COLORS.textPrimary,
   },
   deleteConfirmButton: {
@@ -1138,6 +1147,7 @@ const styles = StyleSheet.create({
   deleteConfirmButtonText: {
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: 'Cairo_600SemiBold',
     color: COLORS.textWhite,
   },
 
