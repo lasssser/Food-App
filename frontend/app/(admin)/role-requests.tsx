@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
 import { adminRoleRequestsAPI } from '../../src/services/api';
 
 interface RoleRequest {
