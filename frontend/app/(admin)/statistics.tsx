@@ -577,7 +577,6 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     padding: SPACING.xl,
     alignItems: 'center',
-    ...SHADOWS.medium,
   },
   revenueIcon: {
     width: 60,
