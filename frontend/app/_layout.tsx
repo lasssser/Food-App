@@ -16,14 +16,8 @@ SplashScreen.preventAutoHideAsync();
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
 
-// Set default font for all Text components
-const originalRender = Text.render;
-Text.render = function (...args: any[]) {
-  const origin = originalRender.call(this, ...args);
-  return React.cloneElement(origin, {
-    style: [{ fontFamily: 'Cairo_400Regular' }, origin.props.style],
-  });
-};
+// Default font is applied via style in individual components
+// Cairo font is loaded globally via useFonts hook
 
 // Animated Splash Screen Component
 function SplashView() {
