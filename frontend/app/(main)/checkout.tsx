@@ -449,6 +449,28 @@ export default function CheckoutScreen() {
           />
         </View>
 
+        {/* Customer Contact Info */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>📞 معلومات التواصل</Text>
+          <TextInput
+            style={[styles.notesInput, { height: 48, marginBottom: 8 }]}
+            value={customerName}
+            onChangeText={setCustomerName}
+            placeholder="اسم المستلم"
+            placeholderTextColor={COLORS.textLight}
+            textAlign="right"
+          />
+          <TextInput
+            style={[styles.notesInput, { height: 48 }]}
+            value={customerPhone}
+            onChangeText={setCustomerPhone}
+            placeholder="رقم هاتف المستلم"
+            placeholderTextColor={COLORS.textLight}
+            textAlign="right"
+            keyboardType="phone-pad"
+          />
+        </View>
+
         {/* Order Summary */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>🧾 ملخص الطلب</Text>
