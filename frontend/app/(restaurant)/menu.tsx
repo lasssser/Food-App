@@ -265,22 +265,32 @@ export default function RestaurantMenu() {
                 </View>
                 
                 <View style={styles.itemFooter}>
-                  <View style={[
-                    styles.statusBadge,
-                    { backgroundColor: item.is_available ? `${COLORS.success}15` : `${COLORS.error}15` }
-                  ]}>
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
                     <View style={[
-                      styles.statusDot,
-                      { backgroundColor: item.is_available ? COLORS.success : COLORS.error }
-                    ]} />
-                    <Text style={[
-                      styles.statusText,
-                      { color: item.is_available ? COLORS.success : COLORS.error }
+                      styles.statusBadge,
+                      { backgroundColor: item.is_available ? `${COLORS.success}15` : `${COLORS.error}15` }
                     ]}>
-                      {item.is_available ? 'متوفر' : 'غير متوفر'}
-                    </Text>
+                      <View style={[
+                        styles.statusDot,
+                        { backgroundColor: item.is_available ? COLORS.success : COLORS.error }
+                      ]} />
+                      <Text style={[
+                        styles.statusText,
+                        { color: item.is_available ? COLORS.success : COLORS.error }
+                      ]}>
+                        {item.is_available ? 'متوفر' : 'غير متوفر'}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => router.push({ pathname: '/(restaurant)/addons', params: { itemId: item.id, itemName: item.name } })}
+                      style={{ flexDirection: 'row-reverse', alignItems: 'center', backgroundColor: '#E8EAF6', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, gap: 4 }}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="options" size={14} color="#3F51B5" />
+                      <Text style={{ fontSize: 11, color: '#3F51B5' }}>إضافات</Text>
+                    </TouchableOpacity>
                   </View>
-                  <Text style={styles.itemPrice}>{item.price.toLocaleString()} ل.س</Text>
+                  <Text style={styles.itemPrice}>{(item.price || 0).toLocaleString()} ل.س</Text>
                 </View>
               </View>
             ))}
