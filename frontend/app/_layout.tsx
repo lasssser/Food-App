@@ -274,17 +274,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.08)',
   },
   splashLogoBox: {
-    width: 130,
-    height: 130,
-    borderRadius: 65,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
   },
   splashLogo: {
-    width: 115,
-    height: 115,
+    width: 140,
+    height: 140,
   },
   splashName: {
     fontSize: 36,
