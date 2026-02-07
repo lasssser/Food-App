@@ -235,7 +235,7 @@ export default function CheckoutScreen() {
         })),
         address_id: selectedAddress,
         payment_method: selectedPaymentMethod,
-        notes: orderNotes.trim() || '',
+        notes: [orderNotes.trim(), customerName.trim() ? `المستلم: ${customerName.trim()}` : '', customerPhone.trim() ? `هاتف: ${customerPhone.trim()}` : ''].filter(Boolean).join(' | ') || '',
       };
 
       // Add payment info for electronic payments
