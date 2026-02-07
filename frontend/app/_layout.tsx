@@ -153,7 +153,7 @@ function SplashView() {
 }
 
 export default function RootLayout() {
-  const { isLoading, isAuthenticated, isGuest, user, checkAuth } = useAuthStore();
+  const { isLoading, isAuthenticated, isGuest, user, checkAuth, setGuestMode } = useAuthStore();
   const router = useRouter();
   const segments = useSegments();
   const [isReady, setIsReady] = useState(false);
