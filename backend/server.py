@@ -877,7 +877,10 @@ async def get_restaurant_order_history(current_user: dict = Depends(get_current_
         "order_status": {"$in": ["delivered", "cancelled"]}
     }).sort("created_at", -1).to_list(100)
     
-    return [Order(**order) for order in orders]
+    for order in orders:
+        order.pop("_id", None)
+    
+    return orders
 
 @api_router.put("/restaurant/orders/{order_id}/status")
 async def update_order_status_restaurant(
