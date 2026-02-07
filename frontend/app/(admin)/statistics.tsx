@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { adminStatisticsAPI } from '../../src/services/api';
+import { adminStatisticsAPI, adminAPI } from '../../src/services/api';
 
 interface RestaurantStat {
   restaurant_id: string;
