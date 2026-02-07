@@ -2125,15 +2125,7 @@ async def create_order(order_data: OrderCreate, current_user: dict = Depends(get
     payment_screenshot = None
     
     if order_data.payment_method == "cod":
-        # Check if customer is verified for COD
-        verified_order = await db.orders.find_one({
-            "user_id": current_user["id"],
-            "order_status": "delivered",
-            "payment_method": {"$in": ["mtn_cash", "syriatel_cash", "shamcash"]},
-            "payment_status": "paid"
-        })
-        if not verified_order:
-            raise HTTPException(status_code=400, detail="يجب إتمام طلب واحد مدفوع إلكترونياً أولاً لتفعيل الدفع عند الاستلام")
+        # COD is available for everyone - no verification needed
         payment_status = "cod"
     elif order_data.payment_method in ["mtn_cash", "syriatel_cash", "shamcash"]:
         # Electronic payment requires transaction info
