@@ -292,17 +292,19 @@ export default function RestaurantOrders() {
   const completedOrders = orders.filter(o => ['delivered', 'cancelled'].includes(o.order_status));
 
   const renderOrder = ({ item: order }: { item: Order }) => {
+    try {
     if (!order || !order.id) return null;
     
-    const status = STATUS_CONFIG[order.order_status] || { label: order.order_status || 'غير معروف', color: '#999', icon: 'help-circle' as keyof typeof Ionicons.glyphMap, bgColor: '#F5F5F5' };
-    const action = STATUS_ACTIONS[order.order_status];
-    const showAssignButton = order.order_status === 'ready' && !order.driver_id;
+    const orderStatus = order.order_status || 'pending';
+    const status = STATUS_CONFIG[orderStatus] || { label: orderStatus, color: '#999', icon: 'help-circle' as keyof typeof Ionicons.glyphMap, bgColor: '#F5F5F5' };
+    const action = STATUS_ACTIONS[orderStatus];
+    const showAssignButton = orderStatus === 'ready' && !order.driver_id;
     const hasDriver = order.driver_id && order.driver_name;
     const isExpanded = expandedOrder === order.id;
-    const isPending = order.order_status === 'pending';
-    const itemsCount = order.items?.length || 0;
-    const orderTotal = order.total || 0;
-    const paymentMethod = (order.payment_method || '').toLowerCase();
+    const isPending = orderStatus === 'pending';
+    const itemsCount = Array.isArray(order.items) ? order.items.length : 0;
+    const orderTotal = typeof order.total === 'number' ? order.total : 0;
+    const paymentMethod = String(order.payment_method || 'cod').toLowerCase();
 
     return (
       <TouchableOpacity 
