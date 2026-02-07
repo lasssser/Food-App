@@ -154,6 +154,30 @@ export default function StatisticsScreen() {
     }
   };
 
+  const handleDeleteRestaurant = (restaurantId: string, restaurantName: string) => {
+    Alert.alert(
+      'حذف المطعم',
+      `هل أنت متأكد من حذف "${restaurantName}"؟ سيتم حذف جميع بياناته وقوائمه.`,
+      [
+        { text: 'إلغاء', style: 'cancel' },
+        {
+          text: 'حذف',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await adminAPI.deleteRestaurant(restaurantId);
+              setRestaurantStats((prev) => prev.filter((r) => r.restaurant_id !== restaurantId));
+              setSelectedRestaurant(null);
+              Alert.alert('تم', 'تم حذف المطعم بنجاح');
+            } catch (error) {
+              Alert.alert('خطأ', 'فشل في حذف المطعم');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   // Render overview tab
   const renderOverview = () => {
     if (!overview) return null;
