@@ -26,6 +26,7 @@ import { MenuItem } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 export default function RestaurantMenu() {
+  const router = useRouter();
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
