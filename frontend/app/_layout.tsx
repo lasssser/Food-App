@@ -205,13 +205,9 @@ export default function RootLayout() {
 
     const inAuthGroup = segments[0] === '(auth)';
 
-    // Not authenticated and not guest and not in auth pages - auto guest mode
+    // Not authenticated and not guest - redirect to login
     if (!isAuthenticated && !isGuest && !inAuthGroup) {
-      // Use setTimeout to avoid state update during render
-      setTimeout(() => {
-        setGuestMode(true);
-        router.replace('/(main)/home');
-      }, 0);
+      router.replace('/(auth)/login');
       return;
     } 
     // Authenticated user in auth group - redirect based on role
