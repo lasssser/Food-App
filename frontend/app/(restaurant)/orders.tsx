@@ -539,6 +539,19 @@ export default function RestaurantOrders() {
         </View>
       </TouchableOpacity>
     );
+    } catch (error) {
+      console.error('Error rendering order:', error, JSON.stringify(order));
+      return (
+        <View style={[styles.orderCard, { padding: 16 }]}>
+          <Text style={{ color: '#999', textAlign: 'center', fontFamily: 'Cairo_400Regular' }}>
+            خطأ في عرض الطلب #{(order?.id || '').slice(0, 8)}
+          </Text>
+          <TouchableOpacity onPress={() => fetchOrders()} style={{ marginTop: 8, alignItems: 'center' }}>
+            <Text style={{ color: COLORS.primary, fontFamily: 'Cairo_400Regular' }}>إعادة تحميل</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
   };
 
   if (loading) {
