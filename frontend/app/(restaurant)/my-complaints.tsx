@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
     borderRadius: RADIUS.lg,
     marginBottom: SPACING.md,
-    ...SHADOWS.sm,
+    ...SHADOWS.small,
   },
   complaintHeader: {
     flexDirection: 'row',
