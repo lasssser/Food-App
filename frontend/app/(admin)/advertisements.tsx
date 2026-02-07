@@ -101,19 +101,16 @@ export default function AdvertisementsScreen() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [16, 9],
-      quality: 0.8,
+      quality: 0.5,
       base64: true,
     });
 
     if (!result.canceled && result.assets[0]) {
       const asset = result.assets[0];
       if (asset.base64) {
-        try {
-          const response = await uploadAPI.uploadImage(asset.base64);
-          setImageUrl(response.url);
-        } catch (error) {
-          Alert.alert('خطأ', 'فشل في رفع الصورة');
-        }
+        setImageUrl(`data:image/jpeg;base64,${asset.base64}`);
+      } else if (asset.uri) {
+        setImageUrl(asset.uri);
       }
     }
   };
