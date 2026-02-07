@@ -78,6 +78,17 @@ agenthub/agents/youtube/db
 
 # Mobile development
 android-sdk/
+
+# Emergent platform files (exclude from repo)
+.emergent/
+emergent.yml
+test_result.md
+summary.txt
+
+# Environment files (create your own on server)
+.env
+*.env
+*.env.*
 -e 
 # Environment files
 *.env
