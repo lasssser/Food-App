@@ -3161,7 +3161,7 @@ class UpdateUserStatusRequest(BaseModel):
 async def update_user_status(
     user_id: str,
     request: UpdateUserStatusRequest,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Activate or deactivate a user"""
     result = await db.users.update_one(
@@ -3182,7 +3182,7 @@ class UpdateUserInfoRequest(BaseModel):
 async def update_user_info(
     user_id: str,
     request: UpdateUserInfoRequest,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Update user information (admin)"""
     user = await db.users.find_one({"id": user_id})
@@ -3243,7 +3243,7 @@ async def change_own_password(
 async def reset_user_password(
     user_id: str,
     request: ResetPasswordRequest,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Reset user password (admin)"""
     user = await db.users.find_one({"id": user_id})
@@ -3361,7 +3361,7 @@ async def get_all_restaurants(
     search: str = None,
     skip: int = 0,
     limit: int = 50,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Get all restaurants"""
     query = {}
@@ -3757,7 +3757,7 @@ async def get_role_requests(
 @api_router.put("/admin/role-requests/{request_id}/approve")
 async def approve_role_request(
     request_id: str,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Approve a role change request (admin only)"""
     role_request = await db.role_requests.find_one({"id": request_id})
@@ -3838,7 +3838,7 @@ async def approve_role_request(
 @api_router.put("/admin/role-requests/{request_id}/reject")
 async def reject_role_request(
     request_id: str,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Reject a role change request (admin only)"""
     role_request = await db.role_requests.find_one({"id": request_id})
@@ -3884,7 +3884,7 @@ async def get_advertisements(active_only: bool = True):
 @api_router.post("/admin/advertisements")
 async def create_advertisement(
     ad_data: AdvertisementCreate,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Create a new advertisement (admin only)"""
     ad = Advertisement(
@@ -3902,7 +3902,7 @@ async def create_advertisement(
 async def update_advertisement(
     ad_id: str,
     ad_data: AdvertisementCreate,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Update an advertisement (admin only)"""
     result = await db.advertisements.update_one(
@@ -3923,7 +3923,7 @@ async def update_advertisement(
 @api_router.delete("/admin/advertisements/{ad_id}")
 async def delete_advertisement(
     ad_id: str,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Delete an advertisement (admin only)"""
     result = await db.advertisements.delete_one({"id": ad_id})
@@ -3937,7 +3937,7 @@ async def delete_advertisement(
 async def toggle_restaurant_featured(
     restaurant_id: str,
     is_featured: bool = True,
-    admin: dict = Depends(require_admin)
+    admin: dict = Depends(require_admin_or_moderator)
 ):
     """Toggle restaurant featured status (admin only)"""
     result = await db.restaurants.update_one(
