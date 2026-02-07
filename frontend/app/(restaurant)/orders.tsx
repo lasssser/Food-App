@@ -338,8 +338,8 @@ export default function RestaurantOrders() {
             <Text style={[styles.quickInfoText, styles.totalText]}>{order.total.toLocaleString()} ل.س</Text>
           </View>
           <View style={styles.quickInfoItem}>
-            <Ionicons name={order.payment_method === 'COD' ? 'wallet' : 'card'} size={18} color={order.payment_method === 'COD' ? '#FF9800' : '#4CAF50'} />
-            <Text style={styles.quickInfoText}>{order.payment_method === 'COD' ? 'كاش' : 'ShamCash'}</Text>
+            <Ionicons name={order.payment_method?.toLowerCase() === 'cod' ? 'wallet' : 'card'} size={18} color={order.payment_method?.toLowerCase() === 'cod' ? '#FF9800' : '#4CAF50'} />
+            <Text style={styles.quickInfoText}>{order.payment_method?.toLowerCase() === 'cod' ? 'كاش' : 'إلكتروني'}</Text>
           </View>
         </View>
 
