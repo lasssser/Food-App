@@ -292,12 +292,17 @@ export default function RestaurantOrders() {
   const completedOrders = orders.filter(o => ['delivered', 'cancelled'].includes(o.order_status));
 
   const renderOrder = ({ item: order }: { item: Order }) => {
-    const status = STATUS_CONFIG[order.order_status] || { label: order.order_status, color: '#999', icon: 'help-circle' as keyof typeof Ionicons.glyphMap, bgColor: '#F5F5F5' };
+    if (!order || !order.id) return null;
+    
+    const status = STATUS_CONFIG[order.order_status] || { label: order.order_status || 'غير معروف', color: '#999', icon: 'help-circle' as keyof typeof Ionicons.glyphMap, bgColor: '#F5F5F5' };
     const action = STATUS_ACTIONS[order.order_status];
     const showAssignButton = order.order_status === 'ready' && !order.driver_id;
     const hasDriver = order.driver_id && order.driver_name;
     const isExpanded = expandedOrder === order.id;
     const isPending = order.order_status === 'pending';
+    const itemsCount = order.items?.length || 0;
+    const orderTotal = order.total || 0;
+    const paymentMethod = (order.payment_method || '').toLowerCase();
 
     return (
       <TouchableOpacity 
@@ -320,9 +325,9 @@ export default function RestaurantOrders() {
             <Text style={[styles.statusText, { color: status.color }]}>{status.label}</Text>
           </View>
           <View style={styles.orderIdContainer}>
-            <Text style={styles.orderId}>#{order.id.slice(0, 8)}</Text>
+            <Text style={styles.orderId}>#{(order.id || '').slice(0, 8)}</Text>
             <Text style={styles.orderTime}>
-              {new Date(order.created_at).toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' })}
+              {order.created_at ? new Date(order.created_at).toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' }) : ''}
             </Text>
           </View>
         </View>
@@ -331,15 +336,15 @@ export default function RestaurantOrders() {
         <View style={styles.quickInfo}>
           <View style={styles.quickInfoItem}>
             <Ionicons name="receipt" size={18} color={COLORS.textSecondary} />
-            <Text style={styles.quickInfoText}>{order.items.length} أصناف</Text>
+            <Text style={styles.quickInfoText}>{itemsCount} أصناف</Text>
           </View>
           <View style={styles.quickInfoItem}>
             <Ionicons name="cash" size={18} color={COLORS.success} />
-            <Text style={[styles.quickInfoText, styles.totalText]}>{order.total.toLocaleString()} ل.س</Text>
+            <Text style={[styles.quickInfoText, styles.totalText]}>{orderTotal.toLocaleString()} ل.س</Text>
           </View>
           <View style={styles.quickInfoItem}>
-            <Ionicons name={order.payment_method?.toLowerCase() === 'cod' ? 'wallet' : 'card'} size={18} color={order.payment_method?.toLowerCase() === 'cod' ? '#FF9800' : '#4CAF50'} />
-            <Text style={styles.quickInfoText}>{order.payment_method?.toLowerCase() === 'cod' ? 'كاش' : 'إلكتروني'}</Text>
+            <Ionicons name={paymentMethod === 'cod' ? 'wallet' : 'card'} size={18} color={paymentMethod === 'cod' ? '#FF9800' : '#4CAF50'} />
+            <Text style={styles.quickInfoText}>{paymentMethod === 'cod' ? 'كاش' : 'إلكتروني'}</Text>
           </View>
         </View>
 
