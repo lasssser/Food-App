@@ -16,9 +16,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../src/store/authStore';
-import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+import { COLORS } from '../../src/constants/theme';
 
 const { width, height } = Dimensions.get('window');
 
@@ -64,123 +63,103 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Background Image */}
-      <Image
-        source={{ uri: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800' }}
-        style={styles.backgroundImage}
-      />
-      <LinearGradient
-        colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)', COLORS.secondary]}
-        style={styles.overlay}
-      />
-
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.keyboardView}
+          style={{ flex: 1 }}
         >
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            {/* Logo Section */}
-            <View style={styles.header}>
-              <View style={styles.logoContainer}>
-                <Image 
-                  source={require('../../assets/images/logo.png')} 
+            {/* Top Red Section */}
+            <View style={styles.topSection}>
+              <View style={styles.logoWrapper}>
+                <Image
+                  source={require('../../assets/images/logo.png')}
                   style={styles.logoImage}
                   resizeMode="contain"
                 />
               </View>
-              <Text style={styles.title}>أكلة عالسريع</Text>
-              <Text style={styles.subtitle}>اطلب أشهى المأكولات بضغطة زر</Text>
+              <Text style={styles.appName}>أكلة عالسريع</Text>
+              <Text style={styles.appSlogan}>اطلب أشهى المأكولات بضغطة زر</Text>
             </View>
 
-            {/* Form Card */}
-            <View style={styles.formCard}>
+            {/* Form Section */}
+            <View style={styles.formSection}>
               <Text style={styles.formTitle}>تسجيل الدخول</Text>
 
-              <View style={styles.inputContainer}>
+              {/* Phone Input */}
+              <View style={styles.inputBox}>
+                <Ionicons name="call-outline" size={20} color="#bbb" />
                 <TextInput
                   style={styles.input}
                   placeholder="رقم الهاتف"
-                  placeholderTextColor={COLORS.textLight}
+                  placeholderTextColor="#bbb"
                   value={phone}
                   onChangeText={setPhone}
                   keyboardType="phone-pad"
                   textAlign="right"
                 />
-                <View style={styles.inputIconContainer}>
-                  <Ionicons name="call-outline" size={20} color={COLORS.textLight} />
-                </View>
               </View>
 
-              <View style={styles.inputContainer}>
-                <TouchableOpacity 
-                  style={styles.eyeButton}
-                  onPress={() => setShowPassword(!showPassword)}
-                >
+              {/* Password Input */}
+              <View style={styles.inputBox}>
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                   <Ionicons
                     name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                     size={20}
-                    color={COLORS.textLight}
+                    color="#bbb"
                   />
                 </TouchableOpacity>
                 <TextInput
                   style={styles.input}
                   placeholder="كلمة المرور"
-                  placeholderTextColor={COLORS.textLight}
+                  placeholderTextColor="#bbb"
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
                   textAlign="right"
                 />
-                <View style={styles.inputIconContainer}>
-                  <Ionicons name="lock-closed-outline" size={20} color={COLORS.textLight} />
-                </View>
+                <Ionicons name="lock-closed-outline" size={20} color="#bbb" />
               </View>
 
               {/* Login Button */}
               <TouchableOpacity
-                style={styles.loginButton}
+                style={styles.loginBtn}
                 onPress={handleLogin}
                 disabled={loading}
-                activeOpacity={0.9}
+                activeOpacity={0.85}
               >
-                <LinearGradient
-                  colors={[COLORS.primary, COLORS.primaryDark]}
-                  style={styles.loginButtonGradient}
-                >
-                  {loading ? (
-                    <ActivityIndicator color={COLORS.textWhite} />
-                  ) : (
-                    <>
-                      <Text style={styles.loginButtonText}>تسجيل الدخول</Text>
-                      <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
-                    </>
-                  )}
-                </LinearGradient>
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <>
+                    <Ionicons name="arrow-back" size={20} color="#fff" />
+                    <Text style={styles.loginBtnText}>تسجيل الدخول</Text>
+                  </>
+                )}
               </TouchableOpacity>
 
               {/* Divider */}
-              <View style={styles.dividerContainer}>
-                <View style={styles.divider} />
+              <View style={styles.dividerRow}>
+                <View style={styles.dividerLine} />
                 <Text style={styles.dividerText}>أو</Text>
-                <View style={styles.divider} />
+                <View style={styles.dividerLine} />
               </View>
 
-              {/* Guest Browse Button */}
+              {/* Guest Button */}
               <TouchableOpacity
-                style={styles.guestButton}
+                style={styles.guestBtn}
                 onPress={handleGuestBrowse}
                 activeOpacity={0.8}
               >
-                <Text style={styles.guestButtonText}>تصفح كضيف 👀</Text>
+                <Text style={styles.guestBtnText}>تصفح كضيف 👀</Text>
               </TouchableOpacity>
 
               {/* Register Link */}
-              <View style={styles.registerContainer}>
+              <View style={styles.registerRow}>
                 <Link href="/(auth)/register" asChild>
                   <TouchableOpacity>
                     <Text style={styles.registerLink}>إنشاء حساب جديد</Text>
@@ -189,6 +168,9 @@ export default function LoginScreen() {
                 <Text style={styles.registerText}>ليس لديك حساب؟ </Text>
               </View>
             </View>
+
+            {/* Footer */}
+            <Text style={styles.footer}>Powered by Wethaq Digital Solutions</Text>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -199,195 +181,159 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.secondary,
-  },
-  backgroundImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: height * 0.45,
-    resizeMode: 'cover',
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#fff',
   },
   safeArea: {
     flex: 1,
   },
-  keyboardView: {
-    flex: 1,
-  },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
-    padding: SPACING.lg,
   },
 
-  // Header
-  header: {
+  // Top section
+  topSection: {
+    backgroundColor: COLORS.primary,
     alignItems: 'center',
-    marginBottom: SPACING.md,
+    paddingTop: 30,
+    paddingBottom: 40,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
   },
-  logoContainer: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+  logoWrapper: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: SPACING.sm,
-    borderWidth: 3,
-    borderColor: COLORS.primary,
-    overflow: 'visible',
+    marginBottom: 12,
+    ...Platform.select({
+      web: { boxShadow: '0px 4px 16px rgba(0,0,0,0.15)' },
+      default: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 16, elevation: 8 },
+    }),
   },
   logoImage: {
-    width: 180,
-    height: 180,
+    width: 100,
+    height: 100,
   },
-  logoEmoji: {
-    fontSize: 50,
-    fontFamily: 'Cairo_400Regular',
+  appName: {
+    fontSize: 30,
+    fontFamily: 'Cairo_700Bold',
+    color: '#fff',
+    marginBottom: 4,
   },
-  title: {
-    fontSize: 36,
-    fontFamily: 'Cairo_400Regular',
-    fontWeight: 'bold',
-    color: COLORS.textWhite,
-    marginBottom: SPACING.xs,
-  },
-  subtitle: {
+  appSlogan: {
     fontSize: 14,
     fontFamily: 'Cairo_400Regular',
-    color: 'rgba(255,255,255,0.8)',
+    color: 'rgba(255,255,255,0.85)',
   },
 
-  // Form Card
-  formCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.xl,
-    padding: SPACING.lg,
-    ...SHADOWS.large,
+  // Form section
+  formSection: {
+    paddingHorizontal: 24,
+    paddingTop: 30,
   },
   formTitle: {
-    fontSize: 18,
-    fontFamily: 'Cairo_400Regular',
-    fontWeight: 'bold',
-    color: COLORS.textPrimary,
+    fontSize: 22,
+    fontFamily: 'Cairo_700Bold',
+    color: '#333',
     textAlign: 'center',
-    marginBottom: SPACING.md,
+    marginBottom: 24,
   },
-  inputContainer: {
+  inputBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.background,
-    borderRadius: RADIUS.md,
-    marginBottom: SPACING.sm,
-    paddingHorizontal: SPACING.md,
-    height: 50,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    height: 54,
+    marginBottom: 14,
     borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  inputIconContainer: {
-    width: 40,
-    alignItems: 'center',
+    borderColor: '#eee',
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: 'Cairo_400Regular',
-    color: COLORS.textPrimary,
-    paddingHorizontal: SPACING.sm,
-  },
-  eyeButton: {
-    padding: SPACING.sm,
+    color: '#333',
+    paddingHorizontal: 10,
   },
 
-  // Login Button
-  loginButton: {
-    borderRadius: RADIUS.md,
-    overflow: 'hidden',
-    marginTop: SPACING.sm,
-  },
-  loginButtonGradient: {
-    flexDirection: 'row-reverse',
+  // Login button
+  loginBtn: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: SPACING.lg,
-    gap: SPACING.sm,
+    gap: 8,
+    backgroundColor: COLORS.primary,
+    height: 54,
+    borderRadius: 14,
+    marginTop: 8,
   },
-  loginButtonText: {
-    color: COLORS.textWhite,
-    fontSize: 18,
-    fontFamily: 'Cairo_400Regular',
-    fontWeight: 'bold',
+  loginBtnText: {
+    fontSize: 17,
+    fontFamily: 'Cairo_700Bold',
+    color: '#fff',
   },
 
   // Divider
-  dividerContainer: {
+  dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: SPACING.lg,
+    marginVertical: 20,
   },
-  divider: {
+  dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: '#eee',
   },
   dividerText: {
-    marginHorizontal: SPACING.sm,
-    color: COLORS.textLight,
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: 'Cairo_400Regular',
+    color: '#bbb',
+    marginHorizontal: 16,
   },
 
-  // Guest Button
-  guestButton: {
-    backgroundColor: COLORS.background,
-    borderRadius: RADIUS.md,
-    paddingVertical: SPACING.md,
+  // Guest button
+  guestBtn: {
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: COLORS.border,
+    justifyContent: 'center',
+    height: 54,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#eee',
+    backgroundColor: '#fafafa',
   },
-  guestButtonText: {
-    color: COLORS.textPrimary,
-    fontSize: 14,
-    fontFamily: 'Cairo_400Regular',
-    fontWeight: '600',
+  guestBtnText: {
+    fontSize: 15,
+    fontFamily: 'Cairo_600SemiBold',
+    color: '#666',
   },
 
   // Register
-  registerContainer: {
+  registerRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: SPACING.md,
+    marginTop: 24,
   },
   registerText: {
     fontSize: 14,
     fontFamily: 'Cairo_400Regular',
-    color: COLORS.textSecondary,
+    color: '#999',
   },
   registerLink: {
     fontSize: 14,
-    fontFamily: 'Cairo_400Regular',
+    fontFamily: 'Cairo_700Bold',
     color: COLORS.primary,
-    fontWeight: 'bold',
   },
 
-  // Features
-  featuresContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: SPACING.xxl,
-  },
-  featureItem: {
-    alignItems: 'center',
-    gap: SPACING.xs,
-  },
-  featureText: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: 12,
+  // Footer
+  footer: {
+    fontSize: 11,
     fontFamily: 'Cairo_400Regular',
+    color: '#ccc',
+    textAlign: 'center',
+    marginTop: 30,
+    marginBottom: 20,
   },
 });
