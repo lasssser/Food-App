@@ -233,7 +233,7 @@ export default function CheckoutScreen() {
         })),
         address_id: selectedAddress,
         payment_method: selectedPaymentMethod,
-        notes: orderNotes.trim() || undefined,
+        notes: orderNotes.trim() || '',
       };
 
       // Add payment info for electronic payments
