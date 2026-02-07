@@ -38,7 +38,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       const user = await login(phone, password);
-      if (user.role === 'admin') {
+      if (user.role === 'admin' || user.role === 'moderator') {
         router.replace('/(admin)/dashboard');
       } else if (user.role === 'restaurant') {
         router.replace('/(restaurant)/dashboard');
