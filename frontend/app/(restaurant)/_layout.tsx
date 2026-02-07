@@ -43,15 +43,6 @@ export default function RestaurantLayout() {
         }}
       />
       <Tabs.Screen
-        name="addons"
-        options={{
-          title: 'الإضافات',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="options" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="drivers"
         options={{
           title: 'السائقين',
@@ -69,24 +60,12 @@ export default function RestaurantLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="reports"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="restaurant-info"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="my-complaints"
-        options={{
-          href: null,
-        }}
-      />
+      {/* Hidden screens */}
+      <Tabs.Screen name="addons" options={{ href: null }} />
+      <Tabs.Screen name="payment-methods" options={{ href: null }} />
+      <Tabs.Screen name="reports" options={{ href: null }} />
+      <Tabs.Screen name="restaurant-info" options={{ href: null }} />
+      <Tabs.Screen name="my-complaints" options={{ href: null }} />
     </Tabs>
   );
 }
