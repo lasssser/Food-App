@@ -200,21 +200,22 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 40,
   },
   logoWrapper: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 55,
+    height: 55,
+    borderRadius: 28,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
+    overflow: 'visible',
     ...Platform.select({
       web: { boxShadow: '0px 4px 16px rgba(0,0,0,0.15)' },
       default: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 16, elevation: 8 },
     }),
   },
   logoImage: {
-    width: 110,
-    height: 110,
+    width: 130,
+    height: 130,
   },
   appName: {
     fontSize: 30,
