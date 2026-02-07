@@ -131,10 +131,10 @@ export async function pickMenuItemImage(): Promise<string | null> {
     aspect: [1, 1],
     maxWidth: 600,
     maxHeight: 600,
-    compress: 0.6,
+    compress: 0.5,
   });
   
-  return result?.uri || null;
+  return result?.base64 || result?.uri || null;
 }
 
 /**
@@ -145,10 +145,10 @@ export async function pickRestaurantImage(): Promise<string | null> {
     aspect: [16, 9],
     maxWidth: 1200,
     maxHeight: 675,
-    compress: 0.7,
+    compress: 0.5,
   });
   
-  return result?.uri || null;
+  return result?.base64 || result?.uri || null;
 }
 
 /**
