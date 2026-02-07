@@ -46,7 +46,8 @@
         {
           "locationAlwaysAndWhenInUsePermission": "لتحديد موقع التوصيل بدقة"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
