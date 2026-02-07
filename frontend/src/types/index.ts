@@ -103,12 +103,12 @@ export interface Order {
   subtotal: number;
   delivery_fee: number;
   total: number;
-  payment_method: 'COD' | 'SHAMCASH';
+  payment_method: string;
   payment_status: string;
   order_status: string;
-  address: {
-    label: string;
-    address_line: string;
+  address?: {
+    label?: string;
+    address_line?: string;
     area?: string;
   };
   notes?: string;
