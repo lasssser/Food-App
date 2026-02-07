@@ -367,15 +367,9 @@ export default function CheckoutScreen() {
                   </View>
                   <View style={styles.paymentInfo}>
                     <Text style={styles.paymentTitle}>{method.display_name}</Text>
-                    {method.method === 'cod' && !isCustomerVerified ? (
-                      <Text style={[styles.paymentDesc, { color: COLORS.warning }]}>
-                        🔒 يتطلب توثيق الحساب أولاً
-                      </Text>
-                    ) : (
-                      <Text style={styles.paymentDesc}>
+                    <Text style={styles.paymentDesc}>
                         {method.method === 'cod' ? 'ادفع نقداً للسائق' : method.instructions || 'حوّل المبلغ وأدخل رقم العملية'}
                       </Text>
-                    )}
                   </View>
                 </View>
                 <View style={[
