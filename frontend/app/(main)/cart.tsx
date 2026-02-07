@@ -220,7 +220,12 @@ export default function CartScreen() {
                 'يرجى تسجيل الدخول أو إنشاء حساب لإتمام الطلب',
                 [
                   { text: 'إلغاء', style: 'cancel' },
-                  { text: 'تسجيل الدخول', onPress: () => router.push('/(auth)/login') },
+                  { text: 'تسجيل الدخول', onPress: () => {
+                    // Exit guest mode first so _layout doesn't redirect back
+                    const { setGuestMode } = useAuthStore.getState();
+                    setGuestMode(false);
+                    router.push('/(auth)/login');
+                  }},
                 ]
               );
             }}
