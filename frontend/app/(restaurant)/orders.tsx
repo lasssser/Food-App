@@ -363,7 +363,7 @@ export default function RestaurantOrders() {
               <View style={styles.addressContent}>
                 <Ionicons name="location" size={20} color={COLORS.primary} />
                 <Text style={styles.addressText}>
-                  {order.address?.label} - {order.address?.address_line}
+                  {order.address?.label || 'غير محدد'} - {order.address?.address_line || ''}
                 </Text>
               </View>
             </View>
