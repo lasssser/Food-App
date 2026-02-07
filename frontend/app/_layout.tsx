@@ -209,13 +209,7 @@ export default function RootLayout() {
     const inDriverGroup = segments[0] === '(driver)';
     const inAdminGroup = segments[0] === '(admin)';
 
-    // Guest mode - allow browsing main screens
-    if (isGuest && inAuthGroup) {
-      router.replace('/(main)/home');
-      return;
-    }
-
-    // Not authenticated and not guest - go to home as guest (not login)
+    // Not authenticated and not guest and not in auth pages - auto guest mode
     if (!isAuthenticated && !isGuest && !inAuthGroup) {
       setGuestMode(true);
       router.replace('/(main)/home');
