@@ -108,18 +108,7 @@ export default function RootLayout() {
   }, [isAuthenticated, isGuest, segments, isLoading, isReady, user, fontsLoaded]);
 
   if (!fontsLoaded || !isReady || isLoading) {
-    return (
-      <View style={styles.splashContainer}>
-        <Image
-          source={require('../assets/images/logo.png')}
-          style={styles.splashLogo}
-          resizeMode="contain"
-        />
-        <Text style={styles.splashName}>أكلة عالسريع</Text>
-        <Text style={styles.splashSlogan}>اطلب أشهى المأكولات بضغطة زر</Text>
-        <ActivityIndicator size="small" color="#fff" style={{ marginTop: 30 }} />
-      </View>
-    );
+    return <SplashView />;
   }
 
   return (
