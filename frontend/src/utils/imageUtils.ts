@@ -106,7 +106,7 @@ export async function compressImage(
       {
         compress,
         format,
-        base64: false,
+        base64: true,
       }
     );
 
@@ -114,6 +114,7 @@ export async function compressImage(
       uri: manipulatedImage.uri,
       width: manipulatedImage.width,
       height: manipulatedImage.height,
+      base64: manipulatedImage.base64 ? `data:image/jpeg;base64,${manipulatedImage.base64}` : undefined,
     };
   } catch (error) {
     console.error('Error compressing image:', error);
