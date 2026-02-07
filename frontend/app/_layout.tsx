@@ -215,9 +215,10 @@ export default function RootLayout() {
       return;
     }
 
-    // Not authenticated and not guest - redirect to login
+    // Not authenticated and not guest - go to home as guest (not login)
     if (!isAuthenticated && !isGuest && !inAuthGroup) {
-      router.replace('/(auth)/login');
+      setGuestMode(true);
+      router.replace('/(main)/home');
     } 
     // Authenticated user in auth group - redirect based on role
     else if (isAuthenticated && inAuthGroup) {
