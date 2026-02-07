@@ -10,17 +10,18 @@ export default function MainLayout() {
   const itemCount = useCartStore((state) => state.getItemCount());
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const fetchUnreadCount = async () => {
+    try {
+      const data = await notificationAPI.getUnreadCount();
+      setUnreadCount(data.count);
+    } catch (error) {
+      // Ignore errors silently
+    }
+  };
+
   useEffect(() => {
-    const fetchUnreadCount = async () => {
-      try {
-        const data = await notificationAPI.getUnreadCount();
-        setUnreadCount(data.count);
-      } catch (error) {
-        // Ignore errors silently
-      }
-    };
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30000);
+    const interval = setInterval(fetchUnreadCount, 15000);
     return () => clearInterval(interval);
   }, []);
 
