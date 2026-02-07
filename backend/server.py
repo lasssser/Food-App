@@ -2477,7 +2477,18 @@ async def get_notifications(current_user: dict = Depends(get_current_user)):
         "user_id": current_user["id"]
     }).sort("created_at", -1).to_list(50)
     
-    return [Notification(**n) for n in notifications]
+    result = []
+    for n in notifications:
+        n.pop("_id", None)
+        # Handle old notifications that use 'message' instead of 'body'
+        if "body" not in n and "message" in n:
+            n["body"] = n.pop("message")
+        elif "body" not in n:
+            n["body"] = ""
+        if "type" not in n:
+            n["type"] = "general"
+        result.append(Notification(**n))
+    return result
 
 @api_router.get("/notifications/unread-count")
 async def get_unread_count(current_user: dict = Depends(get_current_user)):
