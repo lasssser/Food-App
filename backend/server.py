@@ -392,7 +392,8 @@ class Notification(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
     title: str
-    body: str
+    body: Optional[str] = ""
+    message: Optional[str] = ""
     type: str  # order_update, new_order, payment, promo
     data: Optional[dict] = None
     is_read: bool = False
