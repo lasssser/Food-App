@@ -144,6 +144,28 @@ export default function RootLayout() {
 }
 
 const styles = StyleSheet.create({
+  splashContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.primary,
+  },
+  splashLogo: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    marginBottom: 16,
+  },
+  splashName: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  splashSlogan: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
