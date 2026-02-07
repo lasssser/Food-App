@@ -99,7 +99,7 @@ export default function CartScreen() {
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 200 }}
+        contentContainerStyle={{ paddingBottom: 320 }}
       >
         {items.map((item) => {
           const addOnsTotal = item.selectedAddOns?.reduce((sum, addon) => sum + addon.price, 0) || 0;
