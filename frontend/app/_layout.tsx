@@ -204,18 +204,18 @@ export default function RootLayout() {
     if (!isReady || isLoading || !fontsLoaded) return;
 
     const inAuthGroup = segments[0] === '(auth)';
-    const inMainGroup = segments[0] === '(main)';
-    const inRestaurantGroup = segments[0] === '(restaurant)';
-    const inDriverGroup = segments[0] === '(driver)';
-    const inAdminGroup = segments[0] === '(admin)';
 
     // Not authenticated and not guest and not in auth pages - auto guest mode
     if (!isAuthenticated && !isGuest && !inAuthGroup) {
-      setGuestMode(true);
-      router.replace('/(main)/home');
+      // Use setTimeout to avoid state update during render
+      setTimeout(() => {
+        setGuestMode(true);
+        router.replace('/(main)/home');
+      }, 0);
+      return;
     } 
     // Authenticated user in auth group - redirect based on role
-    else if (isAuthenticated && inAuthGroup) {
+    if (isAuthenticated && inAuthGroup) {
       const role = user?.role || 'customer';
       if (role === 'admin' || role === 'moderator') {
         router.replace('/(admin)/dashboard');
