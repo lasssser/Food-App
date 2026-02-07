@@ -204,7 +204,7 @@ export default function PaymentMethodsScreen() {
                   <Text style={styles.methodName}>{method.display_name}</Text>
                   {method.method === 'cod' && (
                     <Text style={styles.methodNote}>
-                      متاح فقط للزبائن الموثقين
+                      متاح لجميع الزبائن
                     </Text>
                   )}
                 </View>
