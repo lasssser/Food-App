@@ -467,6 +467,15 @@ export const adminAPI = {
     const res = await api.put(`/admin/complaints/${complaintId}/respond`, { response, status });
     return res.data;
   },
+  getOrders: async (status?: string) => {
+    const params = status ? `?status=${status}` : '';
+    const response = await api.get(`/admin/orders${params}`);
+    return response.data;
+  },
+  deleteRestaurant: async (restaurantId: string) => {
+    const response = await api.delete(`/admin/restaurants/${restaurantId}`);
+    return response.data;
+  },
 };
 
 // Complaints API (for all users)
