@@ -327,6 +327,27 @@ export default function StatisticsScreen() {
               {selectedRestaurant.is_featured ? 'إلغاء التمييز' : 'تمييز المطعم'}
             </Text>
           </TouchableOpacity>
+
+          {/* Delete Restaurant Button */}
+          <TouchableOpacity
+            onPress={() => handleDeleteRestaurant(selectedRestaurant.restaurant_id, selectedRestaurant.restaurant_name)}
+            style={{
+              flexDirection: 'row-reverse',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#FFEBEE',
+              borderRadius: 12,
+              padding: 12,
+              marginTop: 8,
+              gap: 8,
+            }}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="trash" size={20} color="#f44336" />
+            <Text style={{ fontSize: 14, fontFamily: 'Cairo_400Regular', color: '#f44336', fontWeight: '600' }}>
+              حذف المطعم
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Year selector */}
