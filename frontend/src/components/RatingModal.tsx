@@ -201,7 +201,8 @@ export default function RatingModal({
             </LinearGradient>
           </TouchableOpacity>
         </View>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
