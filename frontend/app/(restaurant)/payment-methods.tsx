@@ -251,9 +251,9 @@ export default function PaymentMethodsScreen() {
             {/* COD Info */}
             {method.is_enabled && method.method === 'cod' && (
               <View style={styles.codInfo}>
-                <Ionicons name="shield-checkmark" size={18} color={COLORS.success} />
+                <Ionicons name="checkmark-circle" size={18} color={COLORS.success} />
                 <Text style={styles.codInfoText}>
-                  الدفع عند الاستلام متاح فقط للزبائن الذين أتموا طلب واحد على الأقل ودفعوه إلكترونياً
+                  الدفع نقداً عند الاستلام متاح لجميع الزبائن
                 </Text>
               </View>
             )}
