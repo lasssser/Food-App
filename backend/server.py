@@ -3397,6 +3397,36 @@ async def approve_restaurant(
     
     return {"message": "تم تحديث حالة المطعم", "is_approved": is_approved}
 
+
+@api_router.delete("/admin/restaurants/{restaurant_id}")
+async def delete_restaurant(restaurant_id: str, admin: dict = Depends(require_admin)):
+    """Delete a restaurant and reset owner role to customer"""
+    restaurant = await db.restaurants.find_one({"id": restaurant_id})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="المطعم غير موجود")
+    
+    # Reset owner role to customer
+    if restaurant.get("owner_id"):
+        await db.users.update_one(
+            {"id": restaurant["owner_id"]},
+            {"$set": {"role": "customer", "restaurant_id": None, "updated_at": datetime.utcnow()}}
+        )
+    
+    # Delete restaurant's menu items
+    await db.menu_items.delete_many({"restaurant_id": restaurant_id})
+    
+    # Delete restaurant's addon groups
+    await db.addon_groups.delete_many({"restaurant_id": restaurant_id})
+    
+    # Delete restaurant's drivers
+    await db.restaurant_drivers.delete_many({"restaurant_id": restaurant_id})
+    
+    # Delete the restaurant
+    await db.restaurants.delete_one({"id": restaurant_id})
+    
+    return {"message": "تم حذف المطعم بنجاح"}
+
+
 @api_router.get("/admin/drivers")
 async def get_all_drivers(
     status: str = None,
