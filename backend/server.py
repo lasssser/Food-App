@@ -857,7 +857,10 @@ async def get_restaurant_orders(current_user: dict = Depends(get_current_user)):
         "order_status": {"$nin": ["delivered", "cancelled"]}
     }).sort("created_at", -1).to_list(100)
     
-    return [Order(**order) for order in orders]
+    for order in orders:
+        order.pop("_id", None)
+    
+    return orders
 
 @api_router.get("/restaurant/orders/history")
 async def get_restaurant_order_history(current_user: dict = Depends(get_current_user)):
