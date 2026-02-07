@@ -93,12 +93,13 @@ export default function RegisterScreen() {
             {/* Form Card */}
             <View style={styles.formCard}>
               <Text style={styles.formTitle}>إنشاء حساب جديد</Text>
+              <Text style={{fontSize: 13, color: COLORS.textSecondary, textAlign: 'center', marginBottom: 16, fontFamily: 'Cairo_400Regular'}}>أدخل بياناتك لإنشاء حساب جديد في التطبيق</Text>
 
               {/* Name Input */}
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="الاسم الكامل"
+                  placeholder="الاسم الكامل (مثال: أحمد محمد)"
                   placeholderTextColor={COLORS.textLight}
                   value={name}
                   onChangeText={setName}
@@ -113,7 +114,7 @@ export default function RegisterScreen() {
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="رقم الهاتف"
+                  placeholder="رقم الهاتف (مثال: 0912345678)"
                   placeholderTextColor={COLORS.textLight}
                   value={phone}
                   onChangeText={setPhone}
@@ -139,7 +140,7 @@ export default function RegisterScreen() {
                 </TouchableOpacity>
                 <TextInput
                   style={styles.input}
-                  placeholder="كلمة المرور"
+                  placeholder="كلمة المرور (6 أحرف على الأقل)"
                   placeholderTextColor={COLORS.textLight}
                   value={password}
                   onChangeText={setPassword}
@@ -155,7 +156,7 @@ export default function RegisterScreen() {
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="تأكيد كلمة المرور"
+                  placeholder="أعد كتابة كلمة المرور"
                   placeholderTextColor={COLORS.textLight}
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
