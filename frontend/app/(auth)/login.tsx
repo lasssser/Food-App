@@ -200,9 +200,9 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 40,
   },
   logoWrapper: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
@@ -213,8 +213,8 @@ const styles = StyleSheet.create({
     }),
   },
   logoImage: {
-    width: 100,
-    height: 100,
+    width: 85,
+    height: 85,
   },
   appName: {
     fontSize: 30,
