@@ -353,7 +353,6 @@ export default function CheckoutScreen() {
                 style={[
                   styles.paymentCard,
                   selectedPaymentMethod === method.method && styles.paymentCardSelected,
-                  method.method === 'cod' && !isCustomerVerified && styles.paymentCardDisabled,
                 ]}
                 onPress={() => handleSelectPaymentMethod(method.method)}
                 activeOpacity={0.7}
