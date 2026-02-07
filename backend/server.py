@@ -2109,10 +2109,11 @@ async def create_order(order_data: OrderCreate, current_user: dict = Depends(get
         subtotal += item_subtotal
     
     # Check minimum order
-    if subtotal < restaurant["min_order"]:
+    min_order = restaurant.get("min_order", 0)
+    if min_order > 0 and subtotal < min_order:
         raise HTTPException(
             status_code=400, 
-            detail=f"الحد الأدنى للطلب هو {restaurant['min_order']} ل.س"
+            detail=f"الحد الأدنى للطلب هو {int(min_order):,} ل.س - طلبك الحالي {int(subtotal):,} ل.س"
         )
     
     delivery_fee = restaurant["delivery_fee"]
