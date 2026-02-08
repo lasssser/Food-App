@@ -285,38 +285,56 @@ export default function NearbyMapScreen() {
       {/* Selected Restaurant Card */}
       {selectedRestaurant && (
         <View style={styles.restaurantCard}>
-          <TouchableOpacity
-            style={styles.cardContent}
-            onPress={() => router.push(`/restaurant/${selectedRestaurant.id}`)}
-            activeOpacity={0.8}
-          >
-            <View style={styles.cardInfo}>
-              <Text style={styles.cardName}>{selectedRestaurant.name}</Text>
-              <View style={styles.cardStats}>
-                <View style={styles.cardStat}>
-                  <Ionicons name="star" size={14} color="#FFD700" />
-                  <Text style={styles.cardStatText}>{selectedRestaurant.rating?.toFixed(1) || '0.0'}</Text>
-                </View>
-                {selectedRestaurant.distance_km > 0 && (
-                  <View style={styles.cardStat}>
-                    <Ionicons name="location" size={14} color={COLORS.info} />
-                    <Text style={styles.cardStatText}>{selectedRestaurant.distance_km} كم</Text>
-                  </View>
-                )}
-                <View style={styles.cardStat}>
-                  <Ionicons name="time" size={14} color={COLORS.textLight} />
-                  <Text style={styles.cardStatText}>{selectedRestaurant.delivery_time}</Text>
-                </View>
-              </View>
-            </View>
+          <TouchableOpacity style={styles.closeCard} onPress={() => setSelectedRestaurant(null)}>
+            <Ionicons name="close-circle" size={28} color="#999" />
+          </TouchableOpacity>
+          
+          {/* Restaurant Name + Status */}
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <Text style={styles.cardName}>{selectedRestaurant.name}</Text>
             <View style={[styles.cardStatusBadge, { backgroundColor: selectedRestaurant.is_open ? '#dcfce7' : '#fee2e2' }]}>
+              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: selectedRestaurant.is_open ? '#16a34a' : '#dc2626', marginLeft: 6 }} />
               <Text style={[styles.cardStatusText, { color: selectedRestaurant.is_open ? '#16a34a' : '#dc2626' }]}>
                 {selectedRestaurant.is_open ? 'مفتوح' : 'مغلق'}
               </Text>
             </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.closeCard} onPress={() => setSelectedRestaurant(null)}>
-            <Ionicons name="close" size={18} color={COLORS.textLight} />
+          </View>
+
+          {/* Stats Row */}
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-around', backgroundColor: '#f8f9fa', borderRadius: 12, paddingVertical: 12, marginBottom: 14 }}>
+            <View style={{ alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Ionicons name="star" size={16} color="#FFD700" />
+                <Text style={{ fontFamily: 'Cairo_700Bold', fontSize: 16, color: COLORS.textPrimary }}>{selectedRestaurant.rating?.toFixed(1) || '0.0'}</Text>
+              </View>
+              <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 11, color: '#999', marginTop: 2 }}>التقييم</Text>
+            </View>
+            {selectedRestaurant.distance_km > 0 && (
+              <View style={{ alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Ionicons name="location" size={16} color={COLORS.primary} />
+                  <Text style={{ fontFamily: 'Cairo_700Bold', fontSize: 16, color: COLORS.textPrimary }}>{selectedRestaurant.distance_km}</Text>
+                </View>
+                <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 11, color: '#999', marginTop: 2 }}>كم</Text>
+              </View>
+            )}
+            <View style={{ alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Ionicons name="time" size={16} color="#F57C00" />
+                <Text style={{ fontFamily: 'Cairo_700Bold', fontSize: 14, color: COLORS.textPrimary }}>{selectedRestaurant.delivery_time || '30 د'}</Text>
+              </View>
+              <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 11, color: '#999', marginTop: 2 }}>التوصيل</Text>
+            </View>
+          </View>
+
+          {/* Order Button */}
+          <TouchableOpacity
+            onPress={() => router.push(`/restaurant/${selectedRestaurant.id}`)}
+            activeOpacity={0.8}
+            style={{ backgroundColor: COLORS.primary, paddingVertical: 14, borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          >
+            <Ionicons name="restaurant" size={20} color="#fff" />
+            <Text style={{ fontFamily: 'Cairo_700Bold', fontSize: 16, color: '#fff' }}>عرض القائمة والطلب</Text>
           </TouchableOpacity>
         </View>
       )}
