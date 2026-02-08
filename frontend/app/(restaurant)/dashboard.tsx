@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
+  Animated,
+  Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
@@ -19,6 +21,29 @@ export default function RestaurantDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Animations
+  const headerAnim = useRef(new Animated.Value(0)).current;
+  const statusAnim = useRef(new Animated.Value(30)).current;
+  const statusOpacity = useRef(new Animated.Value(0)).current;
+  const statsAnim = useRef([0,1,2,3].map(() => new Animated.Value(0))).current;
+  const infoAnim = useRef(new Animated.Value(40)).current;
+  const infoOpacity = useRef(new Animated.Value(0)).current;
+
+  const animateEntrance = () => {
+    Animated.sequence([
+      Animated.timing(headerAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.parallel([
+        Animated.timing(statusAnim, { toValue: 0, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(statusOpacity, { toValue: 1, duration: 350, useNativeDriver: true }),
+      ]),
+      Animated.stagger(80, statsAnim.map(a => Animated.spring(a, { toValue: 1, friction: 6, tension: 80, useNativeDriver: true }))),
+      Animated.parallel([
+        Animated.timing(infoAnim, { toValue: 0, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(infoOpacity, { toValue: 1, duration: 350, useNativeDriver: true }),
+      ]),
+    ]).start();
+  };
 
   const fetchStats = async () => {
     try {
