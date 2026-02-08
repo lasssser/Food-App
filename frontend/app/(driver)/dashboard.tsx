@@ -180,10 +180,11 @@ export default function DriverDashboard() {
               <Text style={styles.statValue}>{stats?.average_rating?.toFixed(1) || '0.0'}</Text>
               <Text style={styles.statLabel}>تقييمك</Text>
             </LinearGradient>
-          </View>
+          </Animated.View>
         </View>
 
         {/* Today's Earnings */}
+        <Animated.View style={{ opacity: earningsOpacity, transform: [{ translateY: earningsSlide }] }}>
         <View style={styles.earningsCard}>
           <View style={styles.earningsHeader}>
             <Ionicons name="wallet" size={24} color={COLORS.primary} />
