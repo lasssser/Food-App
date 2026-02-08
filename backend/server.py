@@ -2518,6 +2518,37 @@ async def create_order(order_data: OrderCreate, current_user: dict = Depends(get
     if not restaurant:
         raise HTTPException(status_code=404, detail="المطعم غير موجود")
     
+    # Check if restaurant is open
+    if not restaurant.get("is_open", True):
+        raise HTTPException(status_code=400, detail="عذراً، المطعم مغلق حالياً")
+    
+    # Check working hours
+    closing_time = restaurant.get("closing_time")
+    opening_time = restaurant.get("opening_time")
+    if closing_time and opening_time:
+        try:
+            now = datetime.utcnow()
+            # Syria is UTC+3
+            syria_hour = (now.hour + 3) % 24
+            syria_min = now.minute
+            current_minutes = syria_hour * 60 + syria_min
+            
+            open_parts = opening_time.split(":")
+            close_parts = closing_time.split(":")
+            open_minutes = int(open_parts[0]) * 60 + int(open_parts[1])
+            close_minutes = int(close_parts[0]) * 60 + int(close_parts[1])
+            
+            if close_minutes > open_minutes:
+                if current_minutes < open_minutes or current_minutes > close_minutes:
+                    raise HTTPException(status_code=400, detail=f"عذراً، المطعم مغلق. أوقات العمل: {opening_time} - {closing_time}")
+            else:  # crosses midnight
+                if current_minutes > close_minutes and current_minutes < open_minutes:
+                    raise HTTPException(status_code=400, detail=f"عذراً، المطعم مغلق. أوقات العمل: {opening_time} - {closing_time}")
+        except HTTPException:
+            raise
+        except:
+            pass  # If time parsing fails, allow the order
+    
     # Get address
     address = await db.addresses.find_one({"id": order_data.address_id, "user_id": current_user["id"]})
     if not address:
