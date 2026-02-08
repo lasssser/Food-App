@@ -893,6 +893,11 @@ async def get_restaurant_orders(current_user: dict = Depends(get_current_user)):
         if isinstance(order.get("address"), dict):
             order["address"].setdefault("label", "غير محدد")
             order["address"].setdefault("address_line", "")
+        # Add customer info for restaurant
+        customer = await db.users.find_one({"id": order.get("user_id")})
+        if customer:
+            order["customer_name"] = customer.get("name", "")
+            order["customer_phone"] = customer.get("phone", "")
         clean_orders.append(order)
     
     return clean_orders
