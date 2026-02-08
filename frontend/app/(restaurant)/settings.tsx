@@ -655,6 +655,60 @@ export default function RestaurantSettings() {
           }
         }}
       />
+
+      {/* Radius Settings Modal */}
+      <Modal visible={showRadiusModal} animationType="slide" transparent>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+          <View style={{ backgroundColor: 'white', borderRadius: 20, padding: 24, width: '100%', maxWidth: 350 }}>
+            <Text style={{ fontFamily: 'Cairo_700Bold', fontSize: 18, textAlign: 'center', marginBottom: 20, color: COLORS.textPrimary }}>نطاق البحث عن سائقين</Text>
+            
+            <Text style={{ fontFamily: 'Cairo_600SemiBold', fontSize: 40, textAlign: 'center', color: COLORS.primary }}>{searchRadius} <Text style={{ fontSize: 16, color: COLORS.textSecondary }}>كم</Text></Text>
+            
+            <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12, marginVertical: 20 }}>
+              {[5, 10, 25, 50, 100].map(r => (
+                <TouchableOpacity
+                  key={r}
+                  onPress={() => setSearchRadius(r)}
+                  style={{
+                    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12,
+                    backgroundColor: searchRadius === r ? COLORS.primary : COLORS.background,
+                    borderWidth: 1, borderColor: searchRadius === r ? COLORS.primary : COLORS.border,
+                  }}
+                >
+                  <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 13, color: searchRadius === r ? 'white' : COLORS.textPrimary }}>{r}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            
+            <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 12, textAlign: 'center', color: COLORS.textLight, marginBottom: 20 }}>
+              السائقين المفضلين يظهرون دائماً بغض النظر عن النطاق
+            </Text>
+            
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity
+                style={{ flex: 1, paddingVertical: 12, borderRadius: 12, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center' }}
+                onPress={() => setShowRadiusModal(false)}
+              >
+                <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 14, color: COLORS.textSecondary }}>إلغاء</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ flex: 1, paddingVertical: 12, borderRadius: 12, backgroundColor: COLORS.primary, alignItems: 'center' }}
+                onPress={async () => {
+                  try {
+                    await restaurantPanelAPI.updateDriverSearchSettings(searchRadius);
+                    setShowRadiusModal(false);
+                    Alert.alert('تم', `تم تحديث نطاق البحث إلى ${searchRadius} كم`);
+                  } catch (e) {
+                    Alert.alert('خطأ', 'فشل تحديث النطاق');
+                  }
+                }}
+              >
+                <Text style={{ fontFamily: 'Cairo_600SemiBold', fontSize: 14, color: 'white' }}>حفظ</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
