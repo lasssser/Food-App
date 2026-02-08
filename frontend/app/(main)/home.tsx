@@ -105,14 +105,39 @@ export default function HomeScreen() {
 
   const fetchRestaurants = async () => {
     try {
-      const filters: any = {};
+      // Try to get user location for proximity sorting
+      let lat = 33.5138, lng = 36.2765; // Default Damascus
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+          const locationPromise = Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low });
+          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000));
+          try {
+            const loc = await Promise.race([locationPromise, timeoutPromise]) as any;
+            lat = loc.coords.latitude;
+            lng = loc.coords.longitude;
+          } catch (e) {}
+        }
+      } catch (e) {}
+      
+      // Get nearby restaurants (sorted by distance)
+      const data = await restaurantAPI.getNearby(lat, lng, 500); // 500km to get all Syria
+      
+      // Filter by category if selected
+      let filtered = data || [];
       if (selectedCategory !== 'all') {
-        filters.cuisine = selectedCategory;
+        filtered = filtered.filter((r: any) => r.cuisine_type === selectedCategory);
       }
-      const data = await restaurantAPI.getAll(filters);
-      setRestaurants(data);
+      
+      setRestaurants(filtered);
     } catch (error) {
-      console.error('Error fetching restaurants:', error);
+      // Fallback to all restaurants
+      try {
+        const data = await restaurantAPI.getAll({});
+        setRestaurants(data || []);
+      } catch (e) {
+        console.error('Error fetching restaurants:', e);
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
