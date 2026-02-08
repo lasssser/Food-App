@@ -139,10 +139,12 @@ export default function DriverDashboard() {
             />
           </View>
         </TouchableOpacity>
+        </Animated.View>
 
         {/* Stats Cards */}
         <View style={styles.statsGrid}>
-          <View style={styles.statCard}>
+          {[0, 1, 2].map(i => (
+            <Animated.View key={i} style={[styles.statCard, { opacity: statsScale[i], transform: [{ scale: statsScale[i] }] }]}>
             <LinearGradient
               colors={['#FFF5F2', '#FFE8E0']}
               style={styles.statCardGradient}
