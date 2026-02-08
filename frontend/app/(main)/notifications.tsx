@@ -38,6 +38,19 @@ export default function NotificationsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'settings'>('all');
   
+  // Animations
+  const headerAnim = useRef(new Animated.Value(0)).current;
+  const contentSlide = useRef(new Animated.Value(25)).current;
+  const contentOpacity = useRef(new Animated.Value(0)).current;
+  
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(headerAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.timing(contentSlide, { toValue: 0, duration: 500, delay: 200, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(contentOpacity, { toValue: 1, duration: 400, delay: 200, useNativeDriver: true }),
+    ]).start();
+  }, []);
+  
   // Notification Settings
   const [orderUpdates, setOrderUpdates] = useState(true);
   const [newOffers, setNewOffers] = useState(true);
