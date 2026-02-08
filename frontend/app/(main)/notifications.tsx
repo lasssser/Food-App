@@ -354,15 +354,25 @@ export default function NotificationsScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
-          <Ionicons name="chevron-forward" size={28} color={COLORS.textPrimary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>الإشعارات</Text>
-        <View style={{ width: 28 }} />
-      </View>
+      <Animated.View style={{ opacity: headerAnim }}>
+      <LinearGradient colors={[COLORS.primary, COLORS.primaryDark]} style={styles.header}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
+            <Ionicons name="chevron-forward" size={28} color="#fff" />
+          </TouchableOpacity>
+          <Text style={[styles.headerTitle, { color: '#fff' }]}>الإشعارات</Text>
+          <View style={{ width: 28 }} />
+        </View>
+        {unreadCount > 0 && (
+          <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 13, color: 'rgba(255,255,255,0.8)', textAlign: 'center', marginTop: 4 }}>
+            لديك {unreadCount} إشعار جديد
+          </Text>
+        )}
+      </LinearGradient>
+      </Animated.View>
 
       {/* Tabs */}
+      <Animated.View style={{ opacity: headerAnim }}>
       <View style={styles.tabs}>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'all' && styles.activeTab]}
