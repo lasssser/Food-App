@@ -577,12 +577,19 @@ export default function RestaurantOrders() {
             <TouchableOpacity 
               style={styles.actionButton}
               onPress={() => handleUpdateStatus(order.id, action.next)}
+              disabled={updatingOrderId === order.id}
             >
               <View
-                style={[styles.actionButtonGradient, { backgroundColor: isPending ? COLORS.success : COLORS.primary }]}
+                style={[styles.actionButtonGradient, { backgroundColor: isPending ? COLORS.success : COLORS.primary, opacity: updatingOrderId === order.id ? 0.7 : 1 }]}
               >
-                <Ionicons name={action.icon} size={20} color={COLORS.textWhite} />
-                <Text style={styles.actionButtonText}>{action.label}</Text>
+                {updatingOrderId === order.id ? (
+                  <ActivityIndicator size="small" color={COLORS.textWhite} />
+                ) : (
+                  <>
+                    <Ionicons name={action.icon} size={20} color={COLORS.textWhite} />
+                    <Text style={styles.actionButtonText}>{action.label}</Text>
+                  </>
+                )}
               </View>
             </TouchableOpacity>
           )}
