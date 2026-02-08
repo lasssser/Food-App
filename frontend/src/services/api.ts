@@ -480,13 +480,15 @@ export const adminAPI = {
 
 // Complaints API (for all users)
 export const complaintsAPI = {
-  submit: async (subject: string, message: string, type: string = 'general', orderId?: string) => {
-    const response = await api.post('/complaints', {
+  submit: async (subject: string, message: string, type: string = 'general', orderId?: string, restaurantId?: string) => {
+    const data: any = {
       subject,
       message,
       type,
-      order_id: orderId,
-    });
+    };
+    if (orderId) data.order_id = orderId;
+    if (restaurantId) data.restaurant_id = restaurantId;
+    const response = await api.post('/complaints', data);
     return response.data;
   },
   getMyComplaints: async () => {
