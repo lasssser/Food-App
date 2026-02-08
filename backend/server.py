@@ -910,8 +910,11 @@ async def get_restaurant_orders(current_user: dict = Depends(get_current_user)):
         # Add customer info for restaurant
         customer = await db.users.find_one({"id": order.get("user_id")})
         if customer:
-            order["customer_name"] = customer.get("name", "")
-            order["customer_phone"] = customer.get("phone", "")
+            order["customer_name"] = order.get("recipient_name") or customer.get("name", "")
+            order["customer_phone"] = order.get("recipient_phone") or customer.get("phone", "")
+        else:
+            order["customer_name"] = order.get("recipient_name", "")
+            order["customer_phone"] = order.get("recipient_phone", "")
         clean_orders.append(order)
     
     return clean_orders
