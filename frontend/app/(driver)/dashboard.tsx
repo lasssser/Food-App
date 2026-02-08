@@ -60,6 +60,7 @@ export default function DriverDashboard() {
   useFocusEffect(
     useCallback(() => {
       fetchStats();
+      animateIn();
     }, [])
   );
 
