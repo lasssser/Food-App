@@ -435,6 +435,8 @@ export default function OrdersScreen() {
         onClose={() => setTrackingOrderId(null)}
       />
     </SafeAreaView>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
