@@ -417,7 +417,7 @@ export default function RestaurantOrders() {
               <Text style={styles.sectionTitle}>تفاصيل الطلب</Text>
               {(order.items || []).map((item, index) => (
                 <View key={index} style={styles.itemRow}>
-                  <Text style={styles.itemPrice}>{((item.price || 0) * (item.quantity || 0)).toLocaleString()} ل.س</Text>
+                  <Text style={styles.itemPrice}>{safeFormatNumber((item.price || 0) * (item.quantity || 0))} ل.س</Text>
                   <Text style={styles.itemName}>{item.quantity || 0}× {item.name || 'صنف'}</Text>
                 </View>
               ))}
