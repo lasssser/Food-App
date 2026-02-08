@@ -91,16 +91,18 @@ class Restaurant(BaseModel):
     image: Optional[str] = None
     address: str
     area: str
-    city_id: str = "damascus"  # المدينة
+    city_id: str = "damascus"
     cuisine_type: str
     rating: float = 4.0
     review_count: int = 0
     is_open: bool = True
-    is_featured: bool = False  # تمييز المطعم
+    is_featured: bool = False
     featured_at: Optional[datetime] = None
     delivery_fee: float = 5000
     min_order: float = 10000
     delivery_time: str = "30-45 دقيقة"
+    lat: Optional[float] = None
+    lng: Optional[float] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 # MenuItem Models
