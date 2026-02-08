@@ -796,11 +796,7 @@ const styles = StyleSheet.create({
   menuContainer: {
     flex: 1,
     backgroundColor: COLORS.background,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    marginTop: -24,
-    paddingTop: SPACING.lg,
-    overflow: 'visible',
+    paddingTop: SPACING.md,
   },
 
   // Info Strip
