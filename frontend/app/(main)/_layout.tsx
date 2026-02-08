@@ -5,12 +5,16 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCartStore } from '../../src/store/cartStore';
 import { notificationAPI } from '../../src/services/api';
+import { usePushNotifications } from '../../src/hooks/usePushNotifications';
 import { COLORS, RADIUS, SHADOWS } from '../../src/constants/theme';
 
 export default function MainLayout() {
   const itemCount = useCartStore((state) => state.getItemCount());
   const [unreadCount, setUnreadCount] = useState(0);
   const insets = useSafeAreaInsets();
+  
+  // Register push notifications
+  usePushNotifications();
 
   const fetchUnreadCount = async () => {
     try {
