@@ -3618,9 +3618,131 @@ async def update_user_info(
 class ResetPasswordRequest(BaseModel):
     new_password: str
 
+class PasswordResetRequestCreate(BaseModel):
+    phone: str
+    reason: Optional[str] = None
+
 class ChangePasswordRequest(BaseModel):
     current_password: str
     new_password: str
+
+# Password Reset Request - User submits request, Admin approves
+@api_router.post("/auth/forgot-password")
+async def request_password_reset(request: PasswordResetRequestCreate):
+    """User requests password reset - creates a request for admin to review"""
+    user = await db.users.find_one({"phone": request.phone})
+    if not user:
+        # Don't reveal if user exists or not
+        return {"message": "إذا كان الرقم مسجلاً، سيتم إرسال طلب إعادة التعيين للإدارة"}
+    
+    # Check if there's already a pending request
+    existing = await db.password_reset_requests.find_one({
+        "phone": request.phone,
+        "status": "pending"
+    })
+    if existing:
+        return {"message": "يوجد طلب سابق قيد المراجعة، يرجى الانتظار"}
+    
+    reset_request = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "user_name": user.get("name", ""),
+        "phone": request.phone,
+        "role": user.get("role", "customer"),
+        "reason": request.reason or "",
+        "status": "pending",  # pending, approved, rejected
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow(),
+    }
+    await db.password_reset_requests.insert_one(reset_request)
+    
+    # Notify admins
+    admins = await db.users.find({"role": {"$in": ["admin", "moderator"]}}).to_list(10)
+    for admin in admins:
+        await create_notification(
+            admin["id"],
+            "طلب إعادة تعيين كلمة مرور",
+            f"{user.get('name', 'مستخدم')} ({request.phone}) يطلب إعادة تعيين كلمة المرور",
+            "password_reset",
+            {"request_id": reset_request["id"], "phone": request.phone}
+        )
+    
+    return {"message": "تم إرسال طلبك للإدارة، سيتم التواصل معك قريباً"}
+
+@api_router.get("/admin/password-reset-requests")
+async def get_password_reset_requests(
+    status: str = None,
+    admin: dict = Depends(require_admin_or_moderator)
+):
+    """Get all password reset requests (admin)"""
+    query = {}
+    if status:
+        query["status"] = status
+    
+    requests = await db.password_reset_requests.find(query).sort("created_at", -1).to_list(50)
+    for r in requests:
+        r.pop("_id", None)
+        for key in ["created_at", "updated_at"]:
+            val = r.get(key)
+            if val and hasattr(val, 'isoformat'):
+                r[key] = val.isoformat()
+    
+    return requests
+
+@api_router.put("/admin/password-reset-requests/{request_id}/approve")
+async def approve_password_reset(
+    request_id: str,
+    password_data: ResetPasswordRequest,
+    admin: dict = Depends(require_admin_or_moderator)
+):
+    """Admin approves and sets new password"""
+    reset_req = await db.password_reset_requests.find_one({"id": request_id})
+    if not reset_req:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    if len(password_data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="كلمة المرور يجب أن تكون 6 أحرف على الأقل")
+    
+    # Reset the password
+    hashed = hash_password(password_data.new_password)
+    await db.users.update_one(
+        {"id": reset_req["user_id"]},
+        {"$set": {"password_hash": hashed, "updated_at": datetime.utcnow()}}
+    )
+    
+    # Mark request as approved
+    await db.password_reset_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": "approved", "approved_by": admin["id"], "updated_at": datetime.utcnow()}}
+    )
+    
+    # Notify user
+    await create_notification(
+        reset_req["user_id"],
+        "تم إعادة تعيين كلمة المرور",
+        "تم إعادة تعيين كلمة مرورك بنجاح. يمكنك تسجيل الدخول الآن",
+        "password_reset_approved",
+        {}
+    )
+    
+    return {"message": "تم إعادة تعيين كلمة المرور وإبلاغ المستخدم"}
+
+@api_router.put("/admin/password-reset-requests/{request_id}/reject")
+async def reject_password_reset(
+    request_id: str,
+    admin: dict = Depends(require_admin_or_moderator)
+):
+    """Admin rejects password reset request"""
+    reset_req = await db.password_reset_requests.find_one({"id": request_id})
+    if not reset_req:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    await db.password_reset_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": "rejected", "updated_at": datetime.utcnow()}}
+    )
+    
+    return {"message": "تم رفض الطلب"}
 
 @api_router.put("/auth/change-password")
 async def change_own_password(
