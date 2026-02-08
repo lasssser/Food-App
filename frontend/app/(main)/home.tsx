@@ -109,10 +109,6 @@ export default function HomeScreen() {
       if (selectedCategory !== 'all') {
         filters.cuisine = selectedCategory;
       }
-      // Filter by city if location is set
-      if (selectedCity) {
-        filters.city_id = selectedCity.id;
-      }
       const data = await restaurantAPI.getAll(filters);
       setRestaurants(data);
     } catch (error) {
@@ -126,7 +122,7 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchRestaurants();
-    }, [selectedCategory, selectedCity])
+    }, [selectedCategory])
   );
 
   const onRefresh = () => {
