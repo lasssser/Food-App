@@ -6,32 +6,58 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List, Optional, Literal
+from typing import List, Optional
 import uuid
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 import jwt
-from passlib.context import CryptContext
-import bcrypt
 import httpx
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
+# MongoDB connection (also available via database.py for sub-modules)
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# JWT Settings
-SECRET_KEY = os.environ['JWT_SECRET']
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_DAYS = 7
+# Import models from schemas module
+from models.schemas import (
+    UserCreate, UserLogin, UserResponse, TokenResponse,
+    AddressCreate, Address,
+    Restaurant, RestaurantUpdate,
+    MenuItem, MenuItemCreate, MenuItemUpdate,
+    AddOnCreate, AddOnGroupCreate, AddOnOption, AddOnGroup,
+    PaymentMethodConfig, RestaurantPaymentMethods, PaymentMethodUpdate,
+    PaymentVerification, Payment,
+    OrderAddOnSelection, OrderPaymentInfo, OrderItemCreate, OrderCreate, OrderItem, Order, OrderStatusUpdate,
+    RatingCreate,
+    DriverLocation, DriverStatus,
+    City, UserLocationUpdate,
+    RestaurantDriverCreate, RestaurantDriver,
+    DriverOffer, AssignDriverRequest,
+    Notification, PushTokenRegister, PushToken,
+    ComplaintCreate, Complaint, ComplaintResponse,
+    RoleRequestCreate, RoleRequest,
+    AdvertisementCreate, Advertisement,
+    UpdateUserStatusRequest, UpdateUserInfoRequest, ResetPasswordRequest,
+    PasswordResetRequestCreate, ChangePasswordRequest, ChangeRoleRequest,
+    AppSettingsUpdate,
+)
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-security = HTTPBearer()
+# Import utilities
+from utils.auth import (
+    hash_password, verify_password, create_access_token,
+    get_current_user, require_admin, require_admin_or_moderator,
+    security, pwd_context,
+)
+from utils.helpers import (
+    SYRIA_TZ, get_syria_now, is_restaurant_open_by_hours, calculate_distance,
+)
+from utils.notifications import (
+    create_notification, send_push_notification, send_push_to_user,
+    send_push_to_drivers_in_city, notify_customer_order_status, notify_drivers_new_order,
+)
 
 # Create the main app
 app = FastAPI(title="يلا ناكل؟ API")
