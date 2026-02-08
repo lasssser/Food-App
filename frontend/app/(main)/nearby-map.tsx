@@ -282,6 +282,26 @@ export default function NearbyMapScreen() {
         <View style={{ width: 44 }} />
       </SafeAreaView>
 
+      {/* Bottom Info Bar - hide when restaurant card is shown */}
+      {!selectedRestaurant && (
+        <View style={styles.bottomInfoBar}>
+          <View style={styles.infoBarItem}>
+            <Text style={styles.infoBarNum}>{restaurants.filter(r => r.lat && r.lng).length}</Text>
+            <Text style={styles.infoBarLabel}>مطعم</Text>
+          </View>
+          <View style={styles.infoBarDivider} />
+          <View style={styles.infoBarItem}>
+            <Text style={styles.infoBarNum}>{restaurants.filter(r => r.lat && r.lng && r.is_open).length}</Text>
+            <Text style={styles.infoBarLabel}>مفتوح الآن</Text>
+          </View>
+          <View style={styles.infoBarDivider} />
+          <View style={styles.infoBarItem}>
+            <Text style={[styles.infoBarNum, { fontSize: 14 }]}>أكلة عالسريع</Text>
+            <Text style={styles.infoBarLabel}>اطلب من أي مكان</Text>
+          </View>
+        </View>
+      )}
+
       {/* Selected Restaurant Card */}
       {selectedRestaurant && (
         <View style={styles.restaurantCard}>
