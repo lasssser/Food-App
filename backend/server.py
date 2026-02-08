@@ -3077,9 +3077,6 @@ async def get_user_details(user_id: str, admin: dict = Depends(require_admin_or_
     
     return {"user": user, "recent_orders": orders}
 
-class UpdateUserStatusRequest(BaseModel):
-    is_active: bool
-
 @api_router.put("/admin/users/{user_id}/status")
 async def update_user_status(
     user_id: str,
