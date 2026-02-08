@@ -540,8 +540,7 @@ export default function RestaurantOrders() {
             color={COLORS.textLight} 
           />
         </View>
-      </TouchableOpacity>
-    </View>
+      </View>
     );
   };
 
