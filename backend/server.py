@@ -2429,7 +2429,12 @@ async def create_order(order_data: OrderCreate, current_user: dict = Depends(get
         notes=order_data.notes
     )
     
-    await db.orders.insert_one(order.dict())
+    order_dict = order.dict()
+    # Save recipient info
+    order_dict["recipient_name"] = order_data.recipient_name or current_user.get("name", "")
+    order_dict["recipient_phone"] = order_data.recipient_phone or current_user.get("phone", "")
+    
+    await db.orders.insert_one(order_dict)
     
     # Create notification for restaurant
     if restaurant.get("owner_id"):
