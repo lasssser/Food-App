@@ -173,10 +173,19 @@ export default function ProfileScreen() {
     }
     setSubmittingComplaint(true);
     try {
-      await complaintsAPI.submit(complaintSubject.trim(), complaintMessage.trim(), 'customer');
+      const selectedOrder = recentOrders.find(o => o.id === selectedOrderForComplaint);
+      await complaintsAPI.submit(
+        complaintSubject.trim(), 
+        complaintMessage.trim(), 
+        complaintType,
+        selectedOrderForComplaint || undefined,
+        selectedOrder?.restaurant_id || undefined
+      );
       setShowComplaintModal(false);
       setComplaintSubject('');
       setComplaintMessage('');
+      setComplaintType('general');
+      setSelectedOrderForComplaint(null);
       // Show success alert
       if (Platform.OS === 'web') {
         alert('تم إرسال الشكوى بنجاح، سنتواصل معك قريباً');
@@ -185,6 +194,16 @@ export default function ProfileScreen() {
       console.error('Error submitting complaint:', error);
     } finally {
       setSubmittingComplaint(false);
+    }
+  };
+
+  const handleOpenComplaintModal = async () => {
+    setShowComplaintModal(true);
+    try {
+      const orders = await orderAPI.getAll();
+      setRecentOrders(orders || []);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
     }
   };
 
