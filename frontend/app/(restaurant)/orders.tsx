@@ -184,16 +184,14 @@ export default function RestaurantOrders() {
 
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     try {
-      // Optimistically update local state first
-      setOrders(prev => prev.map(o => 
-        o.id === orderId ? { ...o, order_status: newStatus, updated_at: new Date().toISOString() } : o
-      ));
+      // Don't use optimistic update - it can cause render issues on Android
+      // Instead, show a loading state via the API call
       await restaurantPanelAPI.updateOrderStatus(orderId, newStatus);
-      // Refetch to get fresh data
-      setTimeout(() => fetchOrders(), 500);
+      // Refetch to get fresh data from server
+      await fetchOrders();
     } catch (error: any) {
       console.error('Error updating status:', error);
-      // Revert on error
+      // Refetch anyway to ensure consistent state
       fetchOrders();
     }
   };
