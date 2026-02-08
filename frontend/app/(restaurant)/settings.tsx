@@ -22,7 +22,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../src/store/authStore';
 import { restaurantPanelAPI, complaintsAPI } from '../../src/services/api';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
-import MapLocationPicker from '../../src/components/MapLocationPicker';
+import { MapLocationPicker } from '../../src/components/LocationPicker';
 
 interface RestaurantStats {
   total_orders: number;
