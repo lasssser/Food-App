@@ -133,35 +133,6 @@ const getMapHTML = (lat: number, lng: number, restaurants: any[]) => {
 <body>
   <div id="map"></div>
   
-  <!-- Custom Zoom -->
-  <div class="custom-zoom">
-    <button class="zoom-btn" onclick="map.zoomIn()">+</button>
-    <button class="zoom-btn" onclick="map.zoomOut()">−</button>
-  </div>
-  
-  <!-- My Location -->
-  <button class="my-loc-btn" onclick="map.flyTo([${lat}, ${lng}], 15, {duration: 1})">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
-  </button>
-  
-  <!-- Info Bar -->
-  <div class="info-bar">
-    <div class="info-item">
-      <div class="info-num">${restCount}</div>
-      <div class="info-label">مطعم</div>
-    </div>
-    <div class="info-divider"></div>
-    <div class="info-item">
-      <div class="info-num">${openCount}</div>
-      <div class="info-label">مفتوح الآن</div>
-    </div>
-    <div class="info-divider"></div>
-    <div class="info-item">
-      <div style="font-size:16px;font-weight:bold;">أكلة عالسريع</div>
-      <div class="info-label">اطلب من أي مكان</div>
-    </div>
-  </div>
-  
   <script>
     var map = L.map('map', {
       zoomControl: false,
