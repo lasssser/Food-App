@@ -1549,15 +1549,19 @@ async def get_available_platform_drivers(
     if not restaurant:
         raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
     
-    # Get restaurant location
+    # Get restaurant location and search radius
     rest_lat = restaurant.get("lat", 33.5138)  # Default Damascus
     rest_lng = restaurant.get("lng", 36.2765)
+    search_radius = restaurant.get("driver_search_radius", 50)  # Default 50km
     
     # Get online platform drivers
     drivers = await db.users.find({
         "role": "driver",
         "is_online": True
-    }).to_list(20)
+    }).to_list(50)
+    
+    # Get favorite driver IDs
+    favorite_ids = restaurant.get("favorite_platform_drivers", []) or []
     
     result = []
     for driver in drivers:
@@ -1572,9 +1576,14 @@ async def get_available_platform_drivers(
         avg_rating = sum(r.get("rating", 5) for r in ratings) / len(ratings) if ratings else 4.5
         
         # Calculate distance from restaurant
-        driver_lat = driver.get("last_lat", rest_lat + 0.01)  # Default nearby
-        driver_lng = driver.get("last_lng", rest_lng + 0.01)
+        driver_loc = driver.get("current_location", {})
+        driver_lat = driver_loc.get("lat", rest_lat + 0.01) if isinstance(driver_loc, dict) else rest_lat + 0.01
+        driver_lng = driver_loc.get("lng", rest_lng + 0.01) if isinstance(driver_loc, dict) else rest_lng + 0.01
         distance = calculate_distance(rest_lat, rest_lng, driver_lat, driver_lng)
+        
+        # Filter by radius
+        if distance > search_radius and driver["id"] not in favorite_ids:
+            continue
         
         current_orders_count = await db.orders.count_documents({
             "driver_id": driver["id"],
@@ -1590,21 +1599,116 @@ async def get_available_platform_drivers(
             "rating": round(avg_rating, 1),
             "current_orders": current_orders_count,
             "distance_km": round(distance, 1),
-            "estimated_time": f"{int(distance * 3 + 5)} دقيقة"  # Rough estimate
+            "estimated_time": f"{int(distance * 3 + 5)} دقيقة",
+            "is_favorite": driver["id"] in favorite_ids,
         })
     
-    # Sort based on preference
+    # Sort: favorites first, then by preference
     if sort_by == "distance":
-        result.sort(key=lambda x: x["distance_km"])
+        result.sort(key=lambda x: (-x["is_favorite"], x["distance_km"]))
     elif sort_by == "rating":
-        result.sort(key=lambda x: -x["rating"])
+        result.sort(key=lambda x: (-x["is_favorite"], -x["rating"]))
     elif sort_by == "availability":
-        result.sort(key=lambda x: x["current_orders"])
+        result.sort(key=lambda x: (-x["is_favorite"], x["current_orders"]))
     else:
-        # Default: combination of distance and availability
-        result.sort(key=lambda x: (x["current_orders"], x["distance_km"]))
+        result.sort(key=lambda x: (-x["is_favorite"], x["current_orders"], x["distance_km"]))
     
     return result
+
+# Favorite Platform Drivers Management
+@api_router.get("/restaurant/favorite-drivers")
+async def get_favorite_drivers(current_user: dict = Depends(get_current_user)):
+    """Get restaurant's favorite platform drivers"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    favorite_ids = restaurant.get("favorite_platform_drivers", []) or []
+    
+    drivers = []
+    for driver_id in favorite_ids:
+        driver = await db.users.find_one({"id": driver_id, "role": "driver"})
+        if driver:
+            completed = await db.orders.count_documents({"driver_id": driver_id, "order_status": "delivered"})
+            drivers.append({
+                "id": driver["id"],
+                "name": driver.get("name", "سائق"),
+                "phone": driver.get("phone", ""),
+                "is_online": driver.get("is_online", False),
+                "total_deliveries": completed,
+            })
+    
+    return drivers
+
+@api_router.post("/restaurant/favorite-drivers/{driver_id}")
+async def add_favorite_driver(driver_id: str, current_user: dict = Depends(get_current_user)):
+    """Add a platform driver to favorites"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    # Verify driver exists
+    driver = await db.users.find_one({"id": driver_id, "role": "driver"})
+    if not driver:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    favorites = restaurant.get("favorite_platform_drivers", []) or []
+    if driver_id not in favorites:
+        favorites.append(driver_id)
+        await db.restaurants.update_one(
+            {"id": restaurant["id"]},
+            {"$set": {"favorite_platform_drivers": favorites}}
+        )
+    
+    return {"message": f"تم إضافة {driver.get('name', 'السائق')} للمفضلين", "favorites": favorites}
+
+@api_router.delete("/restaurant/favorite-drivers/{driver_id}")
+async def remove_favorite_driver(driver_id: str, current_user: dict = Depends(get_current_user)):
+    """Remove a platform driver from favorites"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    favorites = restaurant.get("favorite_platform_drivers", []) or []
+    if driver_id in favorites:
+        favorites.remove(driver_id)
+        await db.restaurants.update_one(
+            {"id": restaurant["id"]},
+            {"$set": {"favorite_platform_drivers": favorites}}
+        )
+    
+    return {"message": "تم إزالة السائق من المفضلين", "favorites": favorites}
+
+@api_router.put("/restaurant/driver-search-settings")
+async def update_driver_search_settings(
+    current_user: dict = Depends(get_current_user),
+    search_radius: float = 50,
+    city_id: str = None,
+):
+    """Update restaurant's driver search radius and city"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    update = {"driver_search_radius": search_radius}
+    if city_id:
+        update["city_id"] = city_id
+    
+    await db.restaurants.update_one({"id": restaurant["id"]}, {"$set": update})
+    
+    return {"message": "تم تحديث إعدادات البحث", "search_radius": search_radius}
 
 @api_router.post("/restaurant/orders/{order_id}/change-driver")
 async def change_order_driver(order_id: str, current_user: dict = Depends(get_current_user)):
