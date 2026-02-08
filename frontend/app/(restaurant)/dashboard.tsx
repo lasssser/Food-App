@@ -97,6 +97,7 @@ export default function RestaurantDashboard() {
         }
       >
         {/* Header */}
+        <Animated.View style={{ opacity: headerAnim }}>
         <View style={styles.header}>
           <View style={styles.headerInfo}>
             <Text style={styles.welcomeText}>مرحباً</Text>
@@ -106,8 +107,10 @@ export default function RestaurantDashboard() {
             <Ionicons name="restaurant" size={30} color="#FF6B35" />
           </View>
         </View>
+        </Animated.View>
 
         {/* Status Toggle */}
+        <Animated.View style={{ opacity: statusOpacity, transform: [{ translateY: statusAnim }] }}>
         <TouchableOpacity
           style={[
             styles.statusCard,
