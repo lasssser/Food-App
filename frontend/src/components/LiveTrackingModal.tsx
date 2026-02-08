@@ -101,7 +101,6 @@ export default function LiveTrackingModal({ orderId, visible, onClose }: Props) 
   const intervalRef = useRef<any>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  // Pulse animation for ETA
   useEffect(() => {
     if (visible) {
       Animated.loop(
@@ -116,10 +115,13 @@ export default function LiveTrackingModal({ orderId, visible, onClose }: Props) 
   const fetchData = async () => {
     try {
       const result = await orderAPI.getDriverLocation(orderId);
-      if (result.driver_location) {
+      
+      // Driver is assigned
+      if (result.driver_assigned) {
         setData(result);
         setError(null);
-        if (webViewRef.current && !loading) {
+        // Update map if driver has location
+        if (result.has_location && result.driver_location && webViewRef.current && !loading) {
           webViewRef.current.postMessage(JSON.stringify({
             type: 'update',
             lat: result.driver_location.lat,
@@ -127,6 +129,8 @@ export default function LiveTrackingModal({ orderId, visible, onClose }: Props) 
           }));
         }
       } else {
+        // No driver assigned yet
+        setData(null);
         setError(result.message || 'لم يتم تعيين سائق بعد');
       }
     } catch (e) {
@@ -148,11 +152,12 @@ export default function LiveTrackingModal({ orderId, visible, onClose }: Props) 
 
   const currentPhaseIndex = PHASES.findIndex(p => p.key === data?.phase);
   const eta = data?.phase === 'delivering' ? data?.eta_to_customer_min : data?.eta_to_restaurant_min;
+  const hasLocation = data?.has_location && data?.driver_location;
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
       <View style={styles.container}>
-        {/* Map */}
+        {/* Map or Waiting State */}
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={COLORS.primary} />
@@ -166,7 +171,19 @@ export default function LiveTrackingModal({ orderId, visible, onClose }: Props) 
               <Text style={styles.retryText}>إعادة المحاولة</Text>
             </TouchableOpacity>
           </View>
-        ) : data?.driver_location ? (
+        ) : data?.driver_assigned && !hasLocation ? (
+          /* Driver assigned but no location shared yet */
+          <View style={styles.loadingContainer}>
+            <Ionicons name="bicycle" size={64} color={COLORS.primary} />
+            <Text style={[styles.errorText, { color: COLORS.textPrimary }]}>
+              تم تعيين السائق: {data.driver_name}
+            </Text>
+            <Text style={styles.waitingLocationText}>
+              بانتظار مشاركة السائق لموقعه...
+            </Text>
+            <ActivityIndicator size="small" color={COLORS.primary} style={{ marginTop: 12 }} />
+          </View>
+        ) : hasLocation ? (
           <WebView
             ref={webViewRef}
             source={{ html: getTrackingHTML(
@@ -181,15 +198,15 @@ export default function LiveTrackingModal({ orderId, visible, onClose }: Props) 
         ) : null}
 
         {/* Close Button */}
-        <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+        <TouchableOpacity style={styles.closeBtn} onPress={onClose} data-testid="tracking-close-btn">
           <Ionicons name="close" size={24} color="#333" />
         </TouchableOpacity>
 
-        {/* Bottom Card */}
-        {data && !error && (
+        {/* Bottom Card - show when driver is assigned (even without location) */}
+        {data?.driver_assigned && !error && (
           <View style={styles.bottomCard}>
             {/* ETA */}
-            {eta && (
+            {eta && hasLocation && (
               <Animated.View style={[styles.etaContainer, { transform: [{ scale: pulseAnim }] }]}>
                 <Text style={styles.etaNumber}>{eta}</Text>
                 <Text style={styles.etaLabel}>دقيقة</Text>
@@ -197,10 +214,10 @@ export default function LiveTrackingModal({ orderId, visible, onClose }: Props) 
             )}
 
             {/* Phase Text */}
-            <Text style={styles.phaseText}>{data.phase_text}</Text>
+            <Text style={styles.phaseText}>{data.phase_text || 'السائق معين'}</Text>
 
             {/* Distance */}
-            {data.distance_to_restaurant_km && (
+            {hasLocation && data.distance_to_restaurant_km && (
               <Text style={styles.distanceText}>
                 {data.phase === 'delivering' 
                   ? `على بعد ${data.distance_to_restaurant_km} كم منك`
@@ -232,12 +249,14 @@ export default function LiveTrackingModal({ orderId, visible, onClose }: Props) 
               <TouchableOpacity
                 style={styles.callBtn}
                 onPress={() => data.driver_phone && Linking.openURL(`tel:${data.driver_phone}`)}
+                data-testid="tracking-call-btn"
               >
                 <Ionicons name="call" size={20} color="#fff" />
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.whatsappBtn}
                 onPress={() => data.driver_phone && Linking.openURL(`https://wa.me/${data.driver_phone}`)}
+                data-testid="tracking-whatsapp-btn"
               >
                 <Ionicons name="logo-whatsapp" size={20} color="#fff" />
               </TouchableOpacity>
@@ -261,6 +280,7 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16 },
   loadingText: { fontFamily: 'Cairo_400Regular', fontSize: 14, color: '#999' },
   errorText: { fontFamily: 'Cairo_400Regular', fontSize: 16, color: '#999', marginTop: 12 },
+  waitingLocationText: { fontFamily: 'Cairo_400Regular', fontSize: 14, color: '#999', marginTop: 4 },
   retryBtn: { marginTop: 12, paddingHorizontal: 24, paddingVertical: 10, backgroundColor: COLORS.primary, borderRadius: 12 },
   retryText: { fontFamily: 'Cairo_600SemiBold', fontSize: 14, color: '#fff' },
   closeBtn: {
@@ -286,7 +306,6 @@ const styles = StyleSheet.create({
   etaLabel: { fontFamily: 'Cairo_400Regular', fontSize: 10, color: 'rgba(255,255,255,0.9)', marginTop: -2 },
   phaseText: { fontFamily: 'Cairo_600SemiBold', fontSize: 17, color: COLORS.textPrimary, textAlign: 'center' },
   distanceText: { fontFamily: 'Cairo_400Regular', fontSize: 13, color: '#999', textAlign: 'center', marginTop: 2, marginBottom: 16 },
-  // Progress Steps
   progressContainer: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, paddingHorizontal: 4 },
   progressStep: { alignItems: 'center', flex: 1, position: 'relative' },
   progressDot: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#f0f0f0', justifyContent: 'center', alignItems: 'center', marginBottom: 4 },
@@ -296,7 +315,6 @@ const styles = StyleSheet.create({
   progressLabelActive: { color: COLORS.textPrimary, fontFamily: 'Cairo_600SemiBold' },
   progressLine: { position: 'absolute', top: 15, right: -20, width: 40, height: 2, backgroundColor: '#eee' },
   progressLineActive: { backgroundColor: COLORS.primary },
-  // Driver Row
   driverRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f8f9fa', borderRadius: 16, padding: 12 },
   driverAvatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: `${COLORS.primary}15`, justifyContent: 'center', alignItems: 'center' },
   driverInfo: { flex: 1, alignItems: 'flex-end', marginRight: 12 },
