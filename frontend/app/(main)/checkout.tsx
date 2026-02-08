@@ -562,6 +562,7 @@ export default function CheckoutScreen() {
           </LinearGradient>
         </TouchableOpacity>
       </View>
+      )}
 
       {/* Add Address Modal */}
       <Modal visible={showAddAddress} animationType="slide" transparent>
