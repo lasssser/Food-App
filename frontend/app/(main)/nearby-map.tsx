@@ -70,6 +70,7 @@ const getMapHTML = (lat: number, lng: number, restaurants: any[]) => {
       transition: transform 0.2s;
     }
     .rest-pin span { transform: rotate(45deg); font-size: 20px; }
+    .rest-pin .pin-letter { transform: rotate(45deg); font-size: 16px; font-weight: bold; color: white; font-family: sans-serif; }
     .rest-pin.open { background: linear-gradient(135deg, #E53935, #FF6B35); }
     .rest-pin.closed { background: #9e9e9e; }
     
