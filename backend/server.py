@@ -1859,18 +1859,32 @@ async def get_available_orders_for_driver(current_user: dict = Depends(get_curre
     
     orders = await db.orders.find({
         "order_status": "ready",
-        "delivery_mode": "platform_driver",  # Only platform delivery orders
-        "driver_id": None,
+        "delivery_mode": "platform_driver",
+        "$or": [{"driver_id": None}, {"driver_id": ""}, {"driver_id": {"$exists": False}}],
         "restaurant_id": {"$in": restaurant_ids}
     }).sort("created_at", 1).to_list(20)
     
     # Enrich orders with restaurant info
     result = []
     for order in orders:
+        order.pop("_id", None)
         restaurant = next((r for r in restaurants_in_city if r["id"] == order["restaurant_id"]), None)
-        order_data = Order(**order).dict()
-        order_data["restaurant_address"] = restaurant.get("address") if restaurant else ""
-        result.append(order_data)
+        order["restaurant_address"] = restaurant.get("address") if restaurant else ""
+        order["restaurant_name"] = restaurant.get("name") if restaurant else ""
+        # Clean items
+        if isinstance(order.get("items"), list):
+            for item in order["items"]:
+                if isinstance(item, dict):
+                    item.pop("_id", None)
+        # Convert datetime
+        for key in ["created_at", "updated_at"]:
+            val = order.get(key)
+            if val and not isinstance(val, str):
+                try:
+                    order[key] = val.isoformat()
+                except:
+                    order[key] = str(val)
+        result.append(order)
     
     return result
 
