@@ -378,10 +378,12 @@ class RestaurantUpdate(BaseModel):
     delivery_fee: Optional[float] = None
     min_order: Optional[float] = None
     delivery_time: Optional[str] = None
+    lat: Optional[float] = None
+    lng: Optional[float] = None
     # Working hours
-    opening_time: Optional[str] = None  # e.g., "09:00"
-    closing_time: Optional[str] = None  # e.g., "23:00"
-    working_days: Optional[List[str]] = None  # e.g., ["السبت", "الأحد", ...]
+    opening_time: Optional[str] = None
+    closing_time: Optional[str] = None
+    working_days: Optional[List[str]] = None
 
 # Order Assignment
 class AssignDriverRequest(BaseModel):
