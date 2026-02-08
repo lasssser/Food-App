@@ -139,8 +139,9 @@ const getMapHTML = (lat: number, lng: number, restaurants: any[]) => {
       attributionControl: false
     }).setView([${lat}, ${lng}], 13);
     
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
+      subdomains: 'abcd',
     }).addTo(map);
 
     // User location
