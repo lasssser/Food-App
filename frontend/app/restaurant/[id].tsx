@@ -54,11 +54,11 @@ export default function RestaurantScreen() {
   const [loadingAddOns, setLoadingAddOns] = useState(false);
 
   // Animations
-  const heroOpacity = useRef(new Animated.Value(0)).current;
-  const infoSlide = useRef(new Animated.Value(40)).current;
-  const infoOpacity = useRef(new Animated.Value(0)).current;
-  const menuSlide = useRef(new Animated.Value(30)).current;
-  const menuOpacity = useRef(new Animated.Value(0)).current;
+  const heroOpacity = useRef(new Animated.Value(1)).current;
+  const infoSlide = useRef(new Animated.Value(0)).current;
+  const infoOpacity = useRef(new Animated.Value(1)).current;
+  const menuSlide = useRef(new Animated.Value(0)).current;
+  const menuOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     if (!loading && restaurant) {
