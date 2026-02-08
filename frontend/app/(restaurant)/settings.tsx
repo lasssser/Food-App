@@ -630,6 +630,21 @@ export default function RestaurantSettings() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* Location Picker */}
+      <MapLocationPicker
+        visible={showLocationPicker}
+        onClose={() => setShowLocationPicker(false)}
+        onLocationSelected={async (location) => {
+          try {
+            await restaurantPanelAPI.updateLocation(location.latitude, location.longitude);
+            setShowLocationPicker(false);
+            Alert.alert('تم', 'تم تحديث موقع المطعم بنجاح');
+          } catch (e) {
+            Alert.alert('خطأ', 'فشل تحديث الموقع');
+          }
+        }}
+      />
     </SafeAreaView>
   );
 }
