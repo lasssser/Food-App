@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,8 @@ import {
   ActivityIndicator,
   Image,
   Dimensions,
+  Animated,
+  Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
@@ -28,6 +30,29 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const { login, setGuestMode } = useAuthStore();
   const router = useRouter();
+
+  // Animations
+  const logoScale = useRef(new Animated.Value(0.3)).current;
+  const logoOpacity = useRef(new Animated.Value(0)).current;
+  const formSlide = useRef(new Animated.Value(40)).current;
+  const formOpacity = useRef(new Animated.Value(0)).current;
+  const btnScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    // Logo entrance
+    Animated.parallel([
+      Animated.spring(logoScale, { toValue: 1, friction: 5, tension: 60, useNativeDriver: true }),
+      Animated.timing(logoOpacity, { toValue: 1, duration: 500, useNativeDriver: true }),
+    ]).start();
+    // Form slide up
+    Animated.parallel([
+      Animated.timing(formSlide, { toValue: 0, duration: 600, delay: 300, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(formOpacity, { toValue: 1, duration: 500, delay: 300, useNativeDriver: true }),
+    ]).start();
+  }, []);
+
+  const onBtnPressIn = () => Animated.spring(btnScale, { toValue: 0.95, friction: 8, useNativeDriver: true }).start();
+  const onBtnPressOut = () => Animated.spring(btnScale, { toValue: 1, friction: 5, useNativeDriver: true }).start();
 
   const handleLogin = async () => {
     if (!phone || !password) {
