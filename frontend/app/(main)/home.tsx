@@ -106,25 +106,10 @@ export default function HomeScreen() {
 
   const fetchRestaurants = async () => {
     try {
-      // Try to get user location for proximity sorting
-      let lat = 33.5138, lng = 36.2765; // Default Damascus
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status === 'granted') {
-          const locationPromise = Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low });
-          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000));
-          try {
-            const loc = await Promise.race([locationPromise, timeoutPromise]) as any;
-            lat = loc.coords.latitude;
-            lng = loc.coords.longitude;
-          } catch (e) {}
-        }
-      } catch (e) {}
+      // Use nearby API with default location (Damascus)
+      // GPS will be requested separately if user wants
+      const data = await restaurantAPI.getNearby(33.5138, 36.2765, 500);
       
-      // Get nearby restaurants (sorted by distance)
-      const data = await restaurantAPI.getNearby(lat, lng, 500); // 500km to get all Syria
-      
-      // Filter by category if selected
       let filtered = data || [];
       if (selectedCategory !== 'all') {
         filtered = filtered.filter((r: any) => r.cuisine_type === selectedCategory);
@@ -132,7 +117,6 @@ export default function HomeScreen() {
       
       setRestaurants(filtered);
     } catch (error) {
-      // Fallback to all restaurants
       try {
         const data = await restaurantAPI.getAll({});
         setRestaurants(data || []);
