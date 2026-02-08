@@ -213,8 +213,10 @@ export default function CartScreen() {
           </View>
         )}
       </ScrollView>
+      </Animated.View>
 
       {/* Order Summary Card */}
+      <Animated.View style={{ transform: [{ translateY: bottomAnim }] }}>
       <View style={styles.summaryCard}>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>المجموع الفرعي</Text>
