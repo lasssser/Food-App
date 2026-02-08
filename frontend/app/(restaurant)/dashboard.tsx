@@ -151,6 +151,7 @@ export default function RestaurantDashboard() {
         </View>
 
         {/* Restaurant Info */}
+        <Animated.View style={{ opacity: infoOpacity, transform: [{ translateY: infoAnim }] }}>
         <View style={styles.infoCard}>
           <Text style={styles.infoTitle}>معلومات المطعم</Text>
           
