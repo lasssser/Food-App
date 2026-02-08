@@ -130,6 +130,10 @@ export const restaurantAPI = {
     const response = await api.get(`/restaurants/${restaurantId}/payment-methods`);
     return response.data;
   },
+  getNearby: async (lat: number, lng: number, radius: number = 50) => {
+    const response = await api.get(`/restaurants/nearby?lat=${lat}&lng=${lng}&radius=${radius}`);
+    return response.data;
+  },
 };
 
 export const addressAPI = {
