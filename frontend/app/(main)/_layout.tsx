@@ -125,6 +125,12 @@ const styles = StyleSheet.create({
     height: 70,
     paddingBottom: 10,
     paddingTop: 10,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
     ...SHADOWS.medium,
   },
   tabBarLabel: {
