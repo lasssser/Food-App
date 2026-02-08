@@ -388,267 +388,148 @@ export default function RestaurantOrders() {
   const completedOrders = orders.filter(o => ['delivered', 'cancelled'].includes(o.order_status));
 
   const renderOrder = ({ item: order }: { item: Order }) => {
-    if (!order || !order.id) {
+    try {
+      if (!order || !order.id) return null;
+      
+      const st = String(order.order_status || 'pending');
+      const cfg = STATUS_CONFIG[st] || { label: st, color: '#999', icon: 'help-circle' as any, bgColor: '#F5F5F5' };
+      const act = STATUS_ACTIONS[st];
+      const expanded = expandedOrder === order.id;
+      const total = Number(order.total) || 0;
+      const itemCount = Array.isArray(order.items) ? order.items.length : 0;
+      const pm = String(order.payment_method || 'cod');
+      const canAssign = (st === 'ready' || st === 'preparing') && !order.driver_id;
+
       return (
-        <View style={{ backgroundColor: '#FFF3E0', borderRadius: 12, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: '#FFE082' }}>
-          <Text style={{ fontFamily: 'Cairo_400Regular', color: '#E65100', textAlign: 'right', fontSize: 14 }}>
-            خطأ في تحميل بيانات الطلب
-          </Text>
+        <View style={{ backgroundColor: '#fff', borderRadius: 16, marginBottom: 12, marginHorizontal: 16, overflow: 'hidden', borderWidth: 1, borderColor: st === 'pending' ? COLORS.primary : '#eee' }}>
+          {/* Color bar */}
+          <View style={{ height: 4, backgroundColor: cfg.color }} />
+
+          {/* Header - always visible */}
+          <TouchableOpacity onPress={() => toggleExpand(order.id)} activeOpacity={0.7} style={{ padding: 14 }}>
+            {/* Row 1: Status + Order ID */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <View style={{ backgroundColor: cfg.bgColor, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Ionicons name={cfg.icon} size={14} color={cfg.color} />
+                <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 12, color: cfg.color }}>{cfg.label}</Text>
+              </View>
+              <Text style={{ fontFamily: 'Cairo_600SemiBold', fontSize: 14, color: COLORS.textPrimary }}>{'#' + String(order.id).slice(0, 8)}</Text>
+            </View>
+            {/* Row 2: Items + Total + Payment */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+              <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 13, color: '#666' }}>{pm === 'cod' ? 'كاش' : 'إلكتروني'}</Text>
+              <Text style={{ fontFamily: 'Cairo_600SemiBold', fontSize: 15, color: COLORS.success }}>{total} ل.س</Text>
+              <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 13, color: '#666' }}>{itemCount} أصناف</Text>
+            </View>
+            {/* Customer info */}
+            {(order.customer_name || order.customer_phone) ? (
+              <View style={{ flexDirection: 'row-reverse', marginTop: 6, gap: 8 }}>
+                {order.customer_name ? <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 12, color: '#888' }}>{order.customer_name}</Text> : null}
+                {order.customer_phone ? <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 12, color: '#888' }}>{order.customer_phone}</Text> : null}
+              </View>
+            ) : null}
+          </TouchableOpacity>
+
+          {/* Expanded Details */}
+          {expanded ? (
+            <View style={{ paddingHorizontal: 14, paddingBottom: 10, borderTopWidth: 1, borderTopColor: '#f0f0f0' }}>
+              {/* Items */}
+              <Text style={{ fontFamily: 'Cairo_600SemiBold', fontSize: 14, color: COLORS.textPrimary, textAlign: 'right', marginTop: 10 }}>تفاصيل الطلب</Text>
+              {(order.items || []).map((item: any, i: number) => (
+                <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 }}>
+                  <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 13, color: '#666' }}>{(Number(item.price) || 0) * (Number(item.quantity) || 0)} ل.س</Text>
+                  <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 13, color: '#333' }}>{item.quantity || 0}x {String(item.name || '')}</Text>
+                </View>
+              ))}
+              {/* Address */}
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6, marginTop: 8, backgroundColor: '#f8f8f8', padding: 10, borderRadius: 10 }}>
+                <Ionicons name="location" size={16} color={COLORS.primary} />
+                <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 13, color: '#333', flex: 1, textAlign: 'right' }}>
+                  {order.address ? (String(order.address.label || '') + ' - ' + String(order.address.address_line || '')) : 'غير محدد'}
+                </Text>
+              </View>
+              {/* Notes */}
+              {order.notes ? (
+                <View style={{ marginTop: 8, backgroundColor: '#FFF8E1', padding: 10, borderRadius: 10 }}>
+                  <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 12, color: '#F57C00', textAlign: 'right' }}>ملاحظة: {String(order.notes)}</Text>
+                </View>
+              ) : null}
+              {/* Driver */}
+              {order.driver_name ? (
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, marginTop: 8, backgroundColor: '#E3F2FD', padding: 10, borderRadius: 10 }}>
+                  <Ionicons name="bicycle" size={18} color="#1976D2" />
+                  <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 13, color: '#1976D2', flex: 1, textAlign: 'right' }}>{String(order.driver_name)}</Text>
+                  {order.driver_phone ? (
+                    <TouchableOpacity onPress={() => Linking.openURL('tel:' + order.driver_phone)}>
+                      <Ionicons name="call" size={20} color="#4CAF50" />
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
+              ) : null}
+              {/* Payment verification */}
+              {order.payment_status === 'pending_verification' ? (
+                <View style={{ marginTop: 8, backgroundColor: '#FFF3E0', padding: 12, borderRadius: 10 }}>
+                  <Text style={{ fontFamily: 'Cairo_600SemiBold', fontSize: 13, color: '#E65100', textAlign: 'right', marginBottom: 8 }}>بانتظار تأكيد الدفع</Text>
+                  <View style={{ flexDirection: 'row', gap: 8 }}>
+                    <TouchableOpacity onPress={() => handleRejectPayment(order.id)} style={{ flex: 1, backgroundColor: '#f44336', paddingVertical: 8, borderRadius: 8, alignItems: 'center' }}>
+                      <Text style={{ fontFamily: 'Cairo_400Regular', color: '#fff', fontSize: 13 }}>رفض</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => handleConfirmPayment(order.id)} style={{ flex: 1, backgroundColor: '#4CAF50', paddingVertical: 8, borderRadius: 8, alignItems: 'center' }}>
+                      <Text style={{ fontFamily: 'Cairo_400Regular', color: '#fff', fontSize: 13 }}>تأكيد الدفع</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ) : null}
+            </View>
+          ) : null}
+
+          {/* Action Buttons */}
+          <View style={{ paddingHorizontal: 14, paddingBottom: 14, gap: 8 }}>
+            {/* Assign Driver */}
+            {canAssign ? (
+              <TouchableOpacity onPress={() => openAssignModal(order)} style={{ backgroundColor: '#2196F3', paddingVertical: 12, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <Ionicons name="bicycle" size={18} color="#fff" />
+                <Text style={{ fontFamily: 'Cairo_600SemiBold', color: '#fff', fontSize: 14 }}>تعيين سائق</Text>
+              </TouchableOpacity>
+            ) : null}
+            {/* Status Action */}
+            {act ? (
+              <TouchableOpacity
+                onPress={() => handleUpdateStatus(order.id, act.next)}
+                disabled={updatingOrderId === order.id}
+                style={{ backgroundColor: st === 'pending' ? '#4CAF50' : COLORS.primary, paddingVertical: 12, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: updatingOrderId === order.id ? 0.6 : 1 }}
+              >
+                {updatingOrderId === order.id ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <>
+                    <Ionicons name={act.icon} size={18} color="#fff" />
+                    <Text style={{ fontFamily: 'Cairo_600SemiBold', color: '#fff', fontSize: 14 }}>{act.label}</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            ) : null}
+            {/* Reject - only pending */}
+            {st === 'pending' ? (
+              <TouchableOpacity onPress={() => { setOrderToCancel(order.id); setConfirmCancelVisible(true); }} style={{ borderWidth: 1, borderColor: '#f44336', paddingVertical: 10, borderRadius: 12, alignItems: 'center' }}>
+                <Text style={{ fontFamily: 'Cairo_400Regular', color: '#f44336', fontSize: 13 }}>رفض الطلب</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
+
+          {/* Expand indicator */}
+          <View style={{ alignItems: 'center', paddingBottom: 8 }}>
+            <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={18} color="#ccc" />
+          </View>
+        </View>
+      );
+    } catch (e) {
+      return (
+        <View style={{ backgroundColor: '#FFF3E0', borderRadius: 12, padding: 16, marginBottom: 12, marginHorizontal: 16 }}>
+          <Text style={{ fontFamily: 'Cairo_400Regular', color: '#E65100', textAlign: 'right' }}>خطأ في عرض الطلب</Text>
         </View>
       );
     }
-    
-    const orderStatus = String(order.order_status || 'pending');
-    const status = STATUS_CONFIG[orderStatus] || { label: orderStatus, color: '#999', icon: 'help-circle' as keyof typeof Ionicons.glyphMap, bgColor: '#F5F5F5' };
-    const action = STATUS_ACTIONS[orderStatus];
-    const showAssignButton = (orderStatus === 'ready' || orderStatus === 'preparing') && !order.driver_id;
-    const hasDriver = !!(order.driver_id && order.driver_name);
-    const isExpanded = expandedOrder === order.id;
-    const isPending = orderStatus === 'pending';
-    const itemsCount = Array.isArray(order.items) ? order.items.length : 0;
-    const orderTotal = typeof order.total === 'number' ? order.total : 0;
-    const paymentMethod = String(order.payment_method || 'cod').toLowerCase();
-    const orderTime = safeFormatTime(order.created_at);
-
-    return (
-      <OrderCardErrorBoundary orderId={order.id}>
-        <View style={[styles.orderCard, isPending && styles.pendingCard]} data-testid={`order-card-${order.id}`}>
-          {/* Status colored top bar */}
-          <View style={{ height: 4, backgroundColor: status.color, borderTopLeftRadius: RADIUS.lg, borderTopRightRadius: RADIUS.lg }} />
-          
-          {/* New Order Indicator */}
-          {isPending && (
-            <View style={styles.newOrderBanner}>
-              <Ionicons name="notifications" size={16} color={COLORS.textWhite} />
-              <Text style={styles.newOrderText}>طلب جديد!</Text>
-            </View>
-          )}
-
-          {/* Header */}
-          <TouchableOpacity onPress={() => toggleExpand(order.id)} activeOpacity={0.8} style={{ padding: 16 }}>
-            <View style={styles.orderHeader}>
-              <View style={[styles.statusBadge, { backgroundColor: status.bgColor }]}>
-                <Ionicons name={status.icon} size={16} color={status.color} />
-                <Text style={[styles.statusText, { color: status.color }]}>{status.label}</Text>
-              </View>
-              <View style={styles.orderIdContainer}>
-                <Text style={styles.orderId}>#{String(order.id || '').slice(0, 8)}</Text>
-                <Text style={styles.orderTime}>{orderTime}</Text>
-              </View>
-            </View>
-
-            {/* Quick Info */}
-            <View style={styles.quickInfo}>
-              <View style={styles.quickInfoItem}>
-                <Ionicons name="receipt" size={18} color={COLORS.textSecondary} />
-                <Text style={styles.quickInfoText}>{itemsCount} أصناف</Text>
-              </View>
-              <View style={styles.quickInfoItem}>
-                <Ionicons name="cash" size={18} color={COLORS.success} />
-                <Text style={[styles.quickInfoText, styles.totalText]}>{safeFormatNumber(orderTotal)} ل.س</Text>
-              </View>
-              <View style={styles.quickInfoItem}>
-                <Ionicons name={paymentMethod === 'cod' ? 'wallet' : 'card'} size={18} color={paymentMethod === 'cod' ? '#FF9800' : '#4CAF50'} />
-                <Text style={styles.quickInfoText}>{paymentMethod === 'cod' ? 'كاش' : 'إلكتروني'}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
-        {/* Expanded Details */}
-        {isExpanded && (
-          <View style={styles.expandedSection}>
-            {/* Items */}
-            <View style={styles.itemsSection}>
-              <Text style={styles.sectionTitle}>تفاصيل الطلب</Text>
-              {(order.items || []).map((item, index) => (
-                <View key={index} style={styles.itemRow}>
-                  <Text style={styles.itemPrice}>{safeFormatNumber((item.price || 0) * (item.quantity || 0))} ل.س</Text>
-                  <Text style={styles.itemName}>{item.quantity || 0}× {item.name || 'صنف'}</Text>
-                </View>
-              ))}
-            </View>
-
-            {/* Address */}
-            <View style={styles.addressSection}>
-              <Text style={styles.sectionTitle}>عنوان التوصيل</Text>
-              <View style={styles.addressContent}>
-                <Ionicons name="location" size={20} color={COLORS.primary} />
-                <Text style={styles.addressText}>
-                  {order.address?.label || 'غير محدد'} - {order.address?.address_line || ''}
-                </Text>
-              </View>
-            </View>
-
-            {/* Driver Info */}
-            {hasDriver && (
-              <View style={styles.driverSection}>
-                <View style={styles.driverSectionHeader}>
-                  <Text style={styles.sectionTitle}>السائق المعيّن</Text>
-                  {/* Change Driver Button - only if not yet picked up */}
-                  {!['picked_up', 'out_for_delivery', 'delivered'].includes(order.order_status) && (
-                    <TouchableOpacity 
-                      style={styles.changeDriverBtn}
-                      onPress={() => handleChangeDriver(order.id)}
-                    >
-                      <Ionicons name="swap-horizontal" size={16} color={COLORS.warning} />
-                      <Text style={styles.changeDriverText}>تغيير</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-                <View style={styles.driverCard2}>
-                  <View style={styles.driverInfo}>
-                    <View style={styles.driverAvatar}>
-                      <Ionicons name="person" size={24} color={COLORS.primary} />
-                    </View>
-                    <View style={styles.driverDetails}>
-                      <Text style={styles.driverName}>{order.driver_name}</Text>
-                      <Text style={styles.driverType}>
-                        {order.driver_type === 'restaurant_driver' ? 'سائق المطعم' : 'سائق المنصة'}
-                      </Text>
-                    </View>
-                  </View>
-                  <View style={styles.driverActions}>
-                    {order.driver_phone && (
-                      <>
-                        <TouchableOpacity 
-                          style={[styles.driverBtn, styles.whatsappBtn]}
-                          onPress={() => whatsappNumber(order.driver_phone!, `مرحباً، استفسار عن الطلب #${order.id.slice(0, 8)}`)}
-                        >
-                          <Ionicons name="logo-whatsapp" size={20} color="#25D366" />
-                        </TouchableOpacity>
-                        <TouchableOpacity 
-                          style={[styles.driverBtn, styles.callBtn]}
-                          onPress={() => callNumber(order.driver_phone!)}
-                        >
-                          <Ionicons name="call" size={20} color={COLORS.success} />
-                        </TouchableOpacity>
-                      </>
-                    )}
-                  </View>
-                </View>
-              </View>
-            )}
-
-            {/* Notes */}
-            {order.notes && (
-              <View style={styles.notesSection}>
-                <Text style={styles.sectionTitle}>ملاحظات العميل</Text>
-                <Text style={styles.notesText}>{order.notes}</Text>
-              </View>
-            )}
-
-            {/* Payment Info - for pending verification orders */}
-            {order.payment_status === 'pending_verification' && (
-              <View style={styles.paymentVerificationSection}>
-                <View style={styles.paymentVerificationHeader}>
-                  <Ionicons name="time" size={20} color="#FF9800" />
-                  <Text style={styles.paymentVerificationTitle}>بانتظار تأكيد الدفع</Text>
-                </View>
-                
-                <View style={styles.paymentDetailsBox}>
-                  <View style={styles.paymentDetailRow}>
-                    <Text style={styles.paymentDetailValue}>
-                      {order.payment_method === 'mtn_cash' ? 'MTN Cash' : 
-                       order.payment_method === 'syriatel_cash' ? 'Syriatel Cash' : 
-                       order.payment_method === 'shamcash' ? 'ShamCash' : order.payment_method}
-                    </Text>
-                    <Text style={styles.paymentDetailLabel}>طريقة الدفع:</Text>
-                  </View>
-                  {(order as any).payment_transaction_id && (
-                    <View style={styles.paymentDetailRow}>
-                      <Text style={[styles.paymentDetailValue, styles.transactionIdText]}>
-                        {(order as any).payment_transaction_id}
-                      </Text>
-                      <Text style={styles.paymentDetailLabel}>رقم العملية:</Text>
-                    </View>
-                  )}
-                </View>
-
-                <View style={styles.paymentActionButtons}>
-                  <TouchableOpacity 
-                    style={[styles.paymentActionBtn, styles.rejectPaymentBtn]}
-                    onPress={() => handleRejectPayment(order.id)}
-                  >
-                    <Ionicons name="close-circle" size={20} color="#FFF" />
-                    <Text style={styles.paymentActionBtnText}>رفض</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={[styles.paymentActionBtn, styles.confirmPaymentBtn]}
-                    onPress={() => handleConfirmPayment(order.id)}
-                  >
-                    <Ionicons name="checkmark-circle" size={20} color="#FFF" />
-                    <Text style={styles.paymentActionBtnText}>تأكيد الدفع</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-          </View>
-        )}
-
-        {/* Actions */}
-        <View style={styles.actionsSection}>
-          {/* Assign Driver Button */}
-          {showAssignButton && (
-            <TouchableOpacity 
-              style={styles.assignButton}
-              onPress={() => openAssignModal(order)}
-            >
-              <View
-                style={[styles.assignButtonGradient, { backgroundColor: COLORS.info }]}
-              >
-                <Ionicons name="bicycle" size={20} color={COLORS.textWhite} />
-                <Text style={styles.assignButtonText}>تعيين سائق</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-
-          {/* Status Action Button */}
-          {action && (
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onPress={() => handleUpdateStatus(order.id, action.next)}
-              disabled={updatingOrderId === order.id}
-            >
-              <View
-                style={[styles.actionButtonGradient, { backgroundColor: isPending ? COLORS.success : COLORS.primary, opacity: updatingOrderId === order.id ? 0.7 : 1 }]}
-              >
-                {updatingOrderId === order.id ? (
-                  <ActivityIndicator size="small" color={COLORS.textWhite} />
-                ) : (
-                  <>
-                    <Ionicons name={action.icon} size={20} color={COLORS.textWhite} />
-                    <Text style={styles.actionButtonText}>{action.label}</Text>
-                  </>
-                )}
-              </View>
-            </TouchableOpacity>
-          )}
-
-          {/* Cancel Button - only for pending */}
-          {isPending && (
-            <TouchableOpacity 
-              style={styles.cancelButton}
-              onPress={() => {
-                setOrderToCancel(order.id);
-                setConfirmCancelVisible(true);
-              }}
-            >
-              <Text style={styles.cancelButtonText}>رفض</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* Expand Indicator */}
-        <View style={styles.expandIndicator}>
-          <Ionicons 
-            name={isExpanded ? 'chevron-up' : 'chevron-down'} 
-            size={20} 
-            color={COLORS.textLight} 
-          />
-        </View>
-      </View>
-      </OrderCardErrorBoundary>
-    );
   };
 
   if (loading) {
