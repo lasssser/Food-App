@@ -300,7 +300,7 @@ export default function OrdersScreen() {
         )}
 
         {/* Track Driver Button - shown when driver is assigned */}
-        {['driver_assigned', 'picked_up', 'out_for_delivery'].includes(order.order_status) && order.driver_id && (
+        {['preparing', 'ready', 'driver_assigned', 'picked_up', 'out_for_delivery'].includes(order.order_status) && order.driver_id && (
           <TouchableOpacity 
             style={styles.trackButton}
             onPress={() => setTrackingOrderId(order.id)}
