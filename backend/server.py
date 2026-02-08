@@ -2025,7 +2025,7 @@ async def assign_driver_to_order(
         notification_title = "🚀 طلب جديد قريب منك"
         notification_body = f"طلب من {restaurant['name']} جاري التحضير - جهّز نفسك!" if is_preparing else f"طلب من {restaurant['name']} جاهز للتوصيل"
         
-        for driver in drivers_to_notify:
+        for driver in platform_drivers:
             await create_notification(
                 driver["id"],
                 notification_title,
