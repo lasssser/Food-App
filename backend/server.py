@@ -2176,37 +2176,38 @@ async def get_available_orders_for_driver(current_user: dict = Depends(get_curre
         logger.info(f"Driver {current_user['id']} is offline, returning empty orders")
         return []
     
-    # Filter by driver's city - try city match first, fall back to all
-    driver_city = current_user.get("city_id", "damascus")
+    # Filter by driver's city - STRICT: only same city
+    driver_city = current_user.get("city_id", "")
     
-    # Get all restaurants (we'll prefer same-city but include all)
-    all_restaurants = await db.restaurants.find({}).to_list(200)
-    city_restaurant_ids = [r["id"] for r in all_restaurants if r.get("city_id") == driver_city]
-    all_restaurant_ids = [r["id"] for r in all_restaurants]
+    if not driver_city:
+        logger.info(f"Driver {current_user['id']} has no city_id set, returning empty")
+        return []
     
-    # Query: orders assigned to platform_driver that are ready and unassigned
+    # Get restaurants in driver's city ONLY
+    city_restaurants = await db.restaurants.find({"city_id": driver_city}).to_list(200)
+    city_restaurant_ids = [r["id"] for r in city_restaurants]
+    
+    if not city_restaurant_ids:
+        logger.info(f"No restaurants in driver's city ({driver_city})")
+        return []
+    
+    # Query: orders assigned to platform_driver that are ready/preparing and unassigned
     query = {
-        "order_status": "ready",
+        "order_status": {"$in": ["ready", "preparing"]},
         "delivery_mode": "platform_driver",
         "$or": [{"driver_id": None}, {"driver_id": ""}, {"driver_id": {"$exists": False}}],
+        "restaurant_id": {"$in": city_restaurant_ids},
     }
-    
-    # Try city-filtered first
-    if city_restaurant_ids:
-        query["restaurant_id"] = {"$in": city_restaurant_ids}
-    else:
-        # No restaurants in city - show all available orders
-        query["restaurant_id"] = {"$in": all_restaurant_ids}
     
     orders = await db.orders.find(query).sort("created_at", 1).to_list(20)
     
-    logger.info(f"Driver {current_user['id']} (city={driver_city}): found {len(orders)} available orders (city_restaurants={len(city_restaurant_ids)}, all_restaurants={len(all_restaurant_ids)})")
+    logger.info(f"Driver {current_user['id']} (city={driver_city}): found {len(orders)} available orders (city_restaurants={len(city_restaurant_ids)})")
     
     # Enrich orders with restaurant info
     result = []
     for order in orders:
         order.pop("_id", None)
-        restaurant = next((r for r in all_restaurants if r["id"] == order.get("restaurant_id")), None)
+        restaurant = next((r for r in city_restaurants if r["id"] == order.get("restaurant_id")), None)
         order["restaurant_address"] = restaurant.get("address", "") if restaurant else ""
         order["restaurant_name"] = restaurant.get("name", "") if restaurant else ""
         # Clean items
