@@ -181,6 +181,10 @@ export const orderAPI = {
     const response = await api.post(`/orders/${id}/cancel`);
     return response.data;
   },
+  getDriverLocation: async (orderId: string) => {
+    const response = await api.get(`/orders/${orderId}/driver-location`);
+    return response.data;
+  },
 };
 
 export const paymentAPI = {
