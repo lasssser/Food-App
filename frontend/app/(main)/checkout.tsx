@@ -471,7 +471,7 @@ export default function CheckoutScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>📞 معلومات التواصل *</Text>
           <TextInput
-            style={[styles.notesInput, { height: 48, marginBottom: 8 }]}
+            style={{ backgroundColor: COLORS.background, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, fontFamily: 'Cairo_400Regular', color: COLORS.textPrimary, textAlign: 'right', borderWidth: 1, borderColor: COLORS.border, marginBottom: 8, height: 46 }}
             value={customerName}
             onChangeText={setCustomerName}
             placeholder="اسم المستلم (مطلوب)"
@@ -479,7 +479,7 @@ export default function CheckoutScreen() {
             textAlign="right"
           />
           <TextInput
-            style={[styles.notesInput, { height: 48 }]}
+            style={{ backgroundColor: COLORS.background, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, fontFamily: 'Cairo_400Regular', color: COLORS.textPrimary, textAlign: 'right', borderWidth: 1, borderColor: COLORS.border, height: 46 }}
             value={customerPhone}
             onChangeText={setCustomerPhone}
             placeholder="رقم هاتف المستلم (مطلوب)"
