@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   Image,
   Alert,
   TextInput,
+  Animated,
+  Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -23,6 +25,22 @@ export default function CartScreen() {
   const { isGuest, isAuthenticated } = useAuthStore();
   const [showNotes, setShowNotes] = useState(false);
   const [orderNotes, setOrderNotes] = useState('');
+  
+  // Animations
+  const headerAnim = useRef(new Animated.Value(0)).current;
+  const contentAnim = useRef(new Animated.Value(30)).current;
+  const contentOpacity = useRef(new Animated.Value(0)).current;
+  const bottomAnim = useRef(new Animated.Value(80)).current;
+  const checkoutScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(headerAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.timing(contentAnim, { toValue: 0, duration: 500, delay: 150, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(contentOpacity, { toValue: 1, duration: 400, delay: 150, useNativeDriver: true }),
+      Animated.spring(bottomAnim, { toValue: 0, friction: 8, tension: 60, delay: 300, useNativeDriver: true }),
+    ]).start();
+  }, []);
 
   const subtotal = getSubtotal();
   const deliveryFee = restaurant?.delivery_fee || 5000;
