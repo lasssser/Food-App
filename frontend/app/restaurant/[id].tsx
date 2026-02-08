@@ -318,7 +318,7 @@ export default function RestaurantScreen() {
       </Animated.View>
 
       {/* Menu Content */}
-      <Animated.View style={[styles.menuContainer, { opacity: menuOpacity, transform: [{ translateY: menuSlide }] }]}>
+      <View style={styles.menuContainer}>
         {/* Info Strip */}
         <View style={styles.infoStrip}>
           <View style={styles.infoStripItem}>
