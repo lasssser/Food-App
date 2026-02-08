@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
   headerTitle: { fontFamily: 'Cairo_600SemiBold', fontSize: 15, color: COLORS.textPrimary },
   headerCount: { fontFamily: 'Cairo_400Regular', fontSize: 11, color: COLORS.textSecondary },
   restaurantCard: {
-    position: 'absolute', bottom: 90, left: SPACING.lg, right: SPACING.lg,
+    position: 'absolute', bottom: 100, left: SPACING.lg, right: SPACING.lg,
     backgroundColor: 'white', borderRadius: 20, padding: 20,
     shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 12,
   },
