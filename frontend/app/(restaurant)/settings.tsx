@@ -132,6 +132,14 @@ export default function RestaurantSettings() {
       onPress: () => setShowLocationPicker(true),
     },
     {
+      id: 'driver-search-radius',
+      title: 'نطاق البحث عن سائقين',
+      subtitle: `${searchRadius} كم`,
+      icon: 'radio-outline' as const,
+      color: '#9C27B0',
+      onPress: () => setShowRadiusModal(true),
+    },
+    {
       id: 'orders',
       title: 'سجل الطلبات',
       subtitle: 'عرض جميع الطلبات السابقة',
