@@ -469,12 +469,12 @@ export default function CheckoutScreen() {
 
         {/* Customer Contact Info */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📞 معلومات التواصل</Text>
+          <Text style={styles.sectionTitle}>📞 معلومات التواصل *</Text>
           <TextInput
             style={[styles.notesInput, { height: 48, marginBottom: 8 }]}
             value={customerName}
             onChangeText={setCustomerName}
-            placeholder="اسم المستلم"
+            placeholder="اسم المستلم (مطلوب)"
             placeholderTextColor={COLORS.textLight}
             textAlign="right"
           />
@@ -482,7 +482,7 @@ export default function CheckoutScreen() {
             style={[styles.notesInput, { height: 48 }]}
             value={customerPhone}
             onChangeText={setCustomerPhone}
-            placeholder="رقم هاتف المستلم"
+            placeholder="رقم هاتف المستلم (مطلوب)"
             placeholderTextColor={COLORS.textLight}
             textAlign="right"
             keyboardType="phone-pad"
