@@ -1779,18 +1779,27 @@ async def assign_driver_to_order(
         # Request platform drivers
         update_data.update({
             "delivery_mode": "platform_driver",
-            "order_status": "ready"  # Mark as ready for platform drivers to see
+            "order_status": "ready",  # Mark as ready for platform drivers to see
+            "driver_id": None,  # Ensure no driver is assigned yet
+            "driver_name": None,
+            "driver_phone": None,
+            "driver_type": "platform_driver",
         })
         
-        # Notify nearby platform drivers
+        # Notify nearby platform drivers (try all cities as fallback)
         city_id = restaurant.get("city_id", "damascus")
         platform_drivers = await db.users.find({
             "role": "driver",
             "is_online": True,
-            "city_id": city_id
         }).to_list(50)
         
-        for driver in platform_drivers:
+        # Filter by city if possible, but notify all if no matches in city
+        city_drivers = [d for d in platform_drivers if d.get("city_id") == city_id]
+        drivers_to_notify = city_drivers if city_drivers else platform_drivers
+        
+        logger.info(f"Platform driver assignment: order={order_id}, city={city_id}, total_online_drivers={len(platform_drivers)}, city_drivers={len(city_drivers)}")
+        
+        for driver in drivers_to_notify:
             await create_notification(
                 driver["id"],
                 "🚀 طلب جديد قريب منك",
