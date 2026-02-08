@@ -313,6 +313,15 @@ export const restaurantPanelAPI = {
     const response = await api.post(`/restaurant/orders/${orderId}/change-driver`);
     return response.data;
   },
+  // Restaurant Complaints
+  getRestaurantComplaints: async () => {
+    const response = await api.get('/restaurant/complaints');
+    return response.data;
+  },
+  respondToComplaint: async (complaintId: string, responseText: string, status: string = 'resolved') => {
+    const response = await api.put(`/restaurant/complaints/${complaintId}/respond`, { response: responseText, status });
+    return response.data;
+  },
   // Reports
   getReports: async (period: string = 'week') => {
     const response = await api.get(`/restaurant/reports?period=${period}`);
