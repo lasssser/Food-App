@@ -1942,7 +1942,7 @@ async def driver_accept_order(order_id: str, current_user: dict = Depends(get_cu
         {"order_id": order_id}
     )
     
-    return {"message": "تم قبول الطلب بنجاح", "order": Order(**order).dict()}
+    return {"message": "تم قبول الطلب بنجاح", "order": order}
 
 @api_router.get("/driver/my-orders")
 async def get_driver_orders(current_user: dict = Depends(get_current_user)):
@@ -1955,7 +1955,22 @@ async def get_driver_orders(current_user: dict = Depends(get_current_user)):
         "order_status": {"$in": ["assigned", "driver_assigned", "picked_up", "out_for_delivery"]}
     }).sort("created_at", -1).to_list(20)
     
-    return [Order(**order) for order in orders]
+    result = []
+    for order in orders:
+        order.pop("_id", None)
+        if isinstance(order.get("items"), list):
+            for item in order["items"]:
+                if isinstance(item, dict):
+                    item.pop("_id", None)
+        for key in ["created_at", "updated_at"]:
+            val = order.get(key)
+            if val and not isinstance(val, str):
+                try:
+                    order[key] = val.isoformat()
+                except:
+                    order[key] = str(val)
+        result.append(order)
+    return result
 
 @api_router.get("/driver/history")
 async def get_driver_history(current_user: dict = Depends(get_current_user)):
@@ -1968,7 +1983,22 @@ async def get_driver_history(current_user: dict = Depends(get_current_user)):
         "order_status": {"$in": ["delivered", "cancelled"]}
     }).sort("created_at", -1).to_list(50)
     
-    return [Order(**order) for order in orders]
+    result = []
+    for order in orders:
+        order.pop("_id", None)
+        if isinstance(order.get("items"), list):
+            for item in order["items"]:
+                if isinstance(item, dict):
+                    item.pop("_id", None)
+        for key in ["created_at", "updated_at"]:
+            val = order.get(key)
+            if val and not isinstance(val, str):
+                try:
+                    order[key] = val.isoformat()
+                except:
+                    order[key] = str(val)
+        result.append(order)
+    return result
 
 @api_router.post("/driver/accept-order/{order_id}")
 async def accept_order_driver(order_id: str, current_user: dict = Depends(get_current_user)):
@@ -2234,14 +2264,29 @@ async def create_order(order_data: OrderCreate, current_user: dict = Depends(get
 @api_router.get("/orders", response_model=List[Order])
 async def get_orders(current_user: dict = Depends(get_current_user)):
     orders = await db.orders.find({"user_id": current_user["id"]}).sort("created_at", -1).to_list(50)
-    return [Order(**order) for order in orders]
+    result = []
+    for order in orders:
+        order.pop("_id", None)
+        if isinstance(order.get("items"), list):
+            for item in order["items"]:
+                if isinstance(item, dict):
+                    item.pop("_id", None)
+        for key in ["created_at", "updated_at"]:
+            val = order.get(key)
+            if val and not isinstance(val, str):
+                try:
+                    order[key] = val.isoformat()
+                except:
+                    order[key] = str(val)
+        result.append(order)
+    return result
 
 @api_router.get("/orders/{order_id}", response_model=Order)
 async def get_order(order_id: str, current_user: dict = Depends(get_current_user)):
     order = await db.orders.find_one({"id": order_id, "user_id": current_user["id"]})
     if not order:
         raise HTTPException(status_code=404, detail="الطلب غير موجود")
-    return Order(**order)
+    order.pop("_id", None); return order
 
 @api_router.post("/orders/{order_id}/cancel")
 async def cancel_order(order_id: str, current_user: dict = Depends(get_current_user)):
