@@ -59,6 +59,9 @@ export default function OrdersScreen() {
   const [orderToRate, setOrderToRate] = useState<Order | null>(null);
   const [ratedOrders, setRatedOrders] = useState<Set<string>>(new Set());
 
+  // Tracking state
+  const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
+
   // Animations
   const headerSlide = useRef(new Animated.Value(-20)).current;
   const headerOpacity = useRef(new Animated.Value(0)).current;
