@@ -623,7 +623,7 @@ export default function RestaurantOrders() {
       {/* Orders List */}
       <FlatList
         data={activeTab === 'active' ? activeOrders : completedOrders}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => `order-${item.id || index}`}
         renderItem={renderOrder}
         contentContainerStyle={styles.listContent}
         refreshControl={
