@@ -144,7 +144,7 @@ export default function AvailableOrders() {
           <View style={styles.summaryDivider} />
           <View style={styles.summaryItem}>
             <Text style={[styles.summaryValue, styles.earningsValue]}>
-              {order.delivery_fee.toLocaleString()}
+              {String(order.delivery_fee || 0)}
             </Text>
             <Text style={styles.summaryLabel}>ربحك (ل.س)</Text>
           </View>
@@ -168,7 +168,7 @@ export default function AvailableOrders() {
                 <Ionicons name="checkmark-circle" size={22} color={COLORS.textWhite} />
                 <Text style={styles.acceptButtonText}>قبول الطلب</Text>
                 <View style={styles.totalBadge}>
-                  <Text style={styles.totalBadgeText}>{order.total.toLocaleString()} ل.س</Text>
+                  <Text style={styles.totalBadgeText}>{String(order.total || 0)} ل.س</Text>
                 </View>
               </>
             )}
