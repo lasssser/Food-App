@@ -368,6 +368,7 @@ export default function OrdersScreen() {
           }
         />
       )}
+      </Animated.View>
 
       {/* Cancel Confirmation Modal */}
       <Modal visible={confirmCancelVisible} animationType="fade" transparent>
