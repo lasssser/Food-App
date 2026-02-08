@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, Component, ErrorInfo, ReactNode } from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,63 @@ import { restaurantPanelAPI } from '../../src/services/api';
 import { Order } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 import LocationViewer from '../../src/components/LocationViewer';
+
+// ErrorBoundary to catch any render crashes in order cards
+class OrderCardErrorBoundary extends Component<{children: ReactNode, orderId: string}, {hasError: boolean}> {
+  constructor(props: {children: ReactNode, orderId: string}) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error(`[OrderCard ${this.props.orderId}] Render error:`, error.message);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View style={{ backgroundColor: '#FFF3E0', borderRadius: 12, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: '#FFE082' }}>
+          <Text style={{ fontFamily: 'Cairo_400Regular', color: '#E65100', textAlign: 'right', fontSize: 14 }}>
+            حدث خطأ في عرض الطلب #{this.props.orderId.slice(0, 8)}
+          </Text>
+          <TouchableOpacity onPress={() => this.setState({ hasError: false })} style={{ marginTop: 8, alignSelf: 'flex-end' }}>
+            <Text style={{ fontFamily: 'Cairo_400Regular', color: COLORS.primary, fontSize: 13 }}>إعادة المحاولة</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// Safe number formatter that never throws
+function safeFormatNumber(num: any): string {
+  try {
+    const n = typeof num === 'number' ? num : Number(num) || 0;
+    return n.toLocaleString('en-US');
+  } catch {
+    return String(num || 0);
+  }
+}
+
+// Safe date formatter
+function safeFormatTime(dateStr: any): string {
+  if (!dateStr) return '';
+  try {
+    // Parse ISO string manually for Android compatibility
+    const str = String(dateStr);
+    const match = str.match(/(\d{2}):(\d{2})/);
+    if (match) return `${match[1]}:${match[2]}`;
+    const d = new Date(str);
+    if (isNaN(d.getTime())) return '';
+    const h = d.getHours().toString().padStart(2, '0');
+    const m = d.getMinutes().toString().padStart(2, '0');
+    return `${h}:${m}`;
+  } catch {
+    return '';
+  }
+}
 
 interface RestaurantDriver {
   id: string;
