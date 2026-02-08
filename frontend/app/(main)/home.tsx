@@ -383,19 +383,11 @@ export default function HomeScreen() {
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyIcon}>🍽️</Text>
               <Text style={styles.emptyText}>
-                {selectedCity ? 'لا توجد مطاعم متاحة في هذه المدينة' : 'اختر موقعك أولاً'}
+                لا توجد مطاعم متاحة حالياً
               </Text>
               <Text style={styles.emptySubtext}>
-                {selectedCity ? 'جرب تغيير الفلتر أو البحث' : 'اضغط على "التوصيل إلى" لاختيار مدينتك'}
+                جرب تغيير الفلتر أو البحث
               </Text>
-              {!selectedCity && (
-                <TouchableOpacity 
-                  style={styles.selectLocationButton}
-                  onPress={() => setShowLocationModal(true)}
-                >
-                  <Text style={styles.selectLocationButtonText}>اختر موقعك</Text>
-                </TouchableOpacity>
-              )}
             </View>
           )}
         </View>
