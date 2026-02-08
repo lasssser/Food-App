@@ -68,13 +68,21 @@ export default function AvailableOrders() {
   };
 
   const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
-    
-    if (diffMinutes < 1) return 'الآن';
-    if (diffMinutes < 60) return `منذ ${diffMinutes} دقيقة`;
-    return date.toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' });
+    try {
+      const str = String(dateString || '');
+      const date = new Date(str);
+      const now = new Date();
+      if (isNaN(date.getTime())) return '';
+      const diffMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
+      
+      if (diffMinutes < 1) return 'الآن';
+      if (diffMinutes < 60) return `منذ ${diffMinutes} دقيقة`;
+      const h = date.getHours().toString().padStart(2, '0');
+      const m = date.getMinutes().toString().padStart(2, '0');
+      return `${h}:${m}`;
+    } catch {
+      return '';
+    }
   };
 
   const renderOrder = ({ item: order }: { item: Order }) => {
