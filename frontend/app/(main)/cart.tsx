@@ -280,6 +280,7 @@ export default function CartScreen() {
           </TouchableOpacity>
         )}
       </View>
+      </Animated.View>
     </SafeAreaView>
   );
 }
