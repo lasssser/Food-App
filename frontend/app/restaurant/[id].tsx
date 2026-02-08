@@ -273,13 +273,13 @@ export default function RestaurantScreen() {
   return (
     <View style={styles.container}>
       {/* Hero Image */}
-      <View style={styles.heroContainer}>
+      <Animated.View style={[styles.heroContainer, { opacity: heroOpacity }]}>
         <Image
           source={{ uri: restaurant.image || 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=600' }}
           style={styles.heroImage}
         />
         <LinearGradient
-          colors={['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.9)']}
+          colors={['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.85)']}
           style={styles.heroOverlay}
         />
         
@@ -319,10 +319,39 @@ export default function RestaurantScreen() {
             </View>
           </View>
         </View>
-      </View>
+      </Animated.View>
+
+      {/* Quick Info Strip */}
+      <Animated.View style={{ opacity: infoOpacity, transform: [{ translateY: infoSlide }] }}>
+        <View style={styles.infoStrip}>
+          <View style={styles.infoStripItem}>
+            <View style={[styles.infoStripIcon, { backgroundColor: '#FFF3E0' }]}>
+              <Ionicons name="time" size={18} color="#F57C00" />
+            </View>
+            <Text style={styles.infoStripText}>{restaurant.delivery_time}</Text>
+            <Text style={styles.infoStripLabel}>وقت التوصيل</Text>
+          </View>
+          <View style={styles.infoStripDivider} />
+          <View style={styles.infoStripItem}>
+            <View style={[styles.infoStripIcon, { backgroundColor: '#E8F5E9' }]}>
+              <Ionicons name="bicycle" size={18} color="#43A047" />
+            </View>
+            <Text style={styles.infoStripText}>{restaurant.delivery_fee.toLocaleString()} ل.س</Text>
+            <Text style={styles.infoStripLabel}>رسوم التوصيل</Text>
+          </View>
+          <View style={styles.infoStripDivider} />
+          <View style={styles.infoStripItem}>
+            <View style={[styles.infoStripIcon, { backgroundColor: '#FFF8E1' }]}>
+              <Ionicons name="cart" size={18} color="#F9A825" />
+            </View>
+            <Text style={styles.infoStripText}>{restaurant.min_order.toLocaleString()} ل.س</Text>
+            <Text style={styles.infoStripLabel}>الحد الأدنى</Text>
+          </View>
+        </View>
+      </Animated.View>
 
       {/* Menu Content */}
-      <View style={styles.menuContainer}>
+      <Animated.View style={[styles.menuContainer, { opacity: menuOpacity, transform: [{ translateY: menuSlide }] }]}>
         {/* Category Tabs */}
         <ScrollView
           horizontal
