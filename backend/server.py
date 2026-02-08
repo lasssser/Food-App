@@ -1857,21 +1857,34 @@ async def get_available_orders_for_driver(current_user: dict = Depends(get_curre
         raise HTTPException(status_code=403, detail="غير مصرح")
     
     if not current_user.get("is_online"):
+        logger.info(f"Driver {current_user['id']} is offline, returning empty orders")
         return []
     
-    # Filter by driver's city
+    # Filter by driver's city - try city match first, fall back to all
     driver_city = current_user.get("city_id", "damascus")
     
-    # Get restaurants in driver's city
-    restaurants_in_city = await db.restaurants.find({"city_id": driver_city}).to_list(100)
-    restaurant_ids = [r["id"] for r in restaurants_in_city]
+    # Get all restaurants (we'll prefer same-city but include all)
+    all_restaurants = await db.restaurants.find({}).to_list(200)
+    city_restaurant_ids = [r["id"] for r in all_restaurants if r.get("city_id") == driver_city]
+    all_restaurant_ids = [r["id"] for r in all_restaurants]
     
-    orders = await db.orders.find({
+    # Query: orders assigned to platform_driver that are ready and unassigned
+    query = {
         "order_status": "ready",
         "delivery_mode": "platform_driver",
         "$or": [{"driver_id": None}, {"driver_id": ""}, {"driver_id": {"$exists": False}}],
-        "restaurant_id": {"$in": restaurant_ids}
-    }).sort("created_at", 1).to_list(20)
+    }
+    
+    # Try city-filtered first
+    if city_restaurant_ids:
+        query["restaurant_id"] = {"$in": city_restaurant_ids}
+    else:
+        # No restaurants in city - show all available orders
+        query["restaurant_id"] = {"$in": all_restaurant_ids}
+    
+    orders = await db.orders.find(query).sort("created_at", 1).to_list(20)
+    
+    logger.info(f"Driver {current_user['id']} (city={driver_city}): found {len(orders)} available orders (city_restaurants={len(city_restaurant_ids)}, all_restaurants={len(all_restaurant_ids)})")
     
     # Enrich orders with restaurant info
     result = []
