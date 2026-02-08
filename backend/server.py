@@ -2008,18 +2008,19 @@ async def assign_driver_to_order(
             "driver_type": "platform_driver",
         })
         
-        # Notify nearby platform drivers (try all cities as fallback)
-        city_id = restaurant.get("city_id", "damascus")
+        # Notify nearby platform drivers - STRICT: same city only
+        city_id = restaurant.get("city_id", "")
+        
+        if not city_id:
+            logger.warning(f"Restaurant {restaurant['id']} has no city_id!")
+        
         platform_drivers = await db.users.find({
             "role": "driver",
             "is_online": True,
+            "city_id": city_id,
         }).to_list(50)
         
-        # Filter by city if possible, but notify all if no matches in city
-        city_drivers = [d for d in platform_drivers if d.get("city_id") == city_id]
-        drivers_to_notify = city_drivers if city_drivers else platform_drivers
-        
-        logger.info(f"Platform driver assignment: order={order_id}, city={city_id}, status={current_status}, total_online_drivers={len(platform_drivers)}, city_drivers={len(city_drivers)}")
+        logger.info(f"Platform driver assignment: order={order_id}, city={city_id}, drivers_in_city={len(platform_drivers)}")
         
         notification_title = "🚀 طلب جديد قريب منك"
         notification_body = f"طلب من {restaurant['name']} جاري التحضير - جهّز نفسك!" if is_preparing else f"طلب من {restaurant['name']} جاهز للتوصيل"
