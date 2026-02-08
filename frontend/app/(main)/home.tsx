@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Dimensions,
   Animated,
+  Easing,
   Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
