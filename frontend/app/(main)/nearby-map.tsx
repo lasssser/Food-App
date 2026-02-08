@@ -22,10 +22,11 @@ const getMapHTML = (lat: number, lng: number, restaurants: any[]) => {
   const markers = restaurants.map(r => {
     if (!r.lat || !r.lng) return '';
     const isOpen = r.is_open;
+    const firstLetter = r.name ? r.name.charAt(0) : '?';
     return `
       L.marker([${r.lat}, ${r.lng}], {
         icon: L.divIcon({
-          html: '<div class="rest-pin ${isOpen ? 'open' : 'closed'}"><span>🍽️</span></div>',
+          html: '<div class="rest-pin ${isOpen ? 'open' : 'closed'}"><span class="pin-letter">${firstLetter}</span></div>',
           iconSize: [44, 52],
           iconAnchor: [22, 52],
           className: ''
