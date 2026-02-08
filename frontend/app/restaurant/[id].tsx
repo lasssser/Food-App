@@ -62,16 +62,12 @@ export default function RestaurantScreen() {
 
   useEffect(() => {
     if (!loading && restaurant) {
-      Animated.sequence([
+      Animated.parallel([
         Animated.timing(heroOpacity, { toValue: 1, duration: 500, useNativeDriver: true }),
-        Animated.parallel([
-          Animated.timing(infoSlide, { toValue: 0, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-          Animated.timing(infoOpacity, { toValue: 1, duration: 350, useNativeDriver: true }),
-        ]),
-        Animated.parallel([
-          Animated.timing(menuSlide, { toValue: 0, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-          Animated.timing(menuOpacity, { toValue: 1, duration: 350, useNativeDriver: true }),
-        ]),
+        Animated.timing(infoSlide, { toValue: 0, duration: 500, delay: 200, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(infoOpacity, { toValue: 1, duration: 400, delay: 200, useNativeDriver: true }),
+        Animated.timing(menuSlide, { toValue: 0, duration: 500, delay: 350, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(menuOpacity, { toValue: 1, duration: 400, delay: 350, useNativeDriver: true }),
       ]).start();
     }
   }, [loading, restaurant]);
