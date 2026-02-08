@@ -187,6 +187,7 @@ export default function RestaurantDashboard() {
             </View>
           </View>
         </View>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
