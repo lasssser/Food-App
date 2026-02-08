@@ -356,67 +356,58 @@ export default function RestaurantOrders() {
   const renderOrder = ({ item: order }: { item: Order }) => {
     if (!order || !order.id) return null;
     
-    const orderStatus = order.order_status || 'pending';
+    const orderStatus = String(order.order_status || 'pending');
     const status = STATUS_CONFIG[orderStatus] || { label: orderStatus, color: '#999', icon: 'help-circle' as keyof typeof Ionicons.glyphMap, bgColor: '#F5F5F5' };
     const action = STATUS_ACTIONS[orderStatus];
     const showAssignButton = orderStatus === 'ready' && !order.driver_id;
-    const hasDriver = order.driver_id && order.driver_name;
+    const hasDriver = !!(order.driver_id && order.driver_name);
     const isExpanded = expandedOrder === order.id;
     const isPending = orderStatus === 'pending';
     const itemsCount = Array.isArray(order.items) ? order.items.length : 0;
     const orderTotal = typeof order.total === 'number' ? order.total : 0;
     const paymentMethod = String(order.payment_method || 'cod').toLowerCase();
-    let orderTime = '';
-    try {
-      if (order.created_at) {
-        const d = new Date(order.created_at);
-        if (!isNaN(d.getTime())) {
-          orderTime = d.toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' });
-        }
-      }
-    } catch (e) {
-      orderTime = '';
-    }
+    const orderTime = safeFormatTime(order.created_at);
 
     return (
-      <View style={[styles.orderCard, isPending && styles.pendingCard]}>
-        {/* New Order Indicator */}
-        {isPending && (
-          <View style={styles.newOrderBanner}>
-            <Ionicons name="notifications" size={16} color={COLORS.textWhite} />
-            <Text style={styles.newOrderText}>طلب جديد!</Text>
-          </View>
-        )}
+      <OrderCardErrorBoundary orderId={order.id}>
+        <View style={[styles.orderCard, isPending && styles.pendingCard]}>
+          {/* New Order Indicator */}
+          {isPending && (
+            <View style={styles.newOrderBanner}>
+              <Ionicons name="notifications" size={16} color={COLORS.textWhite} />
+              <Text style={styles.newOrderText}>طلب جديد!</Text>
+            </View>
+          )}
 
-        {/* Header */}
-        <TouchableOpacity onPress={() => toggleExpand(order.id)} activeOpacity={0.8} style={{ padding: 16 }}>
-          <View style={styles.orderHeader}>
-            <View style={[styles.statusBadge, { backgroundColor: status.bgColor }]}>
-              <Ionicons name={status.icon} size={16} color={status.color} />
-              <Text style={[styles.statusText, { color: status.color }]}>{status.label}</Text>
+          {/* Header */}
+          <TouchableOpacity onPress={() => toggleExpand(order.id)} activeOpacity={0.8} style={{ padding: 16 }}>
+            <View style={styles.orderHeader}>
+              <View style={[styles.statusBadge, { backgroundColor: status.bgColor }]}>
+                <Ionicons name={status.icon} size={16} color={status.color} />
+                <Text style={[styles.statusText, { color: status.color }]}>{status.label}</Text>
+              </View>
+              <View style={styles.orderIdContainer}>
+                <Text style={styles.orderId}>#{String(order.id || '').slice(0, 8)}</Text>
+                <Text style={styles.orderTime}>{orderTime}</Text>
+              </View>
             </View>
-            <View style={styles.orderIdContainer}>
-              <Text style={styles.orderId}>#{(order.id || '').slice(0, 8)}</Text>
-              <Text style={styles.orderTime}>{orderTime}</Text>
-            </View>
-          </View>
 
-          {/* Quick Info */}
-          <View style={styles.quickInfo}>
-            <View style={styles.quickInfoItem}>
-              <Ionicons name="receipt" size={18} color={COLORS.textSecondary} />
-              <Text style={styles.quickInfoText}>{itemsCount} أصناف</Text>
+            {/* Quick Info */}
+            <View style={styles.quickInfo}>
+              <View style={styles.quickInfoItem}>
+                <Ionicons name="receipt" size={18} color={COLORS.textSecondary} />
+                <Text style={styles.quickInfoText}>{itemsCount} أصناف</Text>
+              </View>
+              <View style={styles.quickInfoItem}>
+                <Ionicons name="cash" size={18} color={COLORS.success} />
+                <Text style={[styles.quickInfoText, styles.totalText]}>{safeFormatNumber(orderTotal)} ل.س</Text>
+              </View>
+              <View style={styles.quickInfoItem}>
+                <Ionicons name={paymentMethod === 'cod' ? 'wallet' : 'card'} size={18} color={paymentMethod === 'cod' ? '#FF9800' : '#4CAF50'} />
+                <Text style={styles.quickInfoText}>{paymentMethod === 'cod' ? 'كاش' : 'إلكتروني'}</Text>
+              </View>
             </View>
-            <View style={styles.quickInfoItem}>
-              <Ionicons name="cash" size={18} color={COLORS.success} />
-              <Text style={[styles.quickInfoText, styles.totalText]}>{orderTotal.toLocaleString()} ل.س</Text>
-            </View>
-            <View style={styles.quickInfoItem}>
-              <Ionicons name={paymentMethod === 'cod' ? 'wallet' : 'card'} size={18} color={paymentMethod === 'cod' ? '#FF9800' : '#4CAF50'} />
-              <Text style={styles.quickInfoText}>{paymentMethod === 'cod' ? 'كاش' : 'إلكتروني'}</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
 
         {/* Expanded Details */}
         {isExpanded && (
