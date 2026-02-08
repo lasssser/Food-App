@@ -130,34 +130,24 @@ export default function RestaurantDashboard() {
             color="#fff"
           />
         </TouchableOpacity>
+        </Animated.View>
 
         {/* Stats Cards */}
         <View style={styles.statsGrid}>
-          <View style={styles.statCard}>
-            <Ionicons name="receipt" size={28} color="#FF6B35" />
-            <Text style={styles.statValue}>{stats?.today_orders || 0}</Text>
-            <Text style={styles.statLabel}>طلبات اليوم</Text>
-          </View>
-          
-          <View style={styles.statCard}>
-            <Ionicons name="time" size={28} color="#FFA726" />
-            <Text style={styles.statValue}>{stats?.pending_orders || 0}</Text>
-            <Text style={styles.statLabel}>طلبات معلقة</Text>
-          </View>
-          
-          <View style={styles.statCard}>
-            <Ionicons name="cash" size={28} color="#66BB6A" />
-            <Text style={styles.statValue}>
-              {(stats?.today_revenue || 0).toLocaleString()}
-            </Text>
-            <Text style={styles.statLabel}>إيرادات اليوم (ل.س)</Text>
-          </View>
-          
-          <View style={styles.statCard}>
-            <Ionicons name="star" size={28} color="#FFD700" />
-            <Text style={styles.statValue}>{stats?.restaurant?.rating?.toFixed(1) || '0.0'}</Text>
-            <Text style={styles.statLabel}>التقييم</Text>
-          </View>
+          {[
+            { icon: 'receipt', color: '#FF6B35', value: stats?.today_orders || 0, label: 'طلبات اليوم' },
+            { icon: 'time', color: '#FFA726', value: stats?.pending_orders || 0, label: 'طلبات معلقة' },
+            { icon: 'cash', color: '#66BB6A', value: (stats?.today_revenue || 0).toLocaleString(), label: 'إيرادات اليوم (ل.س)' },
+            { icon: 'star', color: '#FFD700', value: stats?.restaurant?.rating?.toFixed(1) || '0.0', label: 'التقييم' },
+          ].map((stat, i) => (
+            <Animated.View key={i} style={{ opacity: statsAnim[i], transform: [{ scale: statsAnim[i] }] }}>
+              <View style={styles.statCard}>
+                <Ionicons name={stat.icon as any} size={28} color={stat.color} />
+                <Text style={styles.statValue}>{stat.value}</Text>
+                <Text style={styles.statLabel}>{stat.label}</Text>
+              </View>
+            </Animated.View>
+          ))}
         </View>
 
         {/* Restaurant Info */}
