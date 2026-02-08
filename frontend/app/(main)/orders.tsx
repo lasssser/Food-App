@@ -58,6 +58,21 @@ export default function OrdersScreen() {
   const [orderToRate, setOrderToRate] = useState<Order | null>(null);
   const [ratedOrders, setRatedOrders] = useState<Set<string>>(new Set());
 
+  // Animations
+  const headerSlide = useRef(new Animated.Value(-20)).current;
+  const headerOpacity = useRef(new Animated.Value(0)).current;
+  const listSlide = useRef(new Animated.Value(30)).current;
+  const listOpacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(headerSlide, { toValue: 0, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(headerOpacity, { toValue: 1, duration: 350, useNativeDriver: true }),
+      Animated.timing(listSlide, { toValue: 0, duration: 500, delay: 200, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(listOpacity, { toValue: 1, duration: 400, delay: 200, useNativeDriver: true }),
+    ]).start();
+  }, []);
+
   const fetchOrders = async () => {
     try {
       const data = await orderAPI.getAll();
