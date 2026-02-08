@@ -269,9 +269,9 @@ export default function HomeScreen() {
             <View style={styles.greetingTextBox}>
               <Text style={styles.greetingTitle}>شو ناكل اليوم؟ 😋</Text>
               <Text style={styles.greetingSubtitle}>
-                {selectedCity 
-                  ? `${restaurants.length} مطعم متوفر في ${selectedCity.name}` 
-                  : 'اختر موقعك لعرض المطاعم'}
+                {restaurants.length > 0 
+                  ? `${restaurants.length} مطعم متوفر` 
+                  : 'اكتشف المطاعم القريبة منك'}
               </Text>
             </View>
           </View>
