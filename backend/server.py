@@ -1393,60 +1393,6 @@ async def update_restaurant_location(
     
     return {"message": "تم تحديث موقع المطعم", "lat": lat, "lng": lng}
 
-@api_router.get("/restaurants/nearby")
-async def get_nearby_restaurants(
-    lat: float = 33.5138,
-    lng: float = 36.2765,
-    radius: float = 50,
-):
-    """Get restaurants near a location (for map view) - public endpoint"""
-    restaurants = await db.restaurants.find({}).to_list(200)
-    
-    result = []
-    for r in restaurants:
-        r.pop("_id", None)
-        r_lat = r.get("lat")
-        r_lng = r.get("lng")
-        
-        # Include restaurants with coordinates
-        if r_lat and r_lng:
-            distance = calculate_distance(lat, lng, r_lat, r_lng)
-            if distance <= radius:
-                result.append({
-                    "id": r["id"],
-                    "name": r.get("name", ""),
-                    "cuisine_type": r.get("cuisine_type", ""),
-                    "image": r.get("image", ""),
-                    "is_open": r.get("is_open", True),
-                    "rating": r.get("rating", 0),
-                    "delivery_time": r.get("delivery_time", "30-45 دقيقة"),
-                    "delivery_fee": r.get("delivery_fee", 0),
-                    "lat": r_lat,
-                    "lng": r_lng,
-                    "distance_km": round(distance, 1),
-                    "address": r.get("address", ""),
-                })
-        else:
-            # Include without distance if no coordinates
-            result.append({
-                "id": r["id"],
-                "name": r.get("name", ""),
-                "cuisine_type": r.get("cuisine_type", ""),
-                "image": r.get("image", ""),
-                "is_open": r.get("is_open", True),
-                "rating": r.get("rating", 0),
-                "delivery_time": r.get("delivery_time", "30-45 دقيقة"),
-                "delivery_fee": r.get("delivery_fee", 0),
-                "lat": r_lat,
-                "lng": r_lng,
-                "distance_km": None,
-                "address": r.get("address", ""),
-            })
-    
-    # Sort: with coordinates first, then by distance
-    result.sort(key=lambda x: (x["distance_km"] is None, x["distance_km"] or 999))
-    return result
-
 @api_router.put("/restaurant/toggle-status")
 async def toggle_restaurant_status(current_user: dict = Depends(get_current_user)):
     """Toggle restaurant open/close status"""
