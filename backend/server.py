@@ -916,8 +916,7 @@ async def get_restaurant_orders(current_user: dict = Depends(get_current_user)):
     
     orders = await db.orders.find({
         "restaurant_id": restaurant["id"],
-        "order_status": {"$nin": ["delivered", "cancelled"]}
-    }).sort("created_at", -1).to_list(100)
+    }).sort("created_at", -1).to_list(200)
     
     clean_orders = []
     for order in orders:
