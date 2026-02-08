@@ -871,6 +871,7 @@ async def get_restaurant_orders(current_user: dict = Depends(get_current_user)):
                     item.setdefault("quantity", 1)
                     item.setdefault("subtotal", item.get("price", 0) * item.get("quantity", 1))
         # Ensure required fields exist with defaults
+        order.setdefault("id", "")
         order.setdefault("total", 0)
         order.setdefault("subtotal", 0)
         order.setdefault("delivery_fee", 0)
@@ -878,8 +879,19 @@ async def get_restaurant_orders(current_user: dict = Depends(get_current_user)):
         order.setdefault("payment_method", "cod")
         order.setdefault("payment_status", "unpaid")
         order.setdefault("order_status", "pending")
+        order.setdefault("delivery_mode", "pending")
+        order.setdefault("driver_id", None)
+        order.setdefault("driver_name", None)
+        order.setdefault("notes", "")
         order.setdefault("address", {"label": "غير محدد", "address_line": ""})
-        # Convert datetime to string
+        # Convert ALL non-serializable types to strings
+        for key in list(order.keys()):
+            val = order[key]
+            if hasattr(val, 'isoformat'):  # datetime
+                order[key] = val.isoformat()
+            elif hasattr(val, '__str__') and type(val).__name__ == 'ObjectId':
+                order[key] = str(val)
+        # Ensure created_at and updated_at are strings
         for key in ["created_at", "updated_at"]:
             val = order.get(key)
             if val and not isinstance(val, str):
