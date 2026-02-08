@@ -217,7 +217,9 @@ export default function HomeScreen() {
         </View>
       </View>
     </TouchableOpacity>
-  );
+    </Animated.View>
+    );
+  };
 
   if (loading) {
     return (
