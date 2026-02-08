@@ -195,6 +195,7 @@ export default function DriverDashboard() {
           </Text>
           <Text style={styles.earningsHint}>تحديث تلقائي عند إكمال كل توصيلة</Text>
         </View>
+        </Animated.View>
 
         {/* Tips Card */}
         <View style={styles.tipsCard}>
