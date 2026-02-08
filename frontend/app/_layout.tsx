@@ -146,65 +146,40 @@ function SplashView() {
   );
 }
 
-export default function RootLayout() {
+// Navigation handler component - must be inside the Stack navigator context
+function NavigationHandler() {
   const { isLoading, isAuthenticated, isGuest, user, checkAuth } = useAuthStore();
   const router = useRouter();
   const segments = useSegments();
   const [isReady, setIsReady] = useState(false);
-  
-  // Load Cairo fonts
-  const [fontsLoaded] = useFonts({
-    Cairo_300Light,
-    Cairo_400Regular,
-    Cairo_500Medium,
-    Cairo_600SemiBold,
-    Cairo_700Bold,
-  });
-  
+
   // Initialize push notifications
   const { expoPushToken, notification, loading: pushLoading, error: pushError } = usePushNotifications();
   
   useEffect(() => {
     if (expoPushToken) {
-      console.log('📱 Push notifications enabled with token:', expoPushToken.slice(0, 30) + '...');
+      console.log('Push notifications enabled');
     }
-    if (pushError) {
-      console.log('⚠️ Push notification setup error:', pushError);
-    }
-  }, [expoPushToken, pushError]);
+  }, [expoPushToken]);
 
   useEffect(() => {
     const init = async () => {
-      // Seed database with demo data
-      try {
-        await seedAPI.seed();
-      } catch (e) {
-        // Ignore if already seeded
-      }
+      try { await seedAPI.seed(); } catch (e) {}
       await checkAuth();
       setIsReady(true);
     };
     init();
   }, []);
 
-  // Hide splash screen when fonts are loaded
   useEffect(() => {
-    if (fontsLoaded && isReady) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded, isReady]);
-
-  useEffect(() => {
-    if (!isReady || isLoading || !fontsLoaded) return;
+    if (!isReady || isLoading) return;
 
     const inAuthGroup = segments[0] === '(auth)';
 
-    // Not authenticated and not guest - redirect to login
     if (!isAuthenticated && !isGuest && !inAuthGroup) {
       router.replace('/(auth)/login');
       return;
     } 
-    // Authenticated user in auth group - redirect based on role
     if (isAuthenticated && inAuthGroup) {
       const role = user?.role || 'customer';
       if (role === 'admin' || role === 'moderator') {
@@ -217,9 +192,29 @@ export default function RootLayout() {
         router.replace('/(main)/home');
       }
     }
-  }, [isAuthenticated, isGuest, segments, isLoading, isReady, user, fontsLoaded]);
+  }, [isAuthenticated, isGuest, segments, isLoading, isReady, user]);
 
-  if (!fontsLoaded || !isReady || isLoading) {
+  return null;
+}
+
+export default function RootLayout() {
+  // Load Cairo fonts
+  const [fontsLoaded] = useFonts({
+    Cairo_300Light,
+    Cairo_400Regular,
+    Cairo_500Medium,
+    Cairo_600SemiBold,
+    Cairo_700Bold,
+  });
+
+  // Hide splash screen when fonts are loaded
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
     return <SplashView />;
   }
 
@@ -240,6 +235,7 @@ export default function RootLayout() {
         <Stack.Screen name="(admin)" />
         <Stack.Screen name="restaurant" />
       </Stack>
+      <NavigationHandler />
     </>
   );
 }
