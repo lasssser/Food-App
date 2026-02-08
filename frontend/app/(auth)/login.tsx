@@ -151,21 +151,25 @@ export default function LoginScreen() {
               </View>
 
               {/* Login Button */}
-              <TouchableOpacity
-                style={styles.loginBtn}
-                onPress={handleLogin}
-                disabled={loading}
-                activeOpacity={0.85}
-              >
-                {loading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <>
-                    <Ionicons name="arrow-back" size={20} color="#fff" />
-                    <Text style={styles.loginBtnText}>تسجيل الدخول</Text>
-                  </>
-                )}
-              </TouchableOpacity>
+              <Animated.View style={{ transform: [{ scale: btnScale }] }}>
+                <TouchableOpacity
+                  style={styles.loginBtn}
+                  onPress={handleLogin}
+                  onPressIn={onBtnPressIn}
+                  onPressOut={onBtnPressOut}
+                  disabled={loading}
+                  activeOpacity={0.85}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <>
+                      <Ionicons name="arrow-back" size={20} color="#fff" />
+                      <Text style={styles.loginBtnText}>تسجيل الدخول</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              </Animated.View>
 
               {/* Divider */}
               <View style={styles.dividerRow}>
