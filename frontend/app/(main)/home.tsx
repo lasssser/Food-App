@@ -105,23 +105,14 @@ export default function HomeScreen() {
 
   const fetchRestaurants = async () => {
     try {
-      // Use nearby API with default location (Damascus)
-      // GPS will be requested separately if user wants
-      const data = await restaurantAPI.getNearby(33.5138, 36.2765, 500);
-      
-      let filtered = data || [];
+      const filters: any = {};
       if (selectedCategory !== 'all') {
-        filtered = filtered.filter((r: any) => r.cuisine_type === selectedCategory);
+        filters.cuisine = selectedCategory;
       }
-      
-      setRestaurants(filtered);
+      const data = await restaurantAPI.getAll(filters);
+      setRestaurants(data || []);
     } catch (error) {
-      try {
-        const data = await restaurantAPI.getAll({});
-        setRestaurants(data || []);
-      } catch (e) {
-        console.error('Error fetching restaurants:', e);
-      }
+      console.error('Error fetching restaurants:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
