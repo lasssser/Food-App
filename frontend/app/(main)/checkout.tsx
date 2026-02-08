@@ -272,13 +272,13 @@ export default function CheckoutScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
-          <Ionicons name="arrow-forward" size={24} color={COLORS.textPrimary} />
+      <LinearGradient colors={[COLORS.primary, COLORS.primaryDark]} style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' }}>
+          <Ionicons name="arrow-forward" size={22} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>إتمام الطلب</Text>
-        <View style={{ width: 24 }} />
-      </View>
+        <Text style={[styles.headerTitle, { color: '#fff' }]}>إتمام الطلب</Text>
+        <View style={{ width: 40 }} />
+      </LinearGradient>
 
       <KeyboardAvoidingView 
         style={{ flex: 1 }}
