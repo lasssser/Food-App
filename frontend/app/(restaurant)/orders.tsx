@@ -182,16 +182,20 @@ export default function RestaurantOrders() {
     fetchDrivers();
   };
 
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
+    setUpdatingOrderId(orderId);
     try {
-      // Don't use optimistic update - it can cause render issues on Android
-      // Instead, show a loading state via the API call
       await restaurantPanelAPI.updateOrderStatus(orderId, newStatus);
-      // Refetch to get fresh data from server
-      await fetchOrders();
+      // Small delay then refetch
+      setTimeout(async () => {
+        await fetchOrders();
+        setUpdatingOrderId(null);
+      }, 300);
     } catch (error: any) {
       console.error('Error updating status:', error);
-      // Refetch anyway to ensure consistent state
+      setUpdatingOrderId(null);
       fetchOrders();
     }
   };
