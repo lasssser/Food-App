@@ -143,8 +143,7 @@ export default function DriverDashboard() {
 
         {/* Stats Cards */}
         <View style={styles.statsGrid}>
-          {[0, 1, 2].map(i => (
-            <Animated.View key={i} style={[styles.statCard, { opacity: statsScale[i], transform: [{ scale: statsScale[i] }] }]}>
+          <Animated.View style={[styles.statCard, { opacity: statsScale[0], transform: [{ scale: statsScale[0] }] }]}>
             <LinearGradient
               colors={['#FFF5F2', '#FFE8E0']}
               style={styles.statCardGradient}
@@ -155,9 +154,9 @@ export default function DriverDashboard() {
               <Text style={styles.statValue}>{stats?.today_deliveries || 0}</Text>
               <Text style={styles.statLabel}>توصيلات اليوم</Text>
             </LinearGradient>
-          </View>
+          </Animated.View>
           
-          <View style={styles.statCard}>
+          <Animated.View style={[styles.statCard, { opacity: statsScale[1], transform: [{ scale: statsScale[1] }] }]}>
             <LinearGradient
               colors={['#E8F5E9', '#C8E6C9']}
               style={styles.statCardGradient}
@@ -168,9 +167,9 @@ export default function DriverDashboard() {
               <Text style={styles.statValue}>{stats?.total_deliveries || 0}</Text>
               <Text style={styles.statLabel}>إجمالي التوصيلات</Text>
             </LinearGradient>
-          </View>
+          </Animated.View>
           
-          <View style={styles.statCard}>
+          <Animated.View style={[styles.statCard, { opacity: statsScale[2], transform: [{ scale: statsScale[2] }] }]}>
             <LinearGradient
               colors={['#FFF8E1', '#FFECB3']}
               style={styles.statCardGradient}
