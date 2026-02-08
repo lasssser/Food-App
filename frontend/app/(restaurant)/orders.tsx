@@ -325,10 +325,6 @@ export default function RestaurantOrders() {
 
     return (
       <View style={[styles.orderCard, isPending && styles.pendingCard]}>
-        {/* Debug: Always visible text to identify blank cards */}
-        <Text style={{ fontSize: 10, color: '#f44336', padding: 4, textAlign: 'center' }}>
-          ID:{(order.id||'?').slice(0,8)} | Status:{orderStatus} | Items:{itemsCount} | Total:{orderTotal}
-        </Text>
         {/* New Order Indicator */}
         {isPending && (
           <View style={styles.newOrderBanner}>
