@@ -200,7 +200,7 @@ export default function HomeScreen() {
             <Text style={styles.feeText}>توصيل: {restaurant.delivery_fee.toLocaleString()} ل.س</Text>
           </View>
           
-          <Text style={styles.minOrder}>الحد الأدنى: {restaurant.min_order.toLocaleString()} ل.س</Text>
+          <Text style={styles.minOrder}>الحد الأدنى: {(restaurant.min_order || 0).toLocaleString()} ل.س</Text>
         </View>
       </View>
     </TouchableOpacity>
