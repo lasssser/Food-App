@@ -584,7 +584,7 @@ export default function ProfileScreen() {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={() => setShowComplaintModal(true)} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.menuItem} onPress={handleOpenComplaintModal} activeOpacity={0.7}>
             <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
             <View style={styles.menuItemContent}>
               <Text style={styles.menuItemText}>إرسال شكوى</Text>
