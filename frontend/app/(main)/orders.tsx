@@ -299,6 +299,17 @@ export default function OrdersScreen() {
           </TouchableOpacity>
         )}
 
+        {/* Track Driver Button - shown when driver is assigned */}
+        {['driver_assigned', 'picked_up', 'out_for_delivery'].includes(order.order_status) && order.driver_id && (
+          <TouchableOpacity 
+            style={styles.trackButton}
+            onPress={() => setTrackingOrderId(order.id)}
+          >
+            <Ionicons name="navigate" size={18} color="white" />
+            <Text style={styles.trackButtonText}>تتبع السائق مباشرة</Text>
+          </TouchableOpacity>
+        )}
+
         {/* Rate Button - shown for delivered orders not yet rated */}
         {isDelivered && !ratedOrders.has(order.id) && (
           <TouchableOpacity 
