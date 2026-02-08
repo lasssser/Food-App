@@ -372,15 +372,10 @@ export default function HomeScreen() {
 
         {/* Section Title */}
         <View style={styles.sectionHeader}>
-          <View style={{ flexDirection: 'row', gap: 12 }}>
-            <TouchableOpacity onPress={() => router.push('/(main)/nearby-map')} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: `${COLORS.primary}10`, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20 }}>
-              <Text style={[styles.seeAll, { color: COLORS.primary }]}>خريطة</Text>
-              <Ionicons name="map-outline" size={16} color={COLORS.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text style={styles.seeAll}>عرض الكل</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={() => router.push('/(main)/nearby-map')} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLORS.primary, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 }}>
+            <Ionicons name="map" size={16} color="#fff" />
+            <Text style={{ fontFamily: 'Cairo_600SemiBold', fontSize: 13, color: '#fff' }}>خريطة</Text>
+          </TouchableOpacity>
           <Text style={styles.sectionTitle}>المطاعم القريبة 🔥</Text>
         </View>
 
