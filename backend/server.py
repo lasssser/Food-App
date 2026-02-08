@@ -3643,6 +3643,63 @@ async def get_my_complaints(current_user: dict = Depends(get_current_user)):
     
     return complaints
 
+@api_router.get("/restaurant/complaints")
+async def get_restaurant_complaints(current_user: dict = Depends(get_current_user)):
+    """Get complaints directed at the restaurant"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    complaints = await db.complaints.find({
+        "restaurant_id": restaurant["id"]
+    }).sort("created_at", -1).to_list(50)
+    
+    for c in complaints:
+        c.pop("_id", None)
+    
+    return complaints
+
+@api_router.put("/restaurant/complaints/{complaint_id}/respond")
+async def respond_to_restaurant_complaint(
+    complaint_id: str,
+    response_data: ComplaintResponse,
+    current_user: dict = Depends(get_current_user)
+):
+    """Restaurant responds to a complaint"""
+    if current_user.get("role") != "restaurant":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
+    
+    complaint = await db.complaints.find_one({"id": complaint_id, "restaurant_id": restaurant["id"]})
+    if not complaint:
+        raise HTTPException(status_code=404, detail="الشكوى غير موجودة")
+    
+    await db.complaints.update_one(
+        {"id": complaint_id},
+        {"$set": {
+            "admin_response": response_data.response,
+            "status": response_data.status,
+            "updated_at": datetime.utcnow()
+        }}
+    )
+    
+    # Notify the customer
+    await create_notification(
+        complaint["user_id"],
+        "رد على شكواك",
+        f"المطعم رد على شكواك: {response_data.response[:50]}",
+        "complaint_update",
+        {"complaint_id": complaint_id}
+    )
+    
+    return {"message": "تم إرسال الرد بنجاح"}
+
 @api_router.get("/admin/complaints")
 async def get_all_complaints(
     status: str = None,
