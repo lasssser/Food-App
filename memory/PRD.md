@@ -41,18 +41,32 @@ Full-stack food delivery application with FastAPI backend, React Native/Expo fro
 - Added `useSafeAreaInsets` to all tab bar layouts: `(main)/_layout.tsx`, `(restaurant)/_layout.tsx`, `(driver)/_layout.tsx`
 - Tab bar height and bottom padding now dynamically adjust based on device safe area insets
 
+### P2 - Keyboard Hiding Input Fields
+- Wrapped checkout page `ScrollView` in `KeyboardAvoidingView` with platform-appropriate behavior
+- Added `keyboardShouldPersistTaps="handled"` to ScrollViews
+
+### Feature: Restaurant-Tied Complaints
+- Updated complaint modal in profile.tsx with complaint type selector (عامة/مطعم/طلب)
+- Added order picker showing recent orders when complaint type is "restaurant" or "order"
+- Updated `complaintsAPI.submit()` to accept `orderId` and `restaurantId` parameters
+- Complaints now include `restaurant_id` and `order_id` in the database for admin tracking
+
+### Feature: Payment Method Descriptions
+- Enhanced all payment method descriptions with detailed instructions explaining:
+  - COD: pay cash to driver on arrival, no prior action needed
+  - ShamCash: transfer via ShamCash app, enter transaction ID for verification
+  - Syriatel Cash: send via *133#, enter transaction ID  
+  - MTN Cash: send via *444#, enter transaction ID
+
 ### Android Crash Prevention (applied to both restaurant/orders.tsx and driver/available.tsx)
 - Removed `toLocaleTimeString('ar-SY', ...)` - crashes on some Android devices
 - Replaced with manual time formatting using `getHours()/getMinutes()`
 - Removed `toLocaleString()` from number formatting - replaced with `String()` or safe formatter
 
 ## Pending Issues
-- P2: Keyboard hides input fields (partially fixed for Ratings modal, needs full-app fix)
-- P3: Create Account page styling consistency (Cairo font already applied)
+- P3: Create Account page styling consistency (Cairo font already applied, low priority)
 
 ## Upcoming Tasks
-- Customer complaints feature tied to specific restaurants
-- Payment method descriptions on checkout screen
 - Simplify Restaurant Interface (addons button on menu items)
 
 ## Backlog
