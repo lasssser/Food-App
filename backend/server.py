@@ -2096,11 +2096,11 @@ async def get_driver_location_for_order(order_id: str, current_user: dict = Depe
     
     driver_id = order.get("driver_id")
     if not driver_id:
-        return {"driver_location": None, "message": "لم يتم تعيين سائق بعد"}
+        return {"driver_location": None, "driver_assigned": False, "message": "لم يتم تعيين سائق بعد"}
     
     driver = await db.users.find_one({"id": driver_id})
     if not driver:
-        return {"driver_location": None, "message": "السائق غير موجود"}
+        return {"driver_location": None, "driver_assigned": True, "message": "السائق غير موجود في النظام"}
     
     location = driver.get("current_location")
     location_time = driver.get("location_updated_at")
@@ -2121,27 +2121,22 @@ async def get_driver_location_for_order(order_id: str, current_user: dict = Depe
     eta_to_customer = None
     
     if driver_lat and driver_lng:
-        # Distance to restaurant
         if rest_lat and rest_lng:
             distance_to_restaurant = round(calculate_distance(driver_lat, driver_lng, rest_lat, rest_lng), 1)
-            eta_to_restaurant = max(3, int(distance_to_restaurant * 3 + 2))  # ~20km/h avg speed in city + 2min buffer
+            eta_to_restaurant = max(3, int(distance_to_restaurant * 3 + 2))
         
-        # Distance to customer (from delivery address or order address)
-        order_address = order.get("address", {})
-        # Use restaurant location as proxy for delivery route estimate
         if rest_lat and rest_lng and distance_to_restaurant is not None:
-            # Total delivery estimate = to restaurant + prep + to customer (estimate 1.5x distance)
-            total_distance = distance_to_restaurant * 2.5  # rough estimate
+            total_distance = distance_to_restaurant * 2.5
             eta_to_customer = max(5, int(total_distance * 3 + 5))
     
     order_status = order.get("order_status", "")
     
     # Determine current phase
-    phase = "waiting"  # waiting, going_to_restaurant, at_restaurant, delivering, arrived
+    phase = "waiting"
     phase_text = "بانتظار السائق"
     if order_status in ["driver_assigned"]:
         phase = "going_to_restaurant"
-        phase_text = f"السائق في الطريق للمطعم"
+        phase_text = "السائق في الطريق للمطعم"
     elif order_status in ["picked_up"]:
         phase = "at_restaurant"  
         phase_text = "السائق استلم الطلب من المطعم"
@@ -2153,7 +2148,9 @@ async def get_driver_location_for_order(order_id: str, current_user: dict = Depe
         phase_text = "تم التوصيل"
     
     return {
+        "driver_assigned": True,
         "driver_location": location,
+        "has_location": driver_lat is not None and driver_lng is not None,
         "driver_name": driver.get("name", ""),
         "driver_phone": driver.get("phone", ""),
         "location_updated_at": location_time.isoformat() if location_time and hasattr(location_time, 'isoformat') else str(location_time or ""),
