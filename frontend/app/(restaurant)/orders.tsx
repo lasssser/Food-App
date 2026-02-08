@@ -311,7 +311,17 @@ export default function RestaurantOrders() {
     const itemsCount = Array.isArray(order.items) ? order.items.length : 0;
     const orderTotal = typeof order.total === 'number' ? order.total : 0;
     const paymentMethod = String(order.payment_method || 'cod').toLowerCase();
-    const orderTime = order.created_at ? new Date(order.created_at).toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' }) : '';
+    let orderTime = '';
+    try {
+      if (order.created_at) {
+        const d = new Date(order.created_at);
+        if (!isNaN(d.getTime())) {
+          orderTime = d.toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' });
+        }
+      }
+    } catch (e) {
+      orderTime = '';
+    }
 
     return (
       <View style={[styles.orderCard, isPending && styles.pendingCard]}>
