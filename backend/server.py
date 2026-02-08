@@ -3827,11 +3827,18 @@ async def get_all_complaints(
     limit: int = 50,
     admin: dict = Depends(require_admin_or_moderator)
 ):
-    """Get all complaints (admin/moderator)"""
-    query = {}
+    """Get complaints directed to admin/moderator only (not restaurant-specific ones)"""
+    query = {
+        "$or": [
+            {"restaurant_id": None},
+            {"restaurant_id": ""},
+            {"restaurant_id": {"$exists": False}},
+            {"type": "general"},
+        ]
+    }
     if status:
         query["status"] = status
-    if type:
+    if type and type != "general":
         query["type"] = type
     
     complaints = await db.complaints.find(query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
