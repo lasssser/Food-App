@@ -495,6 +495,7 @@ export default function CheckoutScreen() {
           </View>
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
 
       {/* Bottom Summary */}
       <View style={styles.bottomCard}>
