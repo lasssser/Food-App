@@ -810,10 +810,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     backgroundColor: COLORS.surface,
     marginHorizontal: SPACING.lg,
-    marginTop: -20,
+    marginTop: -24,
+    marginBottom: SPACING.md,
     borderRadius: RADIUS.lg,
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.sm,
+    zIndex: 10,
     ...Platform.select({
       web: { boxShadow: '0px 4px 20px rgba(0,0,0,0.1)' },
       default: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 8 },
