@@ -1079,21 +1079,6 @@ async def reject_order_payment(
 
 # ==================== Restaurant Drivers Management ====================
 
-def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """Calculate distance between two points using Haversine formula (in km)"""
-    import math
-    R = 6371  # Earth's radius in km
-    
-    lat1_rad = math.radians(lat1)
-    lat2_rad = math.radians(lat2)
-    delta_lat = math.radians(lat2 - lat1)
-    delta_lon = math.radians(lon2 - lon1)
-    
-    a = math.sin(delta_lat/2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(delta_lon/2)**2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    
-    return R * c
-
 @api_router.get("/restaurant/platform-drivers")
 async def get_available_platform_drivers(
     sort_by: str = "distance",  # distance, rating, availability
@@ -2955,19 +2940,6 @@ async def seed_database():
     return {"message": "تم إضافة البيانات التجريبية بنجاح", "restaurants": len(restaurants), "menu_items": len(menu_items), "addon_groups": len(addon_groups)}
 
 # ==================== Admin APIs ====================
-
-async def require_admin(current_user: dict = Depends(get_current_user)):
-    """Middleware to check if user is admin"""
-    if current_user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="يجب أن تكون مديراً للوصول لهذه الصفحة")
-    return current_user
-
-async def require_admin_or_moderator(current_user: dict = Depends(get_current_user)):
-    """Middleware to check if user is admin or moderator"""
-    role = current_user.get("role")
-    if role not in ["admin", "moderator"]:
-        raise HTTPException(status_code=403, detail="غير مصرح لك بالوصول لهذه الصفحة")
-    return current_user
 
 @api_router.get("/admin/stats")
 async def get_admin_stats(admin: dict = Depends(require_admin_or_moderator)):
