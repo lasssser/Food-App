@@ -394,4 +394,16 @@ const styles = StyleSheet.create({
   cardName: { fontFamily: 'Cairo_700Bold', fontSize: 20, color: COLORS.textPrimary, flex: 1, textAlign: 'right' },
   cardStatusBadge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, flexDirection: 'row', alignItems: 'center' },
   cardStatusText: { fontFamily: 'Cairo_600SemiBold', fontSize: 12 },
+  // Bottom Info Bar
+  bottomInfoBar: {
+    position: 'absolute', bottom: 85, left: SPACING.lg, right: SPACING.lg,
+    backgroundColor: COLORS.primary, borderRadius: 16,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    paddingVertical: 12, paddingHorizontal: 16, gap: 16,
+    shadowColor: COLORS.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 8,
+  },
+  infoBarItem: { alignItems: 'center' },
+  infoBarNum: { fontFamily: 'Cairo_700Bold', fontSize: 18, color: '#fff' },
+  infoBarLabel: { fontFamily: 'Cairo_400Regular', fontSize: 10, color: 'rgba(255,255,255,0.8)' },
+  infoBarDivider: { width: 1, height: 30, backgroundColor: 'rgba(255,255,255,0.3)' },
 });
