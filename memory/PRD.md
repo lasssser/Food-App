@@ -1,101 +1,68 @@
-# PRD - أكلة عالسريع (akla-alsaree) Food Delivery App
+# أكلة عالسريع (Aklah 3al Saree3) - PRD
 
 ## Original Problem Statement
-Full-stack food delivery application with FastAPI backend, React Native/Expo frontend, and MongoDB database. Supports multiple roles: customer, restaurant, driver, moderator, admin. Deployed on Ubuntu VPS with Nginx reverse proxy.
+Food delivery application for Syria with customer frontend, restaurant dashboard, and driver app.
 
-## Architecture
-- **Backend:** FastAPI (Python), MongoDB (motor async), JWT auth, systemd service
-- **Frontend:** React Native, Expo SDK, Expo Router (file-based), Zustand state management, Axios
-- **Database:** MongoDB (production DB: `yalla_nakol_prod`)
-- **Deployment:** Ubuntu VPS, Nginx reverse proxy, EAS builds for APK
+## Core Architecture
+- **Backend**: Python FastAPI + MongoDB (motor async)
+- **Frontend**: React Native (Expo) + TypeScript
+- **Navigation**: Expo Router (file-based)
+- **State**: Zustand
+- **Maps**: OpenStreetMap + Leaflet via WebView
+- **Notifications**: Expo Push Notifications
+
+## Backend Structure (Refactored)
+```
+backend/
+├── server.py           # Main app + all routes (~4200 lines)
+├── database.py         # MongoDB connection
+├── models/
+│   └── schemas.py      # All Pydantic models (~445 lines)
+├── utils/
+│   ├── auth.py         # JWT, password hashing, get_current_user
+│   ├── helpers.py      # calculate_distance, timezone, working hours
+│   └── notifications.py # Push notifications, in-app notifications
+└── routes/             # Ready for future route extraction
+```
 
 ## What's Been Implemented
-- Full auth system (login/register) with JWT
-- Multi-role routing (customer, restaurant, driver, admin, moderator)
-- Restaurant management (menu, orders, drivers, payment methods, stats, reports)
-- Order lifecycle (create → accept → prepare → ready → assign driver → deliver)
-- Driver management (online/offline, available orders, order acceptance, delivery)
-- Customer features (browse, cart, checkout, order tracking, ratings, complaints)
-- Admin dashboard (user management, restaurant management, complaints, statistics)
-- Push notifications system
-- Payment methods (COD, MTN Cash, Syriatel Cash, ShamCash)
-- Image uploads (base64) for advertisements, menu items, restaurants
+- Full user auth (register/login/JWT) for customer, driver, restaurant, admin
+- Restaurant CRUD, menu management, payment methods
+- Order flow: create → accept → prepare → ready → driver_assigned → picked_up → delivered
+- Driver management: platform drivers, restaurant drivers, favorites
+- Live driver tracking with ETA (WebView + Leaflet map)
+- Push notifications via Expo Push Service
+- Admin dashboard with stats, user management, complaints
+- Complaint system, password reset requests
+- Advertisements, restaurant featuring
+- Arabic-only UI with forced RTL layout
+- City-based filtering for drivers and restaurants
 
-## Changes Made (Feb 8, 2026)
+## Completed in Current Session (Feb 2026)
+1. **Bug Fix: Driver tracking "not assigned"** - Backend now returns `driver_assigned` + `has_location` fields. Frontend shows driver info even without GPS location.
+2. **Bug Fix: Working hours auto-close** - Uses `Asia/Damascus` timezone via `zoneinfo`. Auto-updates `is_open` when restaurants are fetched. Order creation validates against working hours.
+3. **Bug Fix: Keyboard covers checkout inputs** - Bottom card hides when keyboard is visible using Keyboard event listeners.
+4. **Map screens unified** - `LocationPicker.tsx` now exports both inline map picker and full-screen `MapLocationPicker`, sharing the same WebView-based Leaflet map code.
+5. **Server.py refactored** - Models extracted to `models/schemas.py`, auth to `utils/auth.py`, helpers to `utils/helpers.py`, notifications to `utils/notifications.py`. Duplicate routes removed.
 
-### P0 - Order Card White Screen Fix (Restaurant Interface)
-- Removed optimistic state update in `handleUpdateStatus` - now waits for backend response before re-rendering
-- Added `OrderCardErrorBoundary` React class component to catch and display render errors gracefully
-- Replaced all `toLocaleString()` / `toLocaleTimeString()` calls with safe formatters (`safeFormatNumber`, `safeFormatTime`) that never throw on Android
-- Replaced `LinearGradient` in order action buttons with simple `View` components to eliminate native component crash risk
-- All field accesses use explicit `String()` wrapping and null checks
+## Known Issues
+- Old admin account (0900000000) has stale bcrypt hash - login fails (pre-existing)
+- Guest user home screen crash (toLocaleString on undefined) - needs fix in home.tsx
+- Restaurant location filtering by city not working properly
+- Map feature stuck in loading loop on some devices
 
-### P1 - Driver Orders Not Appearing
-- Fixed `assign_driver_to_order` endpoint to explicitly set `driver_id: None`, `driver_name: None`, `driver_phone: None`, `driver_type: "platform_driver"` when assigning platform driver
-- Fixed city-based driver notification - now falls back to all online drivers if no drivers found in same city
-- Fixed `get_available_orders_for_driver` endpoint - now falls back to all restaurants if none found in driver's city
-- Added comprehensive logging for driver order queries
-- Fixed `driver_accept_order` endpoint - removed ObjectId from response (was causing 500 error)
+## Pending Tasks (Priority Order)
+### P0
+- Fix guest user crash on home screen (toLocaleString error in renderRestaurantCard)
 
-### P2 - Navigation Bar Hidden Behind System Buttons
-- Added `useSafeAreaInsets` to all tab bar layouts: `(main)/_layout.tsx`, `(restaurant)/_layout.tsx`, `(driver)/_layout.tsx`
-- Tab bar height and bottom padding now dynamically adjust based on device safe area insets
+### P1  
+- Fix restaurant location filtering (restaurants from wrong cities appearing)
+- Continue extracting routes from server.py into separate files
 
-### P2 - Keyboard Hiding Input Fields
-- Wrapped checkout page `ScrollView` in `KeyboardAvoidingView` with platform-appropriate behavior
-- Added `keyboardShouldPersistTaps="handled"` to ScrollViews
+### P2
+- Fix map loading loop on nearby-map screen
+- Simplify restaurant dashboard UI
+- Dark mode
 
-### Feature: Restaurant-Tied Complaints
-- Updated complaint modal in profile.tsx with complaint type selector (عامة/مطعم/طلب)
-- Added order picker showing recent orders when complaint type is "restaurant" or "order"
-- Updated `complaintsAPI.submit()` to accept `orderId` and `restaurantId` parameters
-- Complaints now include `restaurant_id` and `order_id` in the database for admin tracking
-
-### Feature: Payment Method Descriptions
-- Enhanced all payment method descriptions with detailed instructions explaining:
-  - COD: pay cash to driver on arrival, no prior action needed
-  - ShamCash: transfer via ShamCash app, enter transaction ID for verification
-  - Syriatel Cash: send via *133#, enter transaction ID  
-  - MTN Cash: send via *444#, enter transaction ID
-
-### Android Crash Prevention (applied to both restaurant/orders.tsx and driver/available.tsx)
-- Removed `toLocaleTimeString('ar-SY', ...)` - crashes on some Android devices
-- Replaced with manual time formatting using `getHours()/getMinutes()`
-- Removed `toLocaleString()` from number formatting - replaced with `String()` or safe formatter
-
-## Pending Issues
-- P3: Create Account page styling consistency (Cairo font already applied, low priority)
-
-## Upcoming Tasks
-- Simplify Restaurant Interface (addons button on menu items)
-
-## Critical Bugs to Fix Next Session
-
-### 1. City Filter Not Working
-- User selects "حلب" (Aleppo) but still sees restaurants from حمص (Homs)
-- `fetchRestaurants` uses `getAll()` without city filter
-- Need to pass `city_id` from location store to filter restaurants
-
-### 2. Restaurants Still Open After Closing Time
-- It's 00:33 and restaurants still show as open
-- The `is_open` check only happens at order creation, not at display time
-- Need: Backend scheduled check OR frontend time-based display
-
-### 3. City Selection Screen Still Showing
-- The old "اختر مدينتك" modal still appears
-- Need to remove it completely or integrate with the location picker
-
-### 4. Map Not Showing Restaurants
-- The nearby-map page loads but restaurants don't appear as pins
-- restaurants don't have lat/lng set in DB
-
-### 5. Push Notifications Need FCM
-- Error: "Default FirebaseApp is not initialized"
-- Need to add google-services.json for FCM
-- Follow: https://docs.expo.dev/push-notifications/fcm-credentials/
-
-## Key Credentials for Testing
-- Admin: `0900000000` / `admin`
-- Restaurant: `0123456789` / `rest123`
-- Driver: `0911111111` / `driver123`
-- Database: `yalla_nakol_prod` (production), `test_database` (dev pod)
+### P3
+- Further route extraction (auth.py, orders.py, drivers.py, admin.py)
