@@ -548,9 +548,8 @@ export default function RestaurantOrders() {
               style={styles.assignButton}
               onPress={() => openAssignModal(order)}
             >
-              <LinearGradient
-                colors={[COLORS.info, '#1976D2']}
-                style={styles.assignButtonGradient}
+              <View
+                style={[styles.assignButtonGradient, { backgroundColor: COLORS.info }]}
               >
                 <Ionicons name="bicycle" size={20} color={COLORS.textWhite} />
                 <Text style={styles.assignButtonText}>تعيين سائق</Text>
