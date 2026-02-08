@@ -73,7 +73,9 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
 
   try {
     // Get project ID from constants
-    const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+    const projectId = Constants.expoConfig?.extra?.eas?.projectId 
+      ?? Constants.easConfig?.projectId
+      ?? undefined;
     
     // Get Expo push token
     const tokenResponse = await Notifications.getExpoPushTokenAsync({
@@ -84,6 +86,14 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
     console.log('Expo Push Token:', token);
   } catch (error) {
     console.error('Error getting push token:', error);
+    // Try without projectId as fallback
+    try {
+      const tokenResponse = await Notifications.getExpoPushTokenAsync();
+      token = tokenResponse.data;
+      console.log('Expo Push Token (fallback):', token);
+    } catch (e2) {
+      console.error('Error getting push token (fallback):', e2);
+    }
   }
 
   return token;
