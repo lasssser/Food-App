@@ -44,6 +44,9 @@ export default function ProfileScreen() {
   const [complaintSubject, setComplaintSubject] = useState('');
   const [complaintMessage, setComplaintMessage] = useState('');
   const [submittingComplaint, setSubmittingComplaint] = useState(false);
+  const [complaintType, setComplaintType] = useState<string>('general');
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [selectedOrderForComplaint, setSelectedOrderForComplaint] = useState<string | null>(null);
   
   // Role Request states
   const [showRoleRequestModal, setShowRoleRequestModal] = useState(false);
