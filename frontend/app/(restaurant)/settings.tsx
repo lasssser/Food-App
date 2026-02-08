@@ -38,6 +38,7 @@ export default function RestaurantSettings() {
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showComplaintModal, setShowComplaintModal] = useState(false);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [stats, setStats] = useState<RestaurantStats | null>(null);
