@@ -595,6 +595,7 @@ export default function RestaurantOrders() {
           />
         </View>
       </View>
+      </OrderCardErrorBoundary>
     );
   };
 
