@@ -11,7 +11,6 @@ export default function Index() {
 
   useEffect(() => {
     const init = async () => {
-      try { await seedAPI.seed(); } catch (e) {}
       await checkAuth();
       setIsReady(true);
     };
