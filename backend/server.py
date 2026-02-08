@@ -860,11 +860,16 @@ async def get_restaurant_orders(current_user: dict = Depends(get_current_user)):
     clean_orders = []
     for order in orders:
         order.pop("_id", None)
-        # Clean items - remove _id from each item
+        # Clean items - remove _id from each item and ensure proper format
         if "items" in order and isinstance(order["items"], list):
             for item in order["items"]:
                 if isinstance(item, dict):
                     item.pop("_id", None)
+                    # Ensure item has required fields
+                    item.setdefault("name", "صنف")
+                    item.setdefault("price", 0)
+                    item.setdefault("quantity", 1)
+                    item.setdefault("subtotal", item.get("price", 0) * item.get("quantity", 1))
         # Ensure required fields exist with defaults
         order.setdefault("total", 0)
         order.setdefault("subtotal", 0)
@@ -874,8 +879,20 @@ async def get_restaurant_orders(current_user: dict = Depends(get_current_user)):
         order.setdefault("payment_status", "unpaid")
         order.setdefault("order_status", "pending")
         order.setdefault("address", {"label": "غير محدد", "address_line": ""})
-        order.setdefault("created_at", "")
-        order.setdefault("updated_at", "")
+        # Convert datetime to string
+        for key in ["created_at", "updated_at"]:
+            val = order.get(key)
+            if val and not isinstance(val, str):
+                try:
+                    order[key] = val.isoformat()
+                except:
+                    order[key] = str(val)
+            elif not val:
+                order[key] = ""
+        # Convert address datetime if any
+        if isinstance(order.get("address"), dict):
+            order["address"].setdefault("label", "غير محدد")
+            order["address"].setdefault("address_line", "")
         clean_orders.append(order)
     
     return clean_orders
