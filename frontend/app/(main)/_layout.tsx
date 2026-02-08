@@ -118,6 +118,12 @@ export default function MainLayout() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="nearby-map"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
