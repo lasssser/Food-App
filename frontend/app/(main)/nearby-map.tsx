@@ -113,18 +113,23 @@ export default function NearbyMapScreen() {
 
   useEffect(() => {
     const init = async () => {
+      let lat = 33.5138;
+      let lng = 36.2765;
+      
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status === 'granted') {
           const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-          setUserLocation({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+          lat = loc.coords.latitude;
+          lng = loc.coords.longitude;
+          setUserLocation({ lat, lng });
         }
       } catch (e) {
         console.log('Location error, using default');
       }
 
       try {
-        const data = await restaurantAPI.getNearby(userLocation.lat, userLocation.lng, 50);
+        const data = await restaurantAPI.getNearby(lat, lng, 50);
         setRestaurants(data || []);
       } catch (e) {
         console.error('Error fetching nearby:', e);
@@ -133,15 +138,6 @@ export default function NearbyMapScreen() {
     };
     init();
   }, []);
-
-  // Refetch when location changes
-  useEffect(() => {
-    if (!loading) {
-      restaurantAPI.getNearby(userLocation.lat, userLocation.lng, 50)
-        .then(data => setRestaurants(data || []))
-        .catch(console.error);
-    }
-  }, [userLocation]);
 
   const handleWebViewMessage = (event: any) => {
     try {
