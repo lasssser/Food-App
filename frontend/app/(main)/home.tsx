@@ -23,7 +23,6 @@ import { useAuthStore } from '../../src/store/authStore';
 import { useLocationStore, City, District } from '../../src/store/locationStore';
 import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
 import MapLocationPicker from '../../src/components/MapLocationPicker';
-import * as Location from 'expo-location';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 32;
