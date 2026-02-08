@@ -724,6 +724,23 @@ const styles = StyleSheet.create({
     fontFamily: 'Cairo_400Regular',
     fontWeight: '600',
   },
+  trackButton: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#00ACC1',
+    paddingVertical: SPACING.md,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.md,
+    borderRadius: RADIUS.md,
+  },
+  trackButtonText: {
+    color: 'white',
+    fontSize: 15,
+    fontFamily: 'Cairo_600SemiBold',
+    fontWeight: '600',
+  },
 
   // Modal
   modalOverlay: {
