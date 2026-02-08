@@ -317,8 +317,9 @@ export default function RestaurantScreen() {
         </View>
       </Animated.View>
 
-      {/* Quick Info Strip */}
-      <Animated.View style={{ opacity: infoOpacity, transform: [{ translateY: infoSlide }] }}>
+      {/* Menu Content */}
+      <Animated.View style={[styles.menuContainer, { opacity: menuOpacity, transform: [{ translateY: menuSlide }] }]}>
+        {/* Info Strip */}
         <View style={styles.infoStrip}>
           <View style={styles.infoStripItem}>
             <View style={[styles.infoStripIcon, { backgroundColor: '#FFF3E0' }]}>
@@ -344,10 +345,6 @@ export default function RestaurantScreen() {
             <Text style={styles.infoStripLabel}>الحد الأدنى</Text>
           </View>
         </View>
-      </Animated.View>
-
-      {/* Menu Content */}
-      <Animated.View style={[styles.menuContainer, { opacity: menuOpacity, transform: [{ translateY: menuSlide }] }]}>
         {/* Category Tabs */}
         <ScrollView
           horizontal
