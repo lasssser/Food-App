@@ -342,7 +342,11 @@ export const restaurantPanelAPI = {
     const response = await api.put(`/restaurant/complaints/${complaintId}/respond`, { response: responseText, status });
     return response.data;
   },
-  // Reports
+  // Restaurant Location
+  updateLocation: async (lat: number, lng: number) => {
+    const response = await api.put(`/restaurant/location?lat=${lat}&lng=${lng}`);
+    return response.data;
+  },
   getReports: async (period: string = 'week') => {
     const response = await api.get(`/restaurant/reports?period=${period}`);
     return response.data;
