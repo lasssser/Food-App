@@ -525,7 +525,8 @@ export default function CheckoutScreen() {
       </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Bottom Summary */}
+      {/* Bottom Summary - hide when keyboard is visible */}
+      {!keyboardVisible && (
       <View style={styles.bottomCard}>
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>المجموع</Text>
