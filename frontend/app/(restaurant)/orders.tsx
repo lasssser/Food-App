@@ -354,7 +354,15 @@ export default function RestaurantOrders() {
   const completedOrders = orders.filter(o => ['delivered', 'cancelled'].includes(o.order_status));
 
   const renderOrder = ({ item: order }: { item: Order }) => {
-    if (!order || !order.id) return null;
+    if (!order || !order.id) {
+      return (
+        <View style={{ backgroundColor: '#FFF3E0', borderRadius: 12, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: '#FFE082' }}>
+          <Text style={{ fontFamily: 'Cairo_400Regular', color: '#E65100', textAlign: 'right', fontSize: 14 }}>
+            خطأ في تحميل بيانات الطلب
+          </Text>
+        </View>
+      );
+    }
     
     const orderStatus = String(order.order_status || 'pending');
     const status = STATUS_CONFIG[orderStatus] || { label: orderStatus, color: '#999', icon: 'help-circle' as keyof typeof Ionicons.glyphMap, bgColor: '#F5F5F5' };
