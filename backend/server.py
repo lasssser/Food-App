@@ -875,28 +875,6 @@ async def update_restaurant_location(
     
     return {"message": "تم تحديث موقع المطعم", "lat": lat, "lng": lng}
 
-@api_router.put("/restaurant/toggle-status")
-async def toggle_restaurant_status(current_user: dict = Depends(get_current_user)):
-    """Toggle restaurant open/close status"""
-    if current_user.get("role") != "restaurant":
-        raise HTTPException(status_code=403, detail="غير مصرح")
-    
-    restaurant = await db.restaurants.find_one({"owner_id": current_user["id"]})
-    if not restaurant:
-        raise HTTPException(status_code=404, detail="لا يوجد مطعم مرتبط بحسابك")
-    
-    new_status = not restaurant.get("is_open", True)
-    
-    await db.restaurants.update_one(
-        {"id": restaurant["id"]},
-        {"$set": {"is_open": new_status, "updated_at": datetime.utcnow()}}
-    )
-    
-    return {
-        "message": "مفتوح الآن" if new_status else "مغلق الآن",
-        "is_open": new_status
-    }
-
 # ==================== Restaurant Payment Methods ====================
 
 @api_router.get("/restaurant/payment-methods")
