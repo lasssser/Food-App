@@ -416,9 +416,14 @@ export default function OrdersScreen() {
           }}
         />
       )}
+
+      {/* Live Tracking Modal */}
+      <LiveTrackingModal
+        orderId={trackingOrderId || ''}
+        visible={!!trackingOrderId}
+        onClose={() => setTrackingOrderId(null)}
+      />
     </SafeAreaView>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
