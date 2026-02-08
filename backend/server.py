@@ -3094,10 +3094,6 @@ async def update_user_status(
     
     return {"message": "تم تحديث حالة المستخدم بنجاح", "is_active": request.is_active}
 
-class UpdateUserInfoRequest(BaseModel):
-    name: Optional[str] = None
-    phone: Optional[str] = None
-
 @api_router.put("/admin/users/{user_id}")
 async def update_user_info(
     user_id: str,
