@@ -205,6 +205,18 @@ export default function CheckoutScreen() {
       return;
     }
 
+    if (!customerName.trim()) {
+      setErrorMessage('يرجى إدخال اسم المستلم');
+      setShowErrorModal(true);
+      return;
+    }
+
+    if (!customerPhone.trim()) {
+      setErrorMessage('يرجى إدخال رقم هاتف المستلم');
+      setShowErrorModal(true);
+      return;
+    }
+
     if (!selectedPaymentMethod) {
       setErrorMessage('يرجى اختيار طريقة الدفع');
       setShowErrorModal(true);
