@@ -554,7 +554,7 @@ export default function RestaurantOrders() {
               >
                 <Ionicons name="bicycle" size={20} color={COLORS.textWhite} />
                 <Text style={styles.assignButtonText}>تعيين سائق</Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           )}
 
@@ -564,13 +564,12 @@ export default function RestaurantOrders() {
               style={styles.actionButton}
               onPress={() => handleUpdateStatus(order.id, action.next)}
             >
-              <LinearGradient
-                colors={isPending ? [COLORS.success, '#43A047'] : [COLORS.primary, COLORS.primaryDark]}
-                style={styles.actionButtonGradient}
+              <View
+                style={[styles.actionButtonGradient, { backgroundColor: isPending ? COLORS.success : COLORS.primary }]}
               >
                 <Ionicons name={action.icon} size={20} color={COLORS.textWhite} />
                 <Text style={styles.actionButtonText}>{action.label}</Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           )}
 
