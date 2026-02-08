@@ -979,7 +979,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: RADIUS.xl,
     paddingHorizontal: SPACING.lg,
     paddingTop: SPACING.md,
-    paddingBottom: SPACING.lg,
+    paddingBottom: 100,
     ...SHADOWS.large,
   },
   totalRow: {
