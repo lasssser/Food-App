@@ -304,6 +304,26 @@ export const restaurantPanelAPI = {
     const response = await api.get(`/restaurant/platform-drivers?sort_by=${sortBy}`);
     return response.data;
   },
+  // Favorite Platform Drivers
+  getFavoriteDrivers: async () => {
+    const response = await api.get('/restaurant/favorite-drivers');
+    return response.data;
+  },
+  addFavoriteDriver: async (driverId: string) => {
+    const response = await api.post(`/restaurant/favorite-drivers/${driverId}`);
+    return response.data;
+  },
+  removeFavoriteDriver: async (driverId: string) => {
+    const response = await api.delete(`/restaurant/favorite-drivers/${driverId}`);
+    return response.data;
+  },
+  updateDriverSearchSettings: async (searchRadius: number, cityId?: string) => {
+    const params = new URLSearchParams();
+    params.append('search_radius', searchRadius.toString());
+    if (cityId) params.append('city_id', cityId);
+    const response = await api.put(`/restaurant/driver-search-settings?${params.toString()}`);
+    return response.data;
+  },
   // Order Driver Assignment
   assignDriver: async (orderId: string, data: { driver_type: string; driver_id?: string }) => {
     const response = await api.post(`/restaurant/orders/${orderId}/assign-driver`, data);
