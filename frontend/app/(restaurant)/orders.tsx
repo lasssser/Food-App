@@ -292,7 +292,6 @@ export default function RestaurantOrders() {
   const completedOrders = orders.filter(o => ['delivered', 'cancelled'].includes(o.order_status));
 
   const renderOrder = ({ item: order }: { item: Order }) => {
-    try {
     if (!order || !order.id) return null;
     
     const orderStatus = order.order_status || 'pending';
@@ -305,13 +304,10 @@ export default function RestaurantOrders() {
     const itemsCount = Array.isArray(order.items) ? order.items.length : 0;
     const orderTotal = typeof order.total === 'number' ? order.total : 0;
     const paymentMethod = String(order.payment_method || 'cod').toLowerCase();
+    const orderTime = order.created_at ? new Date(order.created_at).toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' }) : '';
 
     return (
-      <TouchableOpacity 
-        style={[styles.orderCard, isPending && styles.pendingCard]}
-        onPress={() => toggleExpand(order.id)}
-        activeOpacity={0.8}
-      >
+      <View style={[styles.orderCard, isPending && styles.pendingCard]}>
         {/* New Order Indicator */}
         {isPending && (
           <View style={styles.newOrderBanner}>
@@ -321,34 +317,34 @@ export default function RestaurantOrders() {
         )}
 
         {/* Header */}
-        <View style={styles.orderHeader}>
-          <View style={[styles.statusBadge, { backgroundColor: status.bgColor }]}>
-            <Ionicons name={status.icon} size={16} color={status.color} />
-            <Text style={[styles.statusText, { color: status.color }]}>{status.label}</Text>
+        <TouchableOpacity onPress={() => toggleExpand(order.id)} activeOpacity={0.8} style={{ padding: 16 }}>
+          <View style={styles.orderHeader}>
+            <View style={[styles.statusBadge, { backgroundColor: status.bgColor }]}>
+              <Ionicons name={status.icon} size={16} color={status.color} />
+              <Text style={[styles.statusText, { color: status.color }]}>{status.label}</Text>
+            </View>
+            <View style={styles.orderIdContainer}>
+              <Text style={styles.orderId}>#{(order.id || '').slice(0, 8)}</Text>
+              <Text style={styles.orderTime}>{orderTime}</Text>
+            </View>
           </View>
-          <View style={styles.orderIdContainer}>
-            <Text style={styles.orderId}>#{(order.id || '').slice(0, 8)}</Text>
-            <Text style={styles.orderTime}>
-              {order.created_at ? new Date(order.created_at).toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' }) : ''}
-            </Text>
-          </View>
-        </View>
 
-        {/* Quick Info */}
-        <View style={styles.quickInfo}>
-          <View style={styles.quickInfoItem}>
-            <Ionicons name="receipt" size={18} color={COLORS.textSecondary} />
-            <Text style={styles.quickInfoText}>{itemsCount} أصناف</Text>
+          {/* Quick Info */}
+          <View style={styles.quickInfo}>
+            <View style={styles.quickInfoItem}>
+              <Ionicons name="receipt" size={18} color={COLORS.textSecondary} />
+              <Text style={styles.quickInfoText}>{itemsCount} أصناف</Text>
+            </View>
+            <View style={styles.quickInfoItem}>
+              <Ionicons name="cash" size={18} color={COLORS.success} />
+              <Text style={[styles.quickInfoText, styles.totalText]}>{orderTotal.toLocaleString()} ل.س</Text>
+            </View>
+            <View style={styles.quickInfoItem}>
+              <Ionicons name={paymentMethod === 'cod' ? 'wallet' : 'card'} size={18} color={paymentMethod === 'cod' ? '#FF9800' : '#4CAF50'} />
+              <Text style={styles.quickInfoText}>{paymentMethod === 'cod' ? 'كاش' : 'إلكتروني'}</Text>
+            </View>
           </View>
-          <View style={styles.quickInfoItem}>
-            <Ionicons name="cash" size={18} color={COLORS.success} />
-            <Text style={[styles.quickInfoText, styles.totalText]}>{orderTotal.toLocaleString()} ل.س</Text>
-          </View>
-          <View style={styles.quickInfoItem}>
-            <Ionicons name={paymentMethod === 'cod' ? 'wallet' : 'card'} size={18} color={paymentMethod === 'cod' ? '#FF9800' : '#4CAF50'} />
-            <Text style={styles.quickInfoText}>{paymentMethod === 'cod' ? 'كاش' : 'إلكتروني'}</Text>
-          </View>
-        </View>
+        </TouchableOpacity>
 
         {/* Expanded Details */}
         {isExpanded && (
