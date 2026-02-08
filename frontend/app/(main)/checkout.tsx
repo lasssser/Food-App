@@ -247,7 +247,9 @@ export default function CheckoutScreen() {
         })),
         address_id: selectedAddress,
         payment_method: selectedPaymentMethod,
-        notes: [orderNotes.trim(), customerName.trim() ? `المستلم: ${customerName.trim()}` : '', customerPhone.trim() ? `هاتف: ${customerPhone.trim()}` : ''].filter(Boolean).join(' | ') || '',
+        notes: orderNotes.trim() || '',
+        recipient_name: customerName.trim(),
+        recipient_phone: customerPhone.trim(),
       };
 
       // Add payment info for electronic payments
