@@ -92,6 +92,7 @@ export default function CartScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
+      <Animated.View style={{ opacity: headerAnim }}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleClearCart}>
           <Text style={styles.clearText}>مسح الكل</Text>
@@ -99,9 +100,11 @@ export default function CartScreen() {
         <Text style={styles.headerTitle}>السلة</Text>
         <View style={{ width: 60 }} />
       </View>
+      </Animated.View>
 
       {/* Restaurant Info */}
       {restaurant && (
+        <Animated.View style={{ opacity: contentOpacity, transform: [{ translateY: contentAnim }] }}>
         <View style={styles.restaurantInfo}>
           <View style={styles.restaurantIcon}>
             <Ionicons name="restaurant" size={24} color={COLORS.primary} />
@@ -111,9 +114,11 @@ export default function CartScreen() {
             <Text style={styles.itemCount}>{getItemCount()} عناصر في السلة</Text>
           </View>
         </View>
+        </Animated.View>
       )}
 
       {/* Cart Items */}
+      <Animated.View style={{ flex: 1, opacity: contentOpacity, transform: [{ translateY: contentAnim }] }}>
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
