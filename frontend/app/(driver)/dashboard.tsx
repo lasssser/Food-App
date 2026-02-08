@@ -24,6 +24,27 @@ export default function DriverDashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Animations
+  const statusSlide = useRef(new Animated.Value(30)).current;
+  const statusOpacity = useRef(new Animated.Value(0)).current;
+  const statsScale = useRef([0,1,2].map(() => new Animated.Value(0))).current;
+  const earningsSlide = useRef(new Animated.Value(30)).current;
+  const earningsOpacity = useRef(new Animated.Value(0)).current;
+
+  const animateIn = () => {
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(statusSlide, { toValue: 0, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(statusOpacity, { toValue: 1, duration: 350, useNativeDriver: true }),
+      ]),
+      Animated.stagger(100, statsScale.map(a => Animated.spring(a, { toValue: 1, friction: 6, tension: 80, useNativeDriver: true }))),
+      Animated.parallel([
+        Animated.timing(earningsSlide, { toValue: 0, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(earningsOpacity, { toValue: 1, duration: 350, useNativeDriver: true }),
+      ]),
+    ]).start();
+  };
+
   const fetchStats = async () => {
     try {
       const data = await driverAPI.getStats();
