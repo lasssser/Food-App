@@ -1775,42 +1775,6 @@ async def get_driver_history(current_user: dict = Depends(get_current_user)):
         result.append(order)
     return result
 
-@api_router.post("/driver/accept-order/{order_id}")
-async def accept_order_driver(order_id: str, current_user: dict = Depends(get_current_user)):
-    """Driver accepts an order for delivery"""
-    if current_user.get("role") != "driver":
-        raise HTTPException(status_code=403, detail="غير مصرح")
-    
-    if not current_user.get("is_online"):
-        raise HTTPException(status_code=400, detail="يجب أن تكون متصلاً لقبول الطلبات")
-    
-    order = await db.orders.find_one({"id": order_id, "order_status": "ready", "driver_id": None})
-    if not order:
-        raise HTTPException(status_code=404, detail="الطلب غير متاح")
-    
-    await db.orders.update_one(
-        {"id": order_id},
-        {
-            "$set": {
-                "driver_id": current_user["id"],
-                "driver_name": current_user["name"],
-                "order_status": "assigned",
-                "updated_at": datetime.utcnow()
-            }
-        }
-    )
-    
-    # Notify customer
-    await create_notification(
-        order["user_id"],
-        "تم تعيين سائق لطلبك",
-        f"السائق {current_user['name']} سيوصل طلبك",
-        "order_update",
-        {"order_id": order_id, "driver_name": current_user["name"]}
-    )
-    
-    return {"message": "تم قبول الطلب"}
-
 @api_router.put("/driver/orders/{order_id}/status")
 async def update_order_status_driver(
     order_id: str,
