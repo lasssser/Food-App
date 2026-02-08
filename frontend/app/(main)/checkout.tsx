@@ -61,28 +61,28 @@ const DEFAULT_PAYMENT_METHODS: PaymentMethod[] = [
     is_enabled: true,
     display_name: 'الدفع نقداً عند الاستلام',
     payment_info: '',
-    instructions: 'ادفع نقداً للسائق عند وصوله إليك. لا حاجة لأي إجراء مسبق - فقط جهّز المبلغ المطلوب.',
+    instructions: 'ادفع نقداً للسائق عند الوصول',
   },
   {
     method: 'shamcash',
     is_enabled: true,
     display_name: 'شام كاش',
     payment_info: '',
-    instructions: 'حوّل المبلغ عبر تطبيق شام كاش إلى رقم المطعم، ثم أدخل رقم العملية هنا لتأكيد الدفع. سيتم التحقق من التحويل قبل بدء تحضير طلبك.',
+    instructions: 'حوّل عبر شام كاش وأدخل رقم العملية',
   },
   {
     method: 'syriatel_cash',
     is_enabled: true,
     display_name: 'سيرياتيل كاش',
     payment_info: '',
-    instructions: 'أرسل المبلغ عبر سيرياتيل كاش (*133#) إلى رقم المطعم، ثم أدخل رقم العملية هنا. سيتم التحقق من عملية التحويل.',
+    instructions: 'أرسل عبر *133# وأدخل رقم العملية',
   },
   {
     method: 'mtn_cash',
     is_enabled: true,
     display_name: 'MTN كاش',
     payment_info: '',
-    instructions: 'أرسل المبلغ عبر MTN كاش (*444#) إلى رقم المطعم، ثم أدخل رقم العملية هنا. سيتم التحقق من عملية التحويل.',
+    instructions: 'أرسل عبر *444# وأدخل رقم العملية',
   },
 ];
 
