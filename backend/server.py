@@ -1897,10 +1897,13 @@ async def assign_driver_to_order(
         })
         
     elif assignment.driver_type == "platform_driver":
-        # Request platform drivers
+        # Request platform drivers - allowed during preparing or ready
+        current_status = order.get("order_status", "")
+        is_preparing = current_status == "preparing"
+        
         update_data.update({
             "delivery_mode": "platform_driver",
-            "order_status": "ready",  # Mark as ready for platform drivers to see
+            "order_status": current_status if is_preparing else "ready",  # Keep preparing if still preparing
             "driver_id": None,  # Ensure no driver is assigned yet
             "driver_name": None,
             "driver_phone": None,
@@ -1918,13 +1921,16 @@ async def assign_driver_to_order(
         city_drivers = [d for d in platform_drivers if d.get("city_id") == city_id]
         drivers_to_notify = city_drivers if city_drivers else platform_drivers
         
-        logger.info(f"Platform driver assignment: order={order_id}, city={city_id}, total_online_drivers={len(platform_drivers)}, city_drivers={len(city_drivers)}")
+        logger.info(f"Platform driver assignment: order={order_id}, city={city_id}, status={current_status}, total_online_drivers={len(platform_drivers)}, city_drivers={len(city_drivers)}")
+        
+        notification_title = "🚀 طلب جديد قريب منك"
+        notification_body = f"طلب من {restaurant['name']} جاري التحضير - جهّز نفسك!" if is_preparing else f"طلب من {restaurant['name']} جاهز للتوصيل"
         
         for driver in drivers_to_notify:
             await create_notification(
                 driver["id"],
-                "🚀 طلب جديد قريب منك",
-                f"طلب من {restaurant['name']} جاهز للتوصيل",
+                notification_title,
+                notification_body,
                 "new_order",
                 {"order_id": order_id, "restaurant_name": restaurant["name"]}
             )
