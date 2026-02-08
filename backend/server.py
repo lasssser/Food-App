@@ -2002,6 +2002,11 @@ async def get_driver_orders(current_user: dict = Depends(get_current_user)):
                     order[key] = val.isoformat()
                 except:
                     order[key] = str(val)
+        # Add customer info
+        customer = await db.users.find_one({"id": order.get("user_id")})
+        if customer:
+            order["customer_name"] = customer.get("name", "")
+            order["customer_phone"] = customer.get("phone", "")
         result.append(order)
     return result
 
