@@ -1890,9 +1890,9 @@ async def get_available_orders_for_driver(current_user: dict = Depends(get_curre
     result = []
     for order in orders:
         order.pop("_id", None)
-        restaurant = next((r for r in restaurants_in_city if r["id"] == order["restaurant_id"]), None)
-        order["restaurant_address"] = restaurant.get("address") if restaurant else ""
-        order["restaurant_name"] = restaurant.get("name") if restaurant else ""
+        restaurant = next((r for r in all_restaurants if r["id"] == order.get("restaurant_id")), None)
+        order["restaurant_address"] = restaurant.get("address", "") if restaurant else ""
+        order["restaurant_name"] = restaurant.get("name", "") if restaurant else ""
         # Clean items
         if isinstance(order.get("items"), list):
             for item in order["items"]:
