@@ -60,6 +60,7 @@ export default function RestaurantDashboard() {
   useFocusEffect(
     useCallback(() => {
       fetchStats();
+      animateEntrance();
     }, [])
   );
 
