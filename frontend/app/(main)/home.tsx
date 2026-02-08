@@ -135,18 +135,9 @@ export default function HomeScreen() {
   );
 
   const renderRestaurantCard = (restaurant: Restaurant, index: number) => {
-    // Create a staggered animation ref per card
-    const cardOpacity = new Animated.Value(0);
-    const cardTranslateY = new Animated.Value(25);
-    
-    Animated.parallel([
-      Animated.timing(cardOpacity, { toValue: 1, duration: 400, delay: index * 100, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-      Animated.timing(cardTranslateY, { toValue: 0, duration: 400, delay: index * 100, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-    ]).start();
-
     return (
-    <Animated.View key={restaurant.id} style={{ opacity: cardOpacity, transform: [{ translateY: cardTranslateY }] }}>
     <TouchableOpacity
+      key={restaurant.id}
       style={styles.restaurantCard}
       onPress={() => router.push(`/restaurant/${restaurant.id}`)}
       activeOpacity={0.9}
