@@ -113,6 +113,7 @@ export default function DriverDashboard() {
         }
       >
         {/* Status Toggle */}
+        <Animated.View style={{ opacity: statusOpacity, transform: [{ translateY: statusSlide }] }}>
         <TouchableOpacity
           style={[
             styles.statusCard,
