@@ -378,7 +378,10 @@ export default function RestaurantOrders() {
 
     return (
       <OrderCardErrorBoundary orderId={order.id}>
-        <View style={[styles.orderCard, isPending && styles.pendingCard]}>
+        <View style={[styles.orderCard, isPending && styles.pendingCard]} data-testid={`order-card-${order.id}`}>
+          {/* Status colored top bar */}
+          <View style={{ height: 4, backgroundColor: status.color, borderTopLeftRadius: RADIUS.lg, borderTopRightRadius: RADIUS.lg }} />
+          
           {/* New Order Indicator */}
           {isPending && (
             <View style={styles.newOrderBanner}>
