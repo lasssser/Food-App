@@ -21,14 +21,13 @@ const { width, height } = Dimensions.get('window');
 const getMapHTML = (lat: number, lng: number, restaurants: any[]) => {
   const markers = restaurants.map(r => {
     if (!r.lat || !r.lng) return '';
-    const color = r.is_open ? '#22c55e' : '#ef4444';
-    const emoji = r.is_open ? '🟢' : '🔴';
+    const isOpen = r.is_open;
     return `
       L.marker([${r.lat}, ${r.lng}], {
         icon: L.divIcon({
-          html: '<div style="background:white;border:2px solid ${color};border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,0.3);">🍽️</div>',
-          iconSize: [36, 36],
-          iconAnchor: [18, 18],
+          html: '<div class="rest-pin ${isOpen ? 'open' : 'closed'}"><span>🍽️</span></div>',
+          iconSize: [44, 52],
+          iconAnchor: [22, 52],
           className: ''
         })
       }).addTo(map).on('click', function() {
@@ -41,9 +40,12 @@ const getMapHTML = (lat: number, lng: number, restaurants: any[]) => {
           distance_km: ${r.distance_km || 0},
           delivery_time: '${r.delivery_time || ''}',
         }));
-      }).bindPopup('<div style="text-align:center;font-family:sans-serif;direction:rtl;"><b>${r.name.replace(/'/g, "\\'")}</b><br>${emoji} ${r.is_open ? "مفتوح" : "مغلق"}<br>${r.distance_km ? r.distance_km + " كم" : ""}</div>');
+      });
     `;
   }).join('\n');
+
+  const restCount = restaurants.filter(r => r.lat && r.lng).length;
+  const openCount = restaurants.filter(r => r.lat && r.lng && r.is_open).length;
 
   return `
 <!DOCTYPE html>
@@ -55,25 +57,111 @@ const getMapHTML = (lat: number, lng: number, restaurants: any[]) => {
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body, #map { width: 100%; height: 100%; }
-    .user-location {
-      width: 16px; height: 16px;
-      background: #4285f4; border: 3px solid white;
-      border-radius: 50%; box-shadow: 0 0 10px rgba(66,133,244,0.5);
+    html, body, #map { width: 100%; height: 100%; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    
+    /* Restaurant pin */
+    .rest-pin {
+      width: 44px; height: 44px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
     }
-    .user-pulse {
-      width: 40px; height: 40px;
-      background: rgba(66,133,244,0.15);
+    .rest-pin span { transform: rotate(45deg); font-size: 20px; }
+    .rest-pin.open { background: linear-gradient(135deg, #E53935, #FF6B35); }
+    .rest-pin.closed { background: #9e9e9e; }
+    
+    /* User location */
+    .user-dot {
+      width: 18px; height: 18px;
+      background: #E53935; border: 3px solid white;
       border-radius: 50%;
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      animation: pulse 2s infinite;
+      box-shadow: 0 0 0 6px rgba(229,57,53,0.2), 0 2px 8px rgba(0,0,0,0.3);
+      animation: userPulse 2.5s infinite;
     }
-    @keyframes pulse { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.6} 50%{transform:translate(-50%,-50%) scale(1.5);opacity:0} }
+    @keyframes userPulse {
+      0%,100% { box-shadow: 0 0 0 6px rgba(229,57,53,0.2), 0 2px 8px rgba(0,0,0,0.3); }
+      50% { box-shadow: 0 0 0 16px rgba(229,57,53,0.05), 0 2px 8px rgba(0,0,0,0.3); }
+    }
+    
+    /* Custom zoom controls */
+    .custom-zoom {
+      position: absolute; bottom: 100px; right: 16px; z-index: 1000;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .zoom-btn {
+      width: 44px; height: 44px;
+      background: white; border: none; border-radius: 12px;
+      font-size: 22px; font-weight: bold; color: #333;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      cursor: pointer; user-select: none;
+      transition: background 0.15s;
+    }
+    .zoom-btn:active { background: #f0f0f0; }
+    
+    /* My location button */
+    .my-loc-btn {
+      position: absolute; bottom: 100px; left: 16px; z-index: 1000;
+      width: 44px; height: 44px;
+      background: white; border: none; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      cursor: pointer;
+    }
+    .my-loc-btn:active { background: #f0f0f0; }
+    
+    /* Info bar */
+    .info-bar {
+      position: absolute; bottom: 16px; left: 16px; right: 16px; z-index: 1000;
+      background: linear-gradient(135deg, #E53935, #FF6B35);
+      border-radius: 16px; padding: 12px 16px;
+      display: flex; align-items: center; justify-content: center; gap: 16px;
+      box-shadow: 0 4px 16px rgba(229,57,53,0.3);
+    }
+    .info-item { text-align: center; color: white; }
+    .info-num { font-size: 20px; font-weight: bold; }
+    .info-label { font-size: 11px; opacity: 0.9; }
+    .info-divider { width: 1px; height: 30px; background: rgba(255,255,255,0.3); }
+    
+    /* Hide default leaflet controls */
+    .leaflet-control-zoom { display: none !important; }
+    .leaflet-control-attribution { display: none !important; }
   </style>
 </head>
 <body>
   <div id="map"></div>
+  
+  <!-- Custom Zoom -->
+  <div class="custom-zoom">
+    <button class="zoom-btn" onclick="map.zoomIn()">+</button>
+    <button class="zoom-btn" onclick="map.zoomOut()">−</button>
+  </div>
+  
+  <!-- My Location -->
+  <button class="my-loc-btn" onclick="map.flyTo([${lat}, ${lng}], 15, {duration: 1})">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+  </button>
+  
+  <!-- Info Bar -->
+  <div class="info-bar">
+    <div class="info-item">
+      <div class="info-num">${restCount}</div>
+      <div class="info-label">مطعم</div>
+    </div>
+    <div class="info-divider"></div>
+    <div class="info-item">
+      <div class="info-num">${openCount}</div>
+      <div class="info-label">مفتوح الآن</div>
+    </div>
+    <div class="info-divider"></div>
+    <div class="info-item">
+      <div style="font-size:16px;font-weight:bold;">أكلة عالسريع</div>
+      <div class="info-label">اطلب من أي مكان</div>
+    </div>
+  </div>
+  
   <script>
     var map = L.map('map', {
       zoomControl: false,
@@ -84,14 +172,12 @@ const getMapHTML = (lat: number, lng: number, restaurants: any[]) => {
       maxZoom: 19,
     }).addTo(map);
 
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-    // User location marker
+    // User location
     L.marker([${lat}, ${lng}], {
       icon: L.divIcon({
-        html: '<div style="position:relative;"><div class="user-pulse"></div><div class="user-location"></div></div>',
-        iconSize: [16, 16],
-        iconAnchor: [8, 8],
+        html: '<div class="user-dot"></div>',
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
         className: ''
       })
     }).addTo(map);
