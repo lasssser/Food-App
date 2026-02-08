@@ -196,7 +196,7 @@ export default function LoginScreen() {
                 </Link>
                 <Text style={styles.registerText}>ليس لديك حساب؟ </Text>
               </View>
-            </View>
+            </Animated.View>
 
             {/* Footer */}
             <Text style={styles.footer}>Powered by Wethaq Digital Solutions</Text>
