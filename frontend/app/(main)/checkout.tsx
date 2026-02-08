@@ -280,10 +280,16 @@ export default function CheckoutScreen() {
         <View style={{ width: 24 }} />
       </View>
 
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 320 }}
+        keyboardShouldPersistTaps="handled"
       >
         {/* Address Section */}
         <View style={styles.section}>
