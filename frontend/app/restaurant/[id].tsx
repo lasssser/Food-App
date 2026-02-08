@@ -498,7 +498,7 @@ export default function RestaurantScreen() {
           )}
         </ScrollView>
       </View>
-      </Animated.View>
+
       {items.length > 0 && (
         <TouchableOpacity
           style={styles.floatingCart}
