@@ -803,9 +803,49 @@ const styles = StyleSheet.create({
   menuContainer: {
     flex: 1,
     backgroundColor: COLORS.background,
-    borderTopLeftRadius: RADIUS.xl,
-    borderTopRightRadius: RADIUS.xl,
-    marginTop: -RADIUS.xl,
+  },
+
+  // Info Strip
+  infoStrip: {
+    flexDirection: 'row-reverse',
+    backgroundColor: COLORS.surface,
+    marginHorizontal: SPACING.lg,
+    marginTop: -20,
+    borderRadius: RADIUS.lg,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.sm,
+    ...Platform.select({
+      web: { boxShadow: '0px 4px 20px rgba(0,0,0,0.1)' },
+      default: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 8 },
+    }),
+  },
+  infoStripItem: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+  },
+  infoStripIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  infoStripText: {
+    fontSize: 13,
+    fontFamily: 'Cairo_600SemiBold',
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  infoStripLabel: {
+    fontSize: 10,
+    fontFamily: 'Cairo_400Regular',
+    color: COLORS.textLight,
+  },
+  infoStripDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: COLORS.divider,
   },
 
   // Category Tabs
