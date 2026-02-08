@@ -120,6 +120,14 @@ export default function RestaurantSettings() {
       onPress: () => router.push('/(restaurant)/restaurant-info'),
     },
     {
+      id: 'restaurant-location',
+      title: 'موقع المطعم على الخريطة',
+      subtitle: 'حدد موقعك ليظهر للزبائن',
+      icon: 'location' as const,
+      color: '#E91E63',
+      onPress: () => setShowLocationPicker(true),
+    },
+    {
       id: 'orders',
       title: 'سجل الطلبات',
       subtitle: 'عرض جميع الطلبات السابقة',
