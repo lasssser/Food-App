@@ -675,16 +675,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.divider,
+    paddingVertical: SPACING.lg,
   },
   headerTitle: {
     fontSize: 20,
-    fontFamily: 'Cairo_400Regular',
+    fontFamily: 'Cairo_700Bold',
     fontWeight: 'bold',
-    color: COLORS.textPrimary,
+    color: '#fff',
   },
 
   // Scroll View
@@ -694,7 +691,12 @@ const styles = StyleSheet.create({
 
   // Section
   section: {
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.md,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
     padding: SPACING.lg,
+    ...SHADOWS.small,
   },
   sectionHeader: {
     flexDirection: 'row-reverse',
@@ -703,12 +705,12 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontFamily: 'Cairo_400Regular',
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontFamily: 'Cairo_600SemiBold',
+    fontWeight: '600',
     color: COLORS.textPrimary,
     textAlign: 'right',
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.sm,
   },
 
   // Address Card
