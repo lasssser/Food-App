@@ -828,59 +828,75 @@ export default function RestaurantOrders() {
                     <Text style={styles.noDriversHint}>جرب لاحقاً أو استخدم سائقين مطعمك</Text>
                   </View>
                 ) : (
-                  platformDrivers.map((driver) => (
-                    <TouchableOpacity
-                      key={driver.id}
-                      style={styles.platformDriverCard}
-                      onPress={() => handleAssignPlatformDriver(driver.id)}
-                      disabled={assigning}
-                    >
-                      <View style={styles.platformDriverInfo2}>
-                        <View style={styles.platformDriverAvatar}>
-                          <Ionicons name="bicycle" size={24} color={COLORS.info} />
-                          {driver.is_online && <View style={styles.onlineDot} />}
-                        </View>
-                        <View style={styles.platformDriverDetails}>
-                          <Text style={styles.platformDriverName}>{driver.name}</Text>
-                          <View style={styles.platformDriverStats}>
-                            <View style={styles.platformDriverStat}>
-                              <Ionicons name="star" size={12} color="#FFD700" />
-                              <Text style={styles.platformDriverStatText}>{driver.rating.toFixed(1)}</Text>
-                            </View>
-                            <View style={styles.platformDriverStat}>
-                              <Ionicons name="checkmark-done" size={12} color={COLORS.success} />
-                              <Text style={styles.platformDriverStatText}>{driver.total_deliveries} توصيلة</Text>
-                            </View>
-                            {driver.current_orders > 0 && (
-                              <View style={[styles.platformDriverStat, styles.busyStat]}>
-                                <Ionicons name="time" size={12} color={COLORS.warning} />
-                                <Text style={[styles.platformDriverStatText, { color: COLORS.warning }]}>
-                                  {driver.current_orders} طلب نشط
-                                </Text>
-                              </View>
-                            )}
+                  platformDrivers.map((driver: any) => (
+                    <View key={driver.id} style={[styles.platformDriverCard, driver.is_favorite && { borderColor: '#FFD700', borderWidth: 1.5, backgroundColor: '#FFFDE7' }]}>
+                      <TouchableOpacity
+                        style={{ flex: 1, flexDirection: 'row-reverse', alignItems: 'center' }}
+                        onPress={() => handleAssignPlatformDriver(driver.id)}
+                        disabled={assigning}
+                      >
+                        <View style={styles.platformDriverInfo2}>
+                          <View style={styles.platformDriverAvatar}>
+                            <Ionicons name="bicycle" size={24} color={driver.is_favorite ? '#FFD700' : COLORS.info} />
+                            {driver.is_online && <View style={styles.onlineDot} />}
                           </View>
-                          {/* Distance and ETA */}
-                          {driver.distance_km !== undefined && (
-                            <View style={styles.platformDriverDistance}>
-                              <View style={styles.distanceBadge}>
-                                <Ionicons name="location" size={12} color={COLORS.info} />
-                                <Text style={styles.distanceText}>{driver.distance_km} كم</Text>
+                          <View style={styles.platformDriverDetails}>
+                            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6 }}>
+                              <Text style={styles.platformDriverName}>{driver.name}</Text>
+                              {driver.is_favorite && <Ionicons name="star" size={14} color="#FFD700" />}
+                            </View>
+                            <View style={styles.platformDriverStats}>
+                              <View style={styles.platformDriverStat}>
+                                <Ionicons name="star" size={12} color="#FFD700" />
+                                <Text style={styles.platformDriverStatText}>{driver.rating.toFixed(1)}</Text>
                               </View>
-                              {driver.estimated_time && (
-                                <View style={styles.etaBadge}>
-                                  <Ionicons name="time-outline" size={12} color={COLORS.success} />
-                                  <Text style={styles.etaText}>{driver.estimated_time}</Text>
+                              <View style={styles.platformDriverStat}>
+                                <Ionicons name="checkmark-done" size={12} color={COLORS.success} />
+                                <Text style={styles.platformDriverStatText}>{driver.total_deliveries} توصيلة</Text>
+                              </View>
+                              {driver.current_orders > 0 && (
+                                <View style={[styles.platformDriverStat, styles.busyStat]}>
+                                  <Ionicons name="time" size={12} color={COLORS.warning} />
+                                  <Text style={[styles.platformDriverStatText, { color: COLORS.warning }]}>
+                                    {driver.current_orders} طلب نشط
+                                  </Text>
                                 </View>
                               )}
                             </View>
-                          )}
+                            {driver.distance_km !== undefined && (
+                              <View style={styles.platformDriverDistance}>
+                                <View style={styles.distanceBadge}>
+                                  <Ionicons name="location" size={12} color={COLORS.info} />
+                                  <Text style={styles.distanceText}>{driver.distance_km} كم</Text>
+                                </View>
+                                {driver.estimated_time && (
+                                  <View style={styles.etaBadge}>
+                                    <Ionicons name="time-outline" size={12} color={COLORS.success} />
+                                    <Text style={styles.etaText}>{driver.estimated_time}</Text>
+                                  </View>
+                                )}
+                              </View>
+                            )}
+                          </View>
                         </View>
-                      </View>
-                      <View style={styles.selectArrow}>
-                        <Ionicons name="chevron-back" size={20} color={COLORS.info} />
-                      </View>
-                    </TouchableOpacity>
+                      </TouchableOpacity>
+                      {/* Favorite toggle */}
+                      <TouchableOpacity
+                        style={{ padding: 8 }}
+                        onPress={async () => {
+                          try {
+                            if (driver.is_favorite) {
+                              await restaurantPanelAPI.removeFavoriteDriver(driver.id);
+                            } else {
+                              await restaurantPanelAPI.addFavoriteDriver(driver.id);
+                            }
+                            fetchDrivers();
+                          } catch (e) { console.error(e); }
+                        }}
+                      >
+                        <Ionicons name={driver.is_favorite ? "heart" : "heart-outline"} size={22} color={driver.is_favorite ? COLORS.primary : COLORS.textLight} />
+                      </TouchableOpacity>
+                    </View>
                   ))
                 )}
               </View>
