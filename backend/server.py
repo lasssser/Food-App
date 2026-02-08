@@ -474,7 +474,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=401, detail="Invalid token")
 
 async def create_notification(user_id: str, title: str, body: str, notif_type: str, data: dict = None):
-    """Create a notification for a user"""
+    """Create a notification for a user AND send push notification"""
     notification = Notification(
         user_id=user_id,
         title=title,
@@ -483,6 +483,29 @@ async def create_notification(user_id: str, title: str, body: str, notif_type: s
         data=data
     )
     await db.notifications.insert_one(notification.dict())
+    
+    # Determine push channel based on notification type
+    channel_id = "default"
+    if notif_type in ["new_order", "order_ready"]:
+        channel_id = "new-orders"
+    elif notif_type in ["order_status", "order_update", "complaint_update"]:
+        channel_id = "order-updates"
+    
+    # Send push notification in background
+    try:
+        push_data = data or {}
+        # Add navigation hints
+        if notif_type == "new_order":
+            push_data["screen"] = "RestaurantOrders"
+        elif notif_type == "order_ready":
+            push_data["screen"] = "MyOrders"
+        elif notif_type == "order_status":
+            push_data["screen"] = "Orders"
+        
+        await send_push_to_user(user_id, title, body, push_data, channel_id)
+    except Exception as e:
+        logger.error(f"Failed to send push for notification: {e}")
+    
     return notification
 
 # ==================== Push Notification Helpers ====================
