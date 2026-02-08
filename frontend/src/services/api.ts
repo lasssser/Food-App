@@ -347,6 +347,7 @@ export const restaurantPanelAPI = {
     const response = await api.put(`/restaurant/location?lat=${lat}&lng=${lng}`);
     return response.data;
   },
+  // Reports
   getReports: async (period: string = 'week') => {
     const response = await api.get(`/restaurant/reports?period=${period}`);
     return response.data;
