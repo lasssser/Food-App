@@ -872,41 +872,102 @@ export default function ProfileScreen() {
               <View style={{ width: 24 }} />
             </View>
 
-            <TextInput
-              style={styles.modalInput}
-              placeholder="موضوع الشكوى"
-              placeholderTextColor={COLORS.textLight}
-              value={complaintSubject}
-              onChangeText={setComplaintSubject}
-              textAlign="right"
-            />
+            <ScrollView style={{ maxHeight: 450 }} keyboardShouldPersistTaps="handled">
+              {/* Complaint Type */}
+              <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 13, color: COLORS.textSecondary, textAlign: 'right', marginBottom: 8, marginHorizontal: SPACING.lg }}>نوع الشكوى</Text>
+              <View style={{ flexDirection: 'row-reverse', gap: 8, marginBottom: SPACING.md, marginHorizontal: SPACING.lg }}>
+                {[
+                  { key: 'general', label: 'عامة', icon: 'chatbubble-outline' },
+                  { key: 'restaurant', label: 'مطعم', icon: 'restaurant-outline' },
+                  { key: 'order', label: 'طلب', icon: 'receipt-outline' },
+                ].map(t => (
+                  <TouchableOpacity
+                    key={t.key}
+                    onPress={() => { setComplaintType(t.key); if (t.key === 'general') setSelectedOrderForComplaint(null); }}
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row-reverse',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 4,
+                      paddingVertical: 10,
+                      borderRadius: RADIUS.md,
+                      backgroundColor: complaintType === t.key ? `${COLORS.primary}15` : COLORS.background,
+                      borderWidth: 1.5,
+                      borderColor: complaintType === t.key ? COLORS.primary : COLORS.border,
+                    }}
+                  >
+                    <Ionicons name={t.icon as any} size={16} color={complaintType === t.key ? COLORS.primary : COLORS.textLight} />
+                    <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 12, color: complaintType === t.key ? COLORS.primary : COLORS.textSecondary }}>{t.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
 
-            <TextInput
-              style={[styles.modalInput, { height: 120, textAlignVertical: 'top' }]}
-              placeholder="اكتب تفاصيل الشكوى هنا..."
-              placeholderTextColor={COLORS.textLight}
-              value={complaintMessage}
-              onChangeText={setComplaintMessage}
-              textAlign="right"
-              multiline
-              numberOfLines={5}
-            />
+              {/* Order Picker - only for restaurant/order complaints */}
+              {(complaintType === 'restaurant' || complaintType === 'order') && recentOrders.length > 0 && (
+                <View style={{ marginHorizontal: SPACING.lg, marginBottom: SPACING.md }}>
+                  <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 13, color: COLORS.textSecondary, textAlign: 'right', marginBottom: 8 }}>اختر الطلب المتعلق بالشكوى</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                    {recentOrders.slice(0, 10).map(order => (
+                      <TouchableOpacity
+                        key={order.id}
+                        onPress={() => setSelectedOrderForComplaint(selectedOrderForComplaint === order.id ? null : order.id)}
+                        style={{
+                          paddingHorizontal: 12,
+                          paddingVertical: 8,
+                          borderRadius: RADIUS.md,
+                          backgroundColor: selectedOrderForComplaint === order.id ? `${COLORS.primary}15` : COLORS.background,
+                          borderWidth: 1.5,
+                          borderColor: selectedOrderForComplaint === order.id ? COLORS.primary : COLORS.border,
+                          minWidth: 120,
+                        }}
+                      >
+                        <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 12, color: COLORS.textPrimary, textAlign: 'right' }}>{order.restaurant_name || 'مطعم'}</Text>
+                        <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 11, color: COLORS.textLight, textAlign: 'right' }}>#{String(order.id || '').slice(0, 8)}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
 
-            <TouchableOpacity 
-              style={[styles.saveButton, submittingComplaint && { opacity: 0.7 }]} 
-              onPress={handleSubmitComplaint} 
-              activeOpacity={0.7}
-              disabled={submittingComplaint}
-            >
-              <LinearGradient
-                colors={[COLORS.primary, COLORS.primaryDark]}
-                style={styles.saveButtonGradient}
-              >
-                <Text style={styles.saveButtonText}>
-                  {submittingComplaint ? 'جاري الإرسال...' : 'إرسال الشكوى'}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+              <TextInput
+                style={[styles.modalInput, { marginHorizontal: SPACING.lg }]}
+                placeholder="موضوع الشكوى"
+                placeholderTextColor={COLORS.textLight}
+                value={complaintSubject}
+                onChangeText={setComplaintSubject}
+                textAlign="right"
+              />
+
+              <TextInput
+                style={[styles.modalInput, { height: 120, textAlignVertical: 'top', marginHorizontal: SPACING.lg }]}
+                placeholder="اكتب تفاصيل الشكوى هنا..."
+                placeholderTextColor={COLORS.textLight}
+                value={complaintMessage}
+                onChangeText={setComplaintMessage}
+                textAlign="right"
+                multiline
+                numberOfLines={5}
+              />
+
+              <View style={{ marginHorizontal: SPACING.lg, marginBottom: SPACING.lg }}>
+                <TouchableOpacity 
+                  style={[styles.saveButton, submittingComplaint && { opacity: 0.7 }]} 
+                  onPress={handleSubmitComplaint} 
+                  activeOpacity={0.7}
+                  disabled={submittingComplaint}
+                >
+                  <LinearGradient
+                    colors={[COLORS.primary, COLORS.primaryDark]}
+                    style={styles.saveButtonGradient}
+                  >
+                    <Text style={styles.saveButtonText}>
+                      {submittingComplaint ? 'جاري الإرسال...' : 'إرسال الشكوى'}
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </View>
         </KeyboardAvoidingView>
       </Modal>
