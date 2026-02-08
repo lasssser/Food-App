@@ -2081,15 +2081,15 @@ async def update_driver_location(location: DriverLocation, current_user: dict = 
 
 @api_router.get("/orders/{order_id}/driver-location")
 async def get_driver_location_for_order(order_id: str, current_user: dict = Depends(get_current_user)):
-    """Get live driver location for an order (for customer/restaurant tracking)"""
+    """Get live driver location for an order with ETA"""
     order = await db.orders.find_one({"id": order_id})
     if not order:
         raise HTTPException(status_code=404, detail="الطلب غير موجود")
     
-    # Only allow order owner or restaurant owner to track
     is_customer = order.get("user_id") == current_user["id"]
     is_restaurant = current_user.get("role") == "restaurant"
-    if not is_customer and not is_restaurant:
+    is_driver = current_user.get("role") == "driver"
+    if not is_customer and not is_restaurant and not is_driver:
         raise HTTPException(status_code=403, detail="غير مصرح")
     
     driver_id = order.get("driver_id")
@@ -2103,12 +2103,68 @@ async def get_driver_location_for_order(order_id: str, current_user: dict = Depe
     location = driver.get("current_location")
     location_time = driver.get("location_updated_at")
     
+    # Get restaurant location
+    restaurant = await db.restaurants.find_one({"id": order.get("restaurant_id")})
+    rest_lat = restaurant.get("lat") if restaurant else None
+    rest_lng = restaurant.get("lng") if restaurant else None
+    rest_name = restaurant.get("name", "") if restaurant else ""
+    
+    # Calculate distances and ETA
+    driver_lat = location.get("lat") if location and isinstance(location, dict) else None
+    driver_lng = location.get("lng") if location and isinstance(location, dict) else None
+    
+    distance_to_restaurant = None
+    distance_to_customer = None
+    eta_to_restaurant = None
+    eta_to_customer = None
+    
+    if driver_lat and driver_lng:
+        # Distance to restaurant
+        if rest_lat and rest_lng:
+            distance_to_restaurant = round(calculate_distance(driver_lat, driver_lng, rest_lat, rest_lng), 1)
+            eta_to_restaurant = max(3, int(distance_to_restaurant * 3 + 2))  # ~20km/h avg speed in city + 2min buffer
+        
+        # Distance to customer (from delivery address or order address)
+        order_address = order.get("address", {})
+        # Use restaurant location as proxy for delivery route estimate
+        if rest_lat and rest_lng and distance_to_restaurant is not None:
+            # Total delivery estimate = to restaurant + prep + to customer (estimate 1.5x distance)
+            total_distance = distance_to_restaurant * 2.5  # rough estimate
+            eta_to_customer = max(5, int(total_distance * 3 + 5))
+    
+    order_status = order.get("order_status", "")
+    
+    # Determine current phase
+    phase = "waiting"  # waiting, going_to_restaurant, at_restaurant, delivering, arrived
+    phase_text = "بانتظار السائق"
+    if order_status in ["driver_assigned"]:
+        phase = "going_to_restaurant"
+        phase_text = f"السائق في الطريق للمطعم"
+    elif order_status in ["picked_up"]:
+        phase = "at_restaurant"  
+        phase_text = "السائق استلم الطلب من المطعم"
+    elif order_status in ["out_for_delivery"]:
+        phase = "delivering"
+        phase_text = "السائق في الطريق إليك"
+    elif order_status in ["delivered"]:
+        phase = "arrived"
+        phase_text = "تم التوصيل"
+    
     return {
         "driver_location": location,
         "driver_name": driver.get("name", ""),
         "driver_phone": driver.get("phone", ""),
         "location_updated_at": location_time.isoformat() if location_time and hasattr(location_time, 'isoformat') else str(location_time or ""),
-        "order_status": order.get("order_status"),
+        "order_status": order_status,
+        "restaurant_name": rest_name,
+        "restaurant_lat": rest_lat,
+        "restaurant_lng": rest_lng,
+        "distance_to_restaurant_km": distance_to_restaurant,
+        "distance_to_customer_km": distance_to_customer,
+        "eta_to_restaurant_min": eta_to_restaurant,
+        "eta_to_customer_min": eta_to_customer,
+        "phase": phase,
+        "phase_text": phase_text,
     }
 
 @api_router.get("/driver/available-orders")
