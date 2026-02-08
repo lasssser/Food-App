@@ -220,7 +220,7 @@ export default function RestaurantOrders() {
         setTimeout(() => {
           // Open WhatsApp with prepared message
           const formattedPhone = driver.phone.startsWith('0') ? `963${driver.phone.slice(1)}` : driver.phone;
-          const message = `مرحباً ${driver.name}، لدينا طلب جديد جاهز للتوصيل!\n\n📍 العنوان: ${selectedOrder.address?.address_line}\n💰 المبلغ: ${selectedOrder.total.toLocaleString()} ل.س\n\nهل أنت متاح؟`;
+          const message = `مرحباً ${driver.name}، لدينا طلب جديد جاهز للتوصيل!\n\n📍 العنوان: ${selectedOrder.address?.address_line}\n💰 المبلغ: ${safeFormatNumber(selectedOrder.total)} ل.س\n\nهل أنت متاح؟`;
           Linking.openURL(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`);
         }, 500);
       } else {
@@ -722,7 +722,7 @@ export default function RestaurantOrders() {
                   <Text style={styles.orderSummaryLabel}>رقم الطلب</Text>
                 </View>
                 <View style={styles.orderSummaryRow}>
-                  <Text style={styles.orderSummaryValue}>{selectedOrder.total.toLocaleString()} ل.س</Text>
+                  <Text style={styles.orderSummaryValue}>{safeFormatNumber(selectedOrder.total)} ل.س</Text>
                   <Text style={styles.orderSummaryLabel}>المبلغ</Text>
                 </View>
                 <View style={styles.orderSummaryRow}>
