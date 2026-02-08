@@ -1,11 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator, StyleSheet, I18nManager, Text, Image, Animated, Easing } from 'react-native';
-import { useAuthStore } from '../src/store/authStore';
-import { seedAPI } from '../src/services/api';
 import { COLORS } from '../src/constants/theme';
-import { usePushNotifications } from '../src/hooks/usePushNotifications';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts, Cairo_300Light, Cairo_400Regular, Cairo_500Medium, Cairo_600SemiBold, Cairo_700Bold } from '@expo-google-fonts/cairo';
 
