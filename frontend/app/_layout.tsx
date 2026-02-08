@@ -9,20 +9,9 @@ import { useFonts, Cairo_300Light, Cairo_400Regular, Cairo_500Medium, Cairo_600S
 // Keep splash screen visible while fonts load
 SplashScreen.preventAutoHideAsync();
 
-// Force RTL for Arabic - must be at top level before any render
-if (!I18nManager.isRTL) {
-  I18nManager.allowRTL(true);
-  I18nManager.forceRTL(true);
-}
-
-// Set default text style for all Text components
-import { Platform } from 'react-native';
-if (Platform.OS !== 'web') {
-  const originalRender = Text.render;
-  if (originalRender) {
-    // Don't override render on new architecture
-  }
-}
+// Force RTL for Arabic
+I18nManager.allowRTL(true);
+I18nManager.forceRTL(true);
 
 // Animated Splash Screen Component
 function SplashView() {
