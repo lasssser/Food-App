@@ -119,13 +119,21 @@ export default function NearbyMapScreen() {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status === 'granted') {
-          const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-          lat = loc.coords.latitude;
-          lng = loc.coords.longitude;
+          // Add timeout to prevent infinite loading
+          const locationPromise = Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low });
+          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject('timeout'), 5000));
+          
+          try {
+            const loc = await Promise.race([locationPromise, timeoutPromise]) as any;
+            lat = loc.coords.latitude;
+            lng = loc.coords.longitude;
+          } catch (e) {
+            console.log('Location timeout, using default');
+          }
           setUserLocation({ lat, lng });
         }
       } catch (e) {
-        console.log('Location error, using default');
+        console.log('Location permission denied, using default');
       }
 
       try {
@@ -136,7 +144,10 @@ export default function NearbyMapScreen() {
       }
       setLoading(false);
     };
-    init();
+    
+    // Safety timeout - always stop loading after 8 seconds
+    const safetyTimeout = setTimeout(() => setLoading(false), 8000);
+    init().finally(() => clearTimeout(safetyTimeout));
   }, []);
 
   const handleWebViewMessage = (event: any) => {
