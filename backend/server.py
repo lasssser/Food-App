@@ -857,10 +857,28 @@ async def get_restaurant_orders(current_user: dict = Depends(get_current_user)):
         "order_status": {"$nin": ["delivered", "cancelled"]}
     }).sort("created_at", -1).to_list(100)
     
+    clean_orders = []
     for order in orders:
         order.pop("_id", None)
+        # Clean items - remove _id from each item
+        if "items" in order and isinstance(order["items"], list):
+            for item in order["items"]:
+                if isinstance(item, dict):
+                    item.pop("_id", None)
+        # Ensure required fields exist with defaults
+        order.setdefault("total", 0)
+        order.setdefault("subtotal", 0)
+        order.setdefault("delivery_fee", 0)
+        order.setdefault("items", [])
+        order.setdefault("payment_method", "cod")
+        order.setdefault("payment_status", "unpaid")
+        order.setdefault("order_status", "pending")
+        order.setdefault("address", {"label": "غير محدد", "address_line": ""})
+        order.setdefault("created_at", "")
+        order.setdefault("updated_at", "")
+        clean_orders.append(order)
     
-    return orders
+    return clean_orders
 
 @api_router.get("/restaurant/orders/history")
 async def get_restaurant_order_history(current_user: dict = Depends(get_current_user)):
