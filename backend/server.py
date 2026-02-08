@@ -3123,17 +3123,6 @@ async def update_user_info(
     
     return {"message": "تم تحديث بيانات المستخدم بنجاح"}
 
-class ResetPasswordRequest(BaseModel):
-    new_password: str
-
-class PasswordResetRequestCreate(BaseModel):
-    phone: str
-    reason: Optional[str] = None
-
-class ChangePasswordRequest(BaseModel):
-    current_password: str
-    new_password: str
-
 # Password Reset Request - User submits request, Admin approves
 @api_router.post("/auth/forgot-password")
 async def request_password_reset(request: PasswordResetRequestCreate):
