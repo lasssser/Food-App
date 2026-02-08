@@ -839,9 +839,9 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
   paymentDesc: {
-    fontSize: 13,
+    fontSize: 11,
     fontFamily: 'Cairo_400Regular',
-    color: COLORS.textSecondary,
+    color: COLORS.textLight,
     marginTop: 2,
   },
   paymentCardDisabled: {
