@@ -3,10 +3,14 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { usePushNotifications } from '../../src/hooks/usePushNotifications';
 import { COLORS } from '../../src/constants/theme';
 
 export default function DriverLayout() {
   const insets = useSafeAreaInsets();
+  
+  // Register push notifications
+  usePushNotifications();
   
   return (
     <Tabs
