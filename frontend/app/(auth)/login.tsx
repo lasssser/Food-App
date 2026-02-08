@@ -196,6 +196,11 @@ export default function LoginScreen() {
                 </Link>
                 <Text style={styles.registerText}>ليس لديك حساب؟ </Text>
               </View>
+
+              {/* Forgot Password */}
+              <TouchableOpacity onPress={() => router.push('/(auth)/forgot-password')} style={{ alignItems: 'center', marginTop: 12 }}>
+                <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 13, color: COLORS.primary }}>نسيت كلمة المرور؟</Text>
+              </TouchableOpacity>
             </Animated.View>
 
             {/* Footer */}
