@@ -2071,10 +2071,45 @@ async def update_driver_location(location: DriverLocation, current_user: dict = 
     
     await db.users.update_one(
         {"id": current_user["id"]},
-        {"$set": {"current_location": {"lat": location.lat, "lng": location.lng}}}
+        {"$set": {
+            "current_location": {"lat": location.lat, "lng": location.lng},
+            "location_updated_at": datetime.utcnow()
+        }}
     )
     
     return {"message": "تم تحديث الموقع"}
+
+@api_router.get("/orders/{order_id}/driver-location")
+async def get_driver_location_for_order(order_id: str, current_user: dict = Depends(get_current_user)):
+    """Get live driver location for an order (for customer/restaurant tracking)"""
+    order = await db.orders.find_one({"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    # Only allow order owner or restaurant owner to track
+    is_customer = order.get("user_id") == current_user["id"]
+    is_restaurant = current_user.get("role") == "restaurant"
+    if not is_customer and not is_restaurant:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    driver_id = order.get("driver_id")
+    if not driver_id:
+        return {"driver_location": None, "message": "لم يتم تعيين سائق بعد"}
+    
+    driver = await db.users.find_one({"id": driver_id})
+    if not driver:
+        return {"driver_location": None, "message": "السائق غير موجود"}
+    
+    location = driver.get("current_location")
+    location_time = driver.get("location_updated_at")
+    
+    return {
+        "driver_location": location,
+        "driver_name": driver.get("name", ""),
+        "driver_phone": driver.get("phone", ""),
+        "location_updated_at": location_time.isoformat() if location_time and hasattr(location_time, 'isoformat') else str(location_time or ""),
+        "order_status": order.get("order_status"),
+    }
 
 @api_router.get("/driver/available-orders")
 async def get_available_orders_for_driver(current_user: dict = Depends(get_current_user)):
