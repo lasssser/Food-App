@@ -134,18 +134,48 @@ export default function RestaurantOrders() {
   const [assigning, setAssigning] = useState(false);
   const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
 
+  // Sanitize order data to prevent render crashes on Android
+  const sanitizeOrder = (order: any): Order => {
+    return {
+      ...order,
+      id: String(order.id || ''),
+      order_status: String(order.order_status || 'pending'),
+      total: typeof order.total === 'number' ? order.total : Number(order.total) || 0,
+      subtotal: typeof order.subtotal === 'number' ? order.subtotal : Number(order.subtotal) || 0,
+      delivery_fee: typeof order.delivery_fee === 'number' ? order.delivery_fee : Number(order.delivery_fee) || 0,
+      payment_method: String(order.payment_method || 'cod'),
+      delivery_mode: String(order.delivery_mode || 'pending'),
+      driver_id: order.driver_id ? String(order.driver_id) : null,
+      driver_name: order.driver_name ? String(order.driver_name) : null,
+      created_at: order.created_at ? String(order.created_at) : new Date().toISOString(),
+      updated_at: order.updated_at ? String(order.updated_at) : new Date().toISOString(),
+      items: Array.isArray(order.items) ? order.items.map((item: any) => ({
+        ...item,
+        name: String(item.name || ''),
+        price: typeof item.price === 'number' ? item.price : Number(item.price) || 0,
+        quantity: typeof item.quantity === 'number' ? item.quantity : Number(item.quantity) || 0,
+        subtotal: typeof item.subtotal === 'number' ? item.subtotal : Number(item.subtotal) || 0,
+      })) : [],
+      address: order.address || { label: '', address_line: '' },
+      notes: order.notes ? String(order.notes) : '',
+      customer_name: order.customer_name ? String(order.customer_name) : '',
+      customer_phone: order.customer_phone ? String(order.customer_phone) : '',
+    };
+  };
+
   const fetchOrders = async () => {
     try {
       const data = await restaurantPanelAPI.getOrders();
       
       // Check for new orders and vibrate
-      const newOrders = data.filter((o: Order) => o.order_status === 'pending');
+      const sanitized = Array.isArray(data) ? data.map(sanitizeOrder) : [];
+      const newOrders = sanitized.filter((o: Order) => o.order_status === 'pending');
       if (newOrders.length > previousOrderCount && previousOrderCount > 0) {
         Vibration.vibrate([0, 500, 200, 500]);
       }
       setPreviousOrderCount(newOrders.length);
       
-      setOrders(data);
+      setOrders(sanitized);
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
