@@ -2051,8 +2051,11 @@ async def get_available_orders_for_driver(current_user: dict = Depends(get_curre
         # Add customer info
         customer = await db.users.find_one({"id": order.get("user_id")})
         if customer:
-            order["customer_name"] = customer.get("name", "")
-            order["customer_phone"] = customer.get("phone", "")
+            order["customer_name"] = order.get("recipient_name") or customer.get("name", "")
+            order["customer_phone"] = order.get("recipient_phone") or customer.get("phone", "")
+        else:
+            order["customer_name"] = order.get("recipient_name", "")
+            order["customer_phone"] = order.get("recipient_phone", "")
         result.append(order)
     
     return result
