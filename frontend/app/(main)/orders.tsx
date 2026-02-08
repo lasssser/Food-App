@@ -338,12 +338,19 @@ export default function OrdersScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
+      <Animated.View style={{ opacity: headerOpacity, transform: [{ translateY: headerSlide }] }}>
       <LinearGradient colors={[COLORS.primary, COLORS.primaryDark]} style={styles.header}>
         <Text style={styles.headerTitle}>طلباتي</Text>
-        <Text style={styles.headerSubtitle}>تتبع طلباتك الحالية والسابقة</Text>
+        <Text style={styles.headerSubtitle}>
+          {orders.length > 0 
+            ? `${orders.filter(o => !['delivered', 'cancelled'].includes(o.order_status)).length} طلبات نشطة`
+            : 'تتبع طلباتك الحالية والسابقة'}
+        </Text>
       </LinearGradient>
+      </Animated.View>
 
       {/* Orders List */}
+      <Animated.View style={{ flex: 1, opacity: listOpacity, transform: [{ translateY: listSlide }] }}>
       {orders.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons name="receipt-outline" size={70} color={COLORS.textLight} />
