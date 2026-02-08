@@ -256,6 +256,8 @@ class OrderCreate(BaseModel):
     payment_method: str  # cod, mtn_cash, syriatel_cash, shamcash
     payment_info: Optional[OrderPaymentInfo] = None  # معلومات الدفع للطرق الإلكترونية
     notes: Optional[str] = None
+    recipient_name: Optional[str] = None
+    recipient_phone: Optional[str] = None
 
 class OrderItem(BaseModel):
     menu_item_id: str
