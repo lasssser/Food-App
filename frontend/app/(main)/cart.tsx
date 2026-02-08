@@ -486,6 +486,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: RADIUS.xl,
     borderTopRightRadius: RADIUS.xl,
     padding: SPACING.xl,
+    paddingBottom: 100,
     borderWidth: 1, borderColor: "#e0e0e0",
   },
   summaryRow: {
