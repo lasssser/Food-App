@@ -99,7 +99,7 @@ export default function LoginScreen() {
             showsVerticalScrollIndicator={false}
           >
             {/* Top Red Section */}
-            <View style={styles.topSection}>
+            <Animated.View style={[styles.topSection, { opacity: logoOpacity, transform: [{ scale: logoScale }] }]}>
               <View style={styles.logoWrapper}>
                 <Image
                   source={require('../../assets/images/logo.png')}
@@ -109,10 +109,10 @@ export default function LoginScreen() {
               </View>
               <Text style={styles.appName}>أكلة عالسريع</Text>
               <Text style={styles.appSlogan}>اطلب أشهى المأكولات بضغطة زر</Text>
-            </View>
+            </Animated.View>
 
             {/* Form Section */}
-            <View style={styles.formSection}>
+            <Animated.View style={[styles.formSection, { opacity: formOpacity, transform: [{ translateY: formSlide }] }]}>
               <Text style={styles.formTitle}>تسجيل الدخول</Text>
 
               {/* Phone Input */}
