@@ -984,6 +984,16 @@ async def update_order_status_restaurant(
     if status_update.status == "ready" and not order.get("driver_id"):
         await notify_drivers_new_order(order, restaurant.get("city_id"))
     
+    # If order is ready and driver IS assigned, notify the assigned driver
+    if status_update.status == "ready" and order.get("driver_id"):
+        await create_notification(
+            order["driver_id"],
+            "📦 الطلب جاهز للاستلام!",
+            f"طلب من {restaurant['name']} جاهز - توجه للمطعم لاستلامه",
+            "order_ready",
+            {"order_id": order_id, "restaurant_name": restaurant["name"]}
+        )
+    
     return {"message": "تم تحديث حالة الطلب"}
 
 @api_router.put("/restaurant/toggle-status")
