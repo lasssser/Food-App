@@ -409,9 +409,12 @@ export default function NotificationsScreen() {
           </Text>
         </TouchableOpacity>
       </View>
+      </Animated.View>
 
       {/* Content */}
+      <Animated.View style={{ flex: 1, opacity: contentOpacity, transform: [{ translateY: contentSlide }] }}>
       {activeTab === 'all' ? renderNotificationsList() : renderSettings()}
+      </Animated.View>
     </SafeAreaView>
   );
 }
