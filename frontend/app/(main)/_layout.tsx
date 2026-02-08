@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCartStore } from '../../src/store/cartStore';
 import { notificationAPI } from '../../src/services/api';
 import { COLORS, RADIUS, SHADOWS } from '../../src/constants/theme';
@@ -9,6 +10,7 @@ import { COLORS, RADIUS, SHADOWS } from '../../src/constants/theme';
 export default function MainLayout() {
   const itemCount = useCartStore((state) => state.getItemCount());
   const [unreadCount, setUnreadCount] = useState(0);
+  const insets = useSafeAreaInsets();
 
   const fetchUnreadCount = async () => {
     try {
@@ -29,7 +31,7 @@ export default function MainLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { paddingBottom: Math.max(insets.bottom, 10), height: 70 + insets.bottom }],
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textLight,
         tabBarLabelStyle: styles.tabBarLabel,
