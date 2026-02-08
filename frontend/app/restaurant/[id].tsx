@@ -53,6 +53,29 @@ export default function RestaurantScreen() {
   const [selectedAddOns, setSelectedAddOns] = useState<{ [groupId: string]: string[] }>({});
   const [loadingAddOns, setLoadingAddOns] = useState(false);
 
+  // Animations
+  const heroOpacity = useRef(new Animated.Value(0)).current;
+  const infoSlide = useRef(new Animated.Value(40)).current;
+  const infoOpacity = useRef(new Animated.Value(0)).current;
+  const menuSlide = useRef(new Animated.Value(30)).current;
+  const menuOpacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (!loading && restaurant) {
+      Animated.sequence([
+        Animated.timing(heroOpacity, { toValue: 1, duration: 500, useNativeDriver: true }),
+        Animated.parallel([
+          Animated.timing(infoSlide, { toValue: 0, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+          Animated.timing(infoOpacity, { toValue: 1, duration: 350, useNativeDriver: true }),
+        ]),
+        Animated.parallel([
+          Animated.timing(menuSlide, { toValue: 0, duration: 400, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+          Animated.timing(menuOpacity, { toValue: 1, duration: 350, useNativeDriver: true }),
+        ]),
+      ]).start();
+    }
+  }, [loading, restaurant]);
+
   useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {
