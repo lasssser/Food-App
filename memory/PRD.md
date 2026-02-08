@@ -76,4 +76,6 @@ Full-stack food delivery application with FastAPI backend, React Native/Expo fro
 
 ## Key Credentials for Testing
 - Admin: `0900000000` / `admin`
+- Restaurant: `0123456789` / `rest123`
+- Driver: `0911111111` / `driver123`
 - Database: `yalla_nakol_prod` (production), `test_database` (dev pod)
