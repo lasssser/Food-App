@@ -401,7 +401,7 @@ export default function RestaurantOrders() {
     const orderStatus = String(order.order_status || 'pending');
     const status = STATUS_CONFIG[orderStatus] || { label: orderStatus, color: '#999', icon: 'help-circle' as keyof typeof Ionicons.glyphMap, bgColor: '#F5F5F5' };
     const action = STATUS_ACTIONS[orderStatus];
-    const showAssignButton = orderStatus === 'ready' && !order.driver_id;
+    const showAssignButton = (orderStatus === 'ready' || orderStatus === 'preparing') && !order.driver_id;
     const hasDriver = !!(order.driver_id && order.driver_name);
     const isExpanded = expandedOrder === order.id;
     const isPending = orderStatus === 'pending';
