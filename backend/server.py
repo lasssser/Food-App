@@ -452,6 +452,32 @@ class ComplaintResponse(BaseModel):
 
 # ==================== Helper Functions ====================
 
+SYRIA_TZ = ZoneInfo("Asia/Damascus")
+
+def get_syria_now():
+    """Get current time in Syria timezone"""
+    return datetime.now(SYRIA_TZ)
+
+def is_restaurant_open_by_hours(restaurant: dict) -> bool:
+    """Check if restaurant should be open based on working hours"""
+    opening_time = restaurant.get("opening_time")
+    closing_time = restaurant.get("closing_time")
+    if not opening_time or not closing_time:
+        return restaurant.get("is_open", True)
+    try:
+        now = get_syria_now()
+        current_minutes = now.hour * 60 + now.minute
+        open_parts = opening_time.split(":")
+        close_parts = closing_time.split(":")
+        open_minutes = int(open_parts[0]) * 60 + int(open_parts[1])
+        close_minutes = int(close_parts[0]) * 60 + int(close_parts[1])
+        if close_minutes > open_minutes:
+            return open_minutes <= current_minutes <= close_minutes
+        else:
+            return current_minutes >= open_minutes or current_minutes <= close_minutes
+    except Exception:
+        return restaurant.get("is_open", True)
+
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
@@ -459,7 +485,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 def create_access_token(user_id: str) -> str:
-    expire = datetime.utcnow() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+    expire = datetime.now(timezone.utc) + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
     to_encode = {"sub": user_id, "exp": expire}
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
