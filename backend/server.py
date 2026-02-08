@@ -1964,7 +1964,18 @@ async def driver_accept_order(order_id: str, current_user: dict = Depends(get_cu
         {"order_id": order_id}
     )
     
-    return {"message": "تم قبول الطلب بنجاح", "order": order}
+    # Clean order for response
+    if order:
+        order.pop("_id", None)
+        for key in ["created_at", "updated_at"]:
+            val = order.get(key)
+            if val and not isinstance(val, str):
+                try:
+                    order[key] = val.isoformat()
+                except:
+                    order[key] = str(val)
+    
+    return {"message": "تم قبول الطلب بنجاح", "order_id": order_id}
 
 @api_router.get("/driver/my-orders")
 async def get_driver_orders(current_user: dict = Depends(get_current_user)):
