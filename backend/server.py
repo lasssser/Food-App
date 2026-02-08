@@ -3292,9 +3292,6 @@ async def reset_user_password(
     
     return {"message": "تم إعادة تعيين كلمة المرور بنجاح"}
 
-class ChangeRoleRequest(BaseModel):
-    role: str
-
 @api_router.put("/admin/users/{user_id}/role")
 async def change_user_role(
     user_id: str,
@@ -3749,11 +3746,6 @@ async def clear_test_data(admin: dict = Depends(require_admin)):
         raise HTTPException(status_code=500, detail=f"فشل في حذف البيانات: {str(e)}")
 
 # ==================== App Settings ====================
-
-class AppSettingsUpdate(BaseModel):
-    whatsapp_number: Optional[str] = None
-    support_email: Optional[str] = None
-    support_phone: Optional[str] = None
 
 @api_router.get("/settings")
 async def get_app_settings():
