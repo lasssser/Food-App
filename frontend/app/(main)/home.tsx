@@ -254,9 +254,8 @@ export default function HomeScreen() {
               <Text style={styles.locationText} numberOfLines={1}>
                 {mapAddress 
                   ? mapAddress
-                  : selectedCity?.name 
-                    ? `${selectedCity.name}${selectedDistrict ? ` - ${selectedDistrict.name}` : ''}`
-                    : 'اختر موقعك'}
+                  : 'موقعك الحالي'
+                    }
               </Text>
             </View>
             <View style={styles.locationIcon}>
