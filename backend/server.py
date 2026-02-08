@@ -876,6 +876,11 @@ async def get_restaurants(
     result = []
     for r in restaurants:
         r["is_featured"] = r.get("is_featured", False)
+        # Auto-check working hours and update is_open
+        should_be_open = is_restaurant_open_by_hours(r)
+        if r.get("is_open", True) != should_be_open and r.get("opening_time") and r.get("closing_time"):
+            await db.restaurants.update_one({"id": r["id"]}, {"$set": {"is_open": should_be_open}})
+            r["is_open"] = should_be_open
         result.append(Restaurant(**r))
     return result
 
