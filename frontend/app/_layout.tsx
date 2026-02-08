@@ -146,57 +146,6 @@ function SplashView() {
   );
 }
 
-// Navigation handler component - must be inside the Stack navigator context
-function NavigationHandler() {
-  const { isLoading, isAuthenticated, isGuest, user, checkAuth } = useAuthStore();
-  const router = useRouter();
-  const segments = useSegments();
-  const [isReady, setIsReady] = useState(false);
-
-  // Initialize push notifications
-  const { expoPushToken, notification, loading: pushLoading, error: pushError } = usePushNotifications();
-  
-  useEffect(() => {
-    if (expoPushToken) {
-      console.log('Push notifications enabled');
-    }
-  }, [expoPushToken]);
-
-  useEffect(() => {
-    const init = async () => {
-      try { await seedAPI.seed(); } catch (e) {}
-      await checkAuth();
-      setIsReady(true);
-    };
-    init();
-  }, []);
-
-  useEffect(() => {
-    if (!isReady || isLoading) return;
-
-    const inAuthGroup = segments[0] === '(auth)';
-
-    if (!isAuthenticated && !isGuest && !inAuthGroup) {
-      router.replace('/(auth)/login');
-      return;
-    } 
-    if (isAuthenticated && inAuthGroup) {
-      const role = user?.role || 'customer';
-      if (role === 'admin' || role === 'moderator') {
-        router.replace('/(admin)/dashboard');
-      } else if (role === 'restaurant') {
-        router.replace('/(restaurant)/dashboard');
-      } else if (role === 'driver') {
-        router.replace('/(driver)/dashboard');
-      } else {
-        router.replace('/(main)/home');
-      }
-    }
-  }, [isAuthenticated, isGuest, segments, isLoading, isReady, user]);
-
-  return null;
-}
-
 export default function RootLayout() {
   // Load Cairo fonts
   const [fontsLoaded] = useFonts({
@@ -235,7 +184,6 @@ export default function RootLayout() {
         <Stack.Screen name="(admin)" />
         <Stack.Screen name="restaurant" />
       </Stack>
-      <NavigationHandler />
     </>
   );
 }
