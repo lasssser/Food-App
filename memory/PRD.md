@@ -69,10 +69,30 @@ Full-stack food delivery application with FastAPI backend, React Native/Expo fro
 ## Upcoming Tasks
 - Simplify Restaurant Interface (addons button on menu items)
 
-## Backlog
-- Refactor `server.py` (4300+ lines) into separate routers
-- Refactor `orders.tsx` into smaller sub-components
-- Consider renaming database from `yalla_nakol_prod` to match project name
+## Critical Bugs to Fix Next Session
+
+### 1. City Filter Not Working
+- User selects "حلب" (Aleppo) but still sees restaurants from حمص (Homs)
+- `fetchRestaurants` uses `getAll()` without city filter
+- Need to pass `city_id` from location store to filter restaurants
+
+### 2. Restaurants Still Open After Closing Time
+- It's 00:33 and restaurants still show as open
+- The `is_open` check only happens at order creation, not at display time
+- Need: Backend scheduled check OR frontend time-based display
+
+### 3. City Selection Screen Still Showing
+- The old "اختر مدينتك" modal still appears
+- Need to remove it completely or integrate with the location picker
+
+### 4. Map Not Showing Restaurants
+- The nearby-map page loads but restaurants don't appear as pins
+- restaurants don't have lat/lng set in DB
+
+### 5. Push Notifications Need FCM
+- Error: "Default FirebaseApp is not initialized"
+- Need to add google-services.json for FCM
+- Follow: https://docs.expo.dev/push-notifications/fcm-credentials/
 
 ## Key Credentials for Testing
 - Admin: `0900000000` / `admin`
