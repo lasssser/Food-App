@@ -296,9 +296,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     backgroundColor: COLORS.primary,
-    height: 54,
-    borderRadius: 14,
+    height: 56,
+    borderRadius: 16,
     marginTop: 8,
+    ...Platform.select({
+      web: { boxShadow: '0px 6px 20px rgba(229, 57, 53, 0.35)' },
+      default: { shadowColor: COLORS.primary, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.35, shadowRadius: 12, elevation: 8 },
+    }),
   },
   loginBtnText: {
     fontSize: 17,
