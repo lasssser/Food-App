@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://akla-alsaree.cloud';
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,

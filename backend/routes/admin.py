@@ -28,18 +28,21 @@ async def get_admin_stats(admin: dict = Depends(require_admin_or_moderator)):
     delivered_orders = await db.orders.count_documents({"order_status": "delivered"})
     cancelled_orders = await db.orders.count_documents({"order_status": "cancelled"})
     
-    # Revenue
-    orders = await db.orders.find({"order_status": "delivered"}).to_list(10000)
-    total_revenue = sum(o.get("total", 0) for o in orders)
+    # Revenue (aggregation pipeline for efficiency)
+    revenue_result = await db.orders.aggregate([
+        {"$match": {"order_status": "delivered"}},
+        {"$group": {"_id": None, "total": {"$sum": "$total"}}}
+    ]).to_list(1)
+    total_revenue = revenue_result[0]["total"] if revenue_result else 0
     
     # Today's stats
     today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     today_orders = await db.orders.count_documents({"created_at": {"$gte": today}})
-    today_revenue_orders = await db.orders.find({
-        "created_at": {"$gte": today},
-        "order_status": "delivered"
-    }).to_list(1000)
-    today_revenue = sum(o.get("total", 0) for o in today_revenue_orders)
+    today_revenue_result = await db.orders.aggregate([
+        {"$match": {"created_at": {"$gte": today}, "order_status": "delivered"}},
+        {"$group": {"_id": None, "total": {"$sum": "$total"}}}
+    ]).to_list(1)
+    today_revenue = today_revenue_result[0]["total"] if today_revenue_result else 0
     
     # Complaints stats
     open_complaints = await db.complaints.count_documents({"status": "open"})
