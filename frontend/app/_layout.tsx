@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator, StyleSheet, I18nManager, Text, Image, Animated, Easing } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, I18nManager, Text, Image, Animated, Easing, TouchableOpacity, Linking, Platform } from 'react-native';
 import { COLORS } from '../src/constants/theme';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts, Cairo_300Light, Cairo_400Regular, Cairo_500Medium, Cairo_600SemiBold, Cairo_700Bold } from '@expo-google-fonts/cairo';
+import Constants from 'expo-constants';
 
 // Keep splash screen visible while fonts load
 SplashScreen.preventAutoHideAsync();
