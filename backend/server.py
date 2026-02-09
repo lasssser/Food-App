@@ -1694,9 +1694,9 @@ async def driver_accept_order(order_id: str, current_user: dict = Depends(get_cu
     result = await db.orders.update_one(
         {
             "id": order_id,
-            "order_status": "ready",
+            "order_status": {"$in": ["ready", "preparing"]},
             "delivery_mode": "platform_driver",
-            "driver_id": None  # Only if no driver assigned yet
+            "$or": [{"driver_id": None}, {"driver_id": ""}, {"driver_id": {"$exists": False}}]
         },
         {"$set": {
             "driver_id": current_user["id"],
