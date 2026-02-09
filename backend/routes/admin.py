@@ -5,6 +5,7 @@ from models.schemas import (
     PasswordResetRequestCreate, ChangePasswordRequest, ChangeRoleRequest,
     AppSettingsUpdate, RoleRequestCreate, RoleRequest,
     AdvertisementCreate, Advertisement, ComplaintResponse,
+    ComplaintCreate, Complaint,
 )
 from typing import List, Optional
 
