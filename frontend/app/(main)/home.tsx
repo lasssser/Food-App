@@ -10,19 +10,16 @@ import {
   RefreshControl,
   ActivityIndicator,
   Dimensions,
-  Animated,
-  Easing,
-  Modal,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Location from 'expo-location';
 import { restaurantAPI, locationAPI, advertisementsAPI } from '../../src/services/api';
 import { useAuthStore } from '../../src/store/authStore';
-import { useLocationStore, City, District } from '../../src/store/locationStore';
 import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
-import { MapLocationPicker } from '../../src/components/LocationPicker';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 32;
