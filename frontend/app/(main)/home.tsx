@@ -54,40 +54,55 @@ const CATEGORIES = [
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
-  const { selectedCity, selectedDistrict, cities, setCities, setLocation, setMapLocation, mapAddress, isLocationSet } = useLocationStore();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [advertisements, setAdvertisements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [showLocationModal, setShowLocationModal] = useState(false);
-  const [selectedCityLocal, setSelectedCityLocal] = useState<City | null>(null);
-  const [districtSearch, setDistrictSearch] = useState('');
-  const [showMapPicker, setShowMapPicker] = useState(false);
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
+  const [detectedCity, setDetectedCity] = useState<string | null>(null);
+  const [detectedCityName, setDetectedCityName] = useState<string>('جاري التحديد...');
+  const [locatingGPS, setLocatingGPS] = useState(false);
 
-  // Fetch cities and advertisements on mount
-  useEffect(() => {
-    const loadData = async () => {
-      // Load cities
-      if (cities.length === 0) {
-        try {
-          const data = await locationAPI.getCities();
-          setCities(data);
-        } catch (error) {
-          console.error('Error loading cities:', error);
-        }
+  // Detect location and city on mount
+  const detectLocation = async () => {
+    setLocatingGPS(true);
+    try {
+      const { status } = await Promise.race([
+        Location.requestForegroundPermissionsAsync(),
+        new Promise<any>((_, reject) => setTimeout(() => reject('timeout'), 3000)),
+      ]);
+      if (status === 'granted') {
+        const loc = await Promise.race([
+          Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low }),
+          new Promise<any>((_, reject) => setTimeout(() => reject('timeout'), 4000)),
+        ]);
+        const result = await locationAPI.detectCity(loc.coords.latitude, loc.coords.longitude);
+        setDetectedCity(result.city_id);
+        setDetectedCityName(result.city_name);
+        setLocatingGPS(false);
+        return result.city_id;
       }
+    } catch {}
+    // Fallback: show all restaurants
+    setDetectedCity(null);
+    setDetectedCityName('كل المدن');
+    setLocatingGPS(false);
+    return null;
+  };
+
+  useEffect(() => {
+    const init = async () => {
       // Load advertisements
       try {
         const ads = await advertisementsAPI.getAll();
         setAdvertisements(ads);
-      } catch (error) {
-        console.error('Error loading advertisements:', error);
-      }
+      } catch {}
+      // Detect location
+      await detectLocation();
     };
-    loadData();
+    init();
   }, []);
 
   // Auto-rotate advertisements
@@ -106,9 +121,9 @@ export default function HomeScreen() {
       if (selectedCategory !== 'all') {
         filters.cuisine = selectedCategory;
       }
-      // Filter by selected city
-      if (selectedCity?.id) {
-        filters.city_id = selectedCity.id;
+      // Filter by detected city
+      if (detectedCity) {
+        filters.city_id = detectedCity;
       }
       const data = await restaurantAPI.getAll(filters);
       setRestaurants(data || []);
@@ -123,12 +138,25 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchRestaurants();
-    }, [selectedCategory, selectedCity?.id])
+    }, [selectedCategory, detectedCity])
   );
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
+    await detectLocation();
     fetchRestaurants();
+  };
+
+  const handleRelocate = async () => {
+    const cityId = await detectLocation();
+    // Re-fetch with new city
+    try {
+      const filters: any = {};
+      if (selectedCategory !== 'all') filters.cuisine = selectedCategory;
+      if (cityId) filters.city_id = cityId;
+      const data = await restaurantAPI.getAll(filters);
+      setRestaurants(data || []);
+    } catch {}
   };
 
   const filteredRestaurants = restaurants.filter((r) =>
