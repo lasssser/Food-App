@@ -167,13 +167,9 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={s.container} edges={['top']}>
-      <Animated.ScrollView
+      <ScrollView
         style={s.scrollView}
         showsVerticalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
         scrollEventThrottle={16}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} tintColor={COLORS.primary} />
