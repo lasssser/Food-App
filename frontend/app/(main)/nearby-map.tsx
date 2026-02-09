@@ -168,46 +168,54 @@ export default function NearbyMapScreen() {
   const [userLocation, setUserLocation] = useState({ lat: 33.5138, lng: 36.2765 });
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedRestaurant, setSelectedRestaurant] = useState<any>(null);
   const webViewRef = useRef<any>(null);
 
   useEffect(() => {
+    let cancelled = false;
     const init = async () => {
       let lat = 33.5138;
       let lng = 36.2765;
       
+      // Try to get user location with aggressive timeout
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
+        const { status } = await Promise.race([
+          Location.requestForegroundPermissionsAsync(),
+          new Promise<any>((_, reject) => setTimeout(() => reject('perm_timeout'), 3000)),
+        ]);
         if (status === 'granted') {
-          // Add timeout to prevent infinite loading
-          const locationPromise = Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low });
-          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject('timeout'), 5000));
-          
           try {
-            const loc = await Promise.race([locationPromise, timeoutPromise]) as any;
+            const loc = await Promise.race([
+              Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low }),
+              new Promise<any>((_, reject) => setTimeout(() => reject('loc_timeout'), 4000)),
+            ]);
             lat = loc.coords.latitude;
             lng = loc.coords.longitude;
-          } catch (e) {
-            console.log('Location timeout, using default');
-          }
-          setUserLocation({ lat, lng });
+          } catch {}
         }
-      } catch (e) {
-        console.log('Location permission denied, using default');
-      }
+      } catch {}
 
+      if (cancelled) return;
+      setUserLocation({ lat, lng });
+
+      // Fetch restaurants
       try {
         const data = await restaurantAPI.getNearby(lat, lng, 50);
-        setRestaurants(data || []);
+        if (!cancelled) setRestaurants(data || []);
       } catch (e) {
-        console.error('Error fetching nearby:', e);
+        if (!cancelled) setError('فشل تحميل المطاعم');
       }
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     };
     
-    // Safety timeout - always stop loading after 8 seconds
-    const safetyTimeout = setTimeout(() => setLoading(false), 8000);
+    // Safety: force stop loading after 6 seconds no matter what
+    const safetyTimeout = setTimeout(() => {
+      if (!cancelled) setLoading(false);
+    }, 6000);
+    
     init().finally(() => clearTimeout(safetyTimeout));
+    return () => { cancelled = true; };
   }, []);
 
   const handleWebViewMessage = (event: any) => {
