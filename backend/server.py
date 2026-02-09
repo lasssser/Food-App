@@ -135,12 +135,14 @@ async def get_me(current_user: dict = Depends(get_current_user)):
 
 # ==================== Cities & Location Routes ====================
 
-# Syrian cities with districts
+# Syrian cities with districts and center coordinates
 SYRIAN_CITIES = [
     {
         "id": "damascus",
         "name": "دمشق",
         "name_en": "Damascus",
+        "lat": 33.5138,
+        "lng": 36.2765,
         "districts": [
             {"id": "mazzeh", "name": "المزة", "name_en": "Mazzeh"},
             {"id": "kafarsouseh", "name": "كفرسوسة", "name_en": "Kafarsouseh"},
@@ -158,6 +160,8 @@ SYRIAN_CITIES = [
         "id": "aleppo",
         "name": "حلب",
         "name_en": "Aleppo",
+        "lat": 36.2021,
+        "lng": 37.1343,
         "districts": [
             {"id": "aziziyeh", "name": "العزيزية", "name_en": "Aziziyeh"},
             {"id": "shahba", "name": "شهباء", "name_en": "Shahba"},
@@ -171,6 +175,8 @@ SYRIAN_CITIES = [
         "id": "homs",
         "name": "حمص",
         "name_en": "Homs",
+        "lat": 34.7324,
+        "lng": 36.7137,
         "districts": [
             {"id": "inshaat", "name": "الإنشاءات", "name_en": "Inshaat"},
             {"id": "wa3r", "name": "الوعر", "name_en": "Waer"},
@@ -183,6 +189,8 @@ SYRIAN_CITIES = [
         "id": "latakia",
         "name": "اللاذقية",
         "name_en": "Latakia",
+        "lat": 35.5317,
+        "lng": 35.7918,
         "districts": [
             {"id": "kornish", "name": "الكورنيش", "name_en": "Corniche"},
             {"id": "zira3a", "name": "الزراعة", "name_en": "Ziraa"},
@@ -195,6 +203,8 @@ SYRIAN_CITIES = [
         "id": "tartous",
         "name": "طرطوس",
         "name_en": "Tartous",
+        "lat": 34.8890,
+        "lng": 35.8866,
         "districts": [
             {"id": "kornish_tartous", "name": "الكورنيش", "name_en": "Corniche"},
             {"id": "thawra", "name": "الثورة", "name_en": "Thawra"},
