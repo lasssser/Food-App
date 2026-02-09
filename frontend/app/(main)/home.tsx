@@ -380,7 +380,7 @@ export default function HomeScreen() {
                       {/* Delivery fee */}
                       <View style={s.cardStat}>
                         <Ionicons name="bicycle-outline" size={14} color={COLORS.textSecondary} />
-                        <Text style={s.cardStatMed}>{(restaurant.delivery_fee ?? 0).toLocaleString()} ل.س</Text>
+                        <Text style={s.cardStatMed}>{(() => { const n = restaurant.delivery_fee ?? 0; const parts = Math.round(n).toString().split('.'); parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ','); return parts.join('.'); })()} ل.س</Text>
                       </View>
                     </View>
                   </View>

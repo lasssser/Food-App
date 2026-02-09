@@ -81,12 +81,19 @@ export default function AdminOrders() {
   }, [selectedStatus]);
 
   const formatCurrency = (amount: number) => {
-    return amount.toLocaleString('ar-SY') + ' ل.س';
+    const parts = Math.round(amount).toString().split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.') + ' ل.س';
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('ar-SY') + ' ' + date.toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' });
+    const d = date.getDate().toString().padStart(2, '0');
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    const y = date.getFullYear();
+    const h = date.getHours().toString().padStart(2, '0');
+    const min = date.getMinutes().toString().padStart(2, '0');
+    return `${y}/${m}/${d} ${h}:${min}`;
   };
 
   const getStatusConfig = (status: string) => {

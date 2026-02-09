@@ -55,7 +55,9 @@ class OrderCardErrorBoundary extends Component<{children: ReactNode, orderId: st
 function safeFormatNumber(num: any): string {
   try {
     const n = typeof num === 'number' ? num : Number(num) || 0;
-    return n.toLocaleString('en-US');
+    const parts = Math.round(n).toString().split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
   } catch {
     return String(num || 0);
   }

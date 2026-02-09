@@ -209,7 +209,7 @@ export default function StatisticsScreen() {
           <Ionicons name="wallet" size={28} color="#fff" />
           <Text style={styles.revenueLabel}>إجمالي الإيرادات</Text>
           <Text style={styles.revenueValue}>
-            {(overview.total_revenue || 0).toLocaleString('ar-SY')} ل.س
+            {(() => { const n = overview.total_revenue || 0; const parts = Math.round(n).toString().split('.'); parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ','); return parts.join('.'); })()} ل.س
           </Text>
         </View>
       </View>
