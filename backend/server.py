@@ -1500,19 +1500,32 @@ async def update_driver_status(status: DriverStatus, current_user: dict = Depend
 
 @api_router.put("/driver/location")
 async def update_driver_location(location: DriverLocation, current_user: dict = Depends(get_current_user)):
-    """Update driver current location"""
+    """Update driver current location and auto-detect city"""
     if current_user.get("role") != "driver":
         raise HTTPException(status_code=403, detail="غير مصرح")
     
+    # Auto-detect city from GPS coordinates
+    closest_city_id = None
+    min_dist = float('inf')
+    for city in SYRIAN_CITIES:
+        dist = calculate_distance(location.lat, location.lng, city["lat"], city["lng"])
+        if dist < min_dist:
+            min_dist = dist
+            closest_city_id = city["id"]
+    
+    update_data = {
+        "current_location": {"lat": location.lat, "lng": location.lng},
+        "location_updated_at": datetime.utcnow()
+    }
+    if closest_city_id:
+        update_data["city_id"] = closest_city_id
+    
     await db.users.update_one(
         {"id": current_user["id"]},
-        {"$set": {
-            "current_location": {"lat": location.lat, "lng": location.lng},
-            "location_updated_at": datetime.utcnow()
-        }}
+        {"$set": update_data}
     )
     
-    return {"message": "تم تحديث الموقع"}
+    return {"message": "تم تحديث الموقع", "city_id": closest_city_id}
 
 @api_router.get("/orders/{order_id}/driver-location")
 async def get_driver_location_for_order(order_id: str, current_user: dict = Depends(get_current_user)):
