@@ -88,6 +88,10 @@ export const locationAPI = {
     const response = await api.get(`/cities/${cityId}`);
     return response.data;
   },
+  detectCity: async (lat: number, lng: number) => {
+    const response = await api.get(`/cities/detect?lat=${lat}&lng=${lng}`);
+    return response.data;
+  },
   updateUserLocation: async (cityId: string, districtId?: string, lat?: number, lng?: number) => {
     const response = await api.put('/users/location', {
       city_id: cityId,
