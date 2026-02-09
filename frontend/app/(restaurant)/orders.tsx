@@ -134,6 +134,7 @@ export default function RestaurantOrders() {
   const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
   const [assigning, setAssigning] = useState(false);
   const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
+  const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
 
   // Sanitize order data to prevent render crashes on Android
   const sanitizeOrder = (order: any): Order => {
