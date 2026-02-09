@@ -218,6 +218,20 @@ async def get_cities():
     """Get list of available cities with districts"""
     return SYRIAN_CITIES
 
+@api_router.get("/cities/detect")
+async def detect_city(lat: float, lng: float):
+    """Detect the closest city based on GPS coordinates"""
+    closest_city = None
+    min_distance = float('inf')
+    for city in SYRIAN_CITIES:
+        dist = calculate_distance(lat, lng, city["lat"], city["lng"])
+        if dist < min_distance:
+            min_distance = dist
+            closest_city = city
+    if closest_city:
+        return {"city_id": closest_city["id"], "city_name": closest_city["name"], "distance_km": round(min_distance, 1)}
+    return {"city_id": "damascus", "city_name": "دمشق", "distance_km": 0}
+
 @api_router.get("/cities/{city_id}")
 async def get_city(city_id: str):
     """Get specific city details"""
