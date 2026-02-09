@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -12,8 +12,6 @@ import {
   ActivityIndicator,
   Image,
   Dimensions,
-  Animated,
-  Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
@@ -30,29 +28,6 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const { login, setGuestMode } = useAuthStore();
   const router = useRouter();
-
-  // Animations
-  const logoScale = useRef(new Animated.Value(0.3)).current;
-  const logoOpacity = useRef(new Animated.Value(0)).current;
-  const formSlide = useRef(new Animated.Value(40)).current;
-  const formOpacity = useRef(new Animated.Value(0)).current;
-  const btnScale = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    // Logo entrance
-    Animated.parallel([
-      Animated.spring(logoScale, { toValue: 1, friction: 5, tension: 60, useNativeDriver: true }),
-      Animated.timing(logoOpacity, { toValue: 1, duration: 500, useNativeDriver: true }),
-    ]).start();
-    // Form slide up
-    Animated.parallel([
-      Animated.timing(formSlide, { toValue: 0, duration: 600, delay: 300, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-      Animated.timing(formOpacity, { toValue: 1, duration: 500, delay: 300, useNativeDriver: true }),
-    ]).start();
-  }, []);
-
-  const onBtnPressIn = () => Animated.spring(btnScale, { toValue: 0.95, friction: 8, useNativeDriver: true }).start();
-  const onBtnPressOut = () => Animated.spring(btnScale, { toValue: 1, friction: 5, useNativeDriver: true }).start();
 
   const handleLogin = async () => {
     if (!phone || !password) {
@@ -99,7 +74,7 @@ export default function LoginScreen() {
             showsVerticalScrollIndicator={false}
           >
             {/* Top Red Section */}
-            <Animated.View style={[styles.topSection, { opacity: logoOpacity, transform: [{ scale: logoScale }] }]}>
+            <View style={styles.topSection}>
               <View style={styles.logoWrapper}>
                 <Image
                   source={require('../../assets/images/logo.png')}
@@ -109,10 +84,10 @@ export default function LoginScreen() {
               </View>
               <Text style={styles.appName}>أكلة عالسريع</Text>
               <Text style={styles.appSlogan}>اطلب أشهى المأكولات بضغطة زر</Text>
-            </Animated.View>
+            </View>
 
             {/* Form Section */}
-            <Animated.View style={[styles.formSection, { opacity: formOpacity, transform: [{ translateY: formSlide }] }]}>
+            <View style={styles.formSection}>
               <Text style={styles.formTitle}>تسجيل الدخول</Text>
 
               {/* Phone Input */}
@@ -151,25 +126,21 @@ export default function LoginScreen() {
               </View>
 
               {/* Login Button */}
-              <Animated.View style={{ transform: [{ scale: btnScale }] }}>
-                <TouchableOpacity
-                  style={styles.loginBtn}
-                  onPress={handleLogin}
-                  onPressIn={onBtnPressIn}
-                  onPressOut={onBtnPressOut}
-                  disabled={loading}
-                  activeOpacity={0.85}
-                >
-                  {loading ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <>
-                      <Ionicons name="arrow-back" size={20} color="#fff" />
-                      <Text style={styles.loginBtnText}>تسجيل الدخول</Text>
-                    </>
-                  )}
-                </TouchableOpacity>
-              </Animated.View>
+              <TouchableOpacity
+                style={styles.loginBtn}
+                onPress={handleLogin}
+                disabled={loading}
+                activeOpacity={0.85}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <>
+                    <Ionicons name="arrow-back" size={20} color="#fff" />
+                    <Text style={styles.loginBtnText}>تسجيل الدخول</Text>
+                  </>
+                )}
+              </TouchableOpacity>
 
               {/* Divider */}
               <View style={styles.dividerRow}>
@@ -184,7 +155,7 @@ export default function LoginScreen() {
                 onPress={handleGuestBrowse}
                 activeOpacity={0.8}
               >
-                <Text style={styles.guestBtnText}>تصفح كضيف 👀</Text>
+                <Text style={styles.guestBtnText}>تصفح كضيف</Text>
               </TouchableOpacity>
 
               {/* Register Link */}
@@ -201,7 +172,7 @@ export default function LoginScreen() {
               <TouchableOpacity onPress={() => router.push('/(auth)/forgot-password')} style={{ alignItems: 'center', marginTop: 12 }}>
                 <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 13, color: COLORS.primary }}>نسيت كلمة المرور؟</Text>
               </TouchableOpacity>
-            </Animated.View>
+            </View>
 
             {/* Footer */}
             <Text style={styles.footer}>Powered by Wethaq Digital Solutions</Text>
@@ -223,8 +194,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
   },
-
-  // Top section
   topSection: {
     backgroundColor: COLORS.primary,
     alignItems: 'center',
@@ -262,8 +231,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Cairo_400Regular',
     color: 'rgba(255,255,255,0.85)',
   },
-
-  // Form section
   formSection: {
     paddingHorizontal: 24,
     paddingTop: 30,
@@ -293,8 +260,6 @@ const styles = StyleSheet.create({
     color: '#333',
     paddingHorizontal: 10,
   },
-
-  // Login button
   loginBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -314,8 +279,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Cairo_700Bold',
     color: '#fff',
   },
-
-  // Divider
   dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -332,8 +295,6 @@ const styles = StyleSheet.create({
     color: '#bbb',
     marginHorizontal: 16,
   },
-
-  // Guest button
   guestBtn: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -348,8 +309,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Cairo_600SemiBold',
     color: '#666',
   },
-
-  // Register
   registerRow: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -365,8 +324,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Cairo_700Bold',
     color: COLORS.primary,
   },
-
-  // Footer
   footer: {
     fontSize: 11,
     fontFamily: 'Cairo_400Regular',
