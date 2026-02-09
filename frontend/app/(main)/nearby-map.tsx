@@ -238,6 +238,23 @@ export default function NearbyMapScreen() {
     );
   }
 
+  if (error && restaurants.length === 0) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.loadingContainer}>
+          <Ionicons name="map-outline" size={64} color="#ddd" />
+          <Text style={[styles.loadingText, { color: '#999', marginTop: 12 }]}>{error}</Text>
+          <TouchableOpacity
+            style={{ marginTop: 16, backgroundColor: COLORS.primary, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 12 }}
+            onPress={() => { setLoading(true); setError(null); }}
+          >
+            <Text style={{ fontFamily: 'Cairo_600SemiBold', fontSize: 14, color: '#fff' }}>إعادة المحاولة</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {/* Map */}
