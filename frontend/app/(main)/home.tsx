@@ -261,22 +261,28 @@ export default function HomeScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          {/* Location Bar */}
+          {/* Location Bar - tap to re-detect GPS */}
           <TouchableOpacity 
             style={styles.locationBar}
-            onPress={() => setShowLocationModal(true)}
+            onPress={handleRelocate}
             activeOpacity={0.8}
+            data-testid="relocate-btn"
           >
-            <Ionicons name="chevron-down" size={18} color="#fff" />
+            {locatingGPS ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Ionicons name="navigate" size={18} color="#fff" />
+            )}
             <View style={styles.locationInfo}>
               <Text style={styles.locationLabel}>التوصيل إلى</Text>
               <Text style={styles.locationText} numberOfLines={1}>
-                {selectedCity?.name 
-                  ? selectedCity.name
-                  : mapAddress 
-                    ? mapAddress
-                    : 'اختر مدينتك'
-                }
+                {detectedCityName}
+              </Text>
+            </View>
+            <View style={styles.locationIcon}>
+              <Ionicons name="location" size={18} color={COLORS.primary} />
+            </View>
+          </TouchableOpacity>
               </Text>
             </View>
             <View style={styles.locationIcon}>
