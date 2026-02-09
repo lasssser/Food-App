@@ -10,6 +10,29 @@ from typing import List, Optional
 
 router = APIRouter()
 
+# ==================== Admin APIs ====================
+
+@router.get("/admin/stats")
+async def get_admin_stats(admin: dict = Depends(require_admin_or_moderator)):
+    """Get overall app statistics"""
+    # Users stats
+    total_customers = await db.users.count_documents({"role": "customer"})
+    total_restaurants = await db.restaurants.count_documents({})
+    total_drivers = await db.users.count_documents({"role": "driver"})
+    online_drivers = await db.users.count_documents({"role": "driver", "is_online": True})
+    
+    # Orders stats
+    total_orders = await db.orders.count_documents({})
+    pending_orders = await db.orders.count_documents({"order_status": "pending"})
+    delivered_orders = await db.orders.count_documents({"order_status": "delivered"})
+    cancelled_orders = await db.orders.count_documents({"order_status": "cancelled"})
+    
+    # Revenue
+    orders = await db.orders.find({"order_status": "delivered"}).to_list(10000)
+    total_revenue = sum(o.get("total", 0) for o in orders)
+    
+    # Today's stats
+    today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     today_orders = await db.orders.count_documents({"created_at": {"$gte": today}})
     today_revenue_orders = await db.orders.find({
         "created_at": {"$gte": today},
