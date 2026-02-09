@@ -473,26 +473,3 @@ async def get_order_rating(order_id: str, current_user: dict = Depends(get_curre
         return {"rated": True, "rating": rating}
     return {"rated": False, "rating": None}
 
-# ==================== Notifications Routes ====================
-
-@router.get("/notifications")
-async def get_notifications(current_user: dict = Depends(get_current_user)):
-    """Get user notifications"""
-    notifications = await db.notifications.find({
-        "user_id": current_user["id"]
-    }).sort("created_at", -1).to_list(50)
-    
-    result = []
-    for n in notifications:
-        n.pop("_id", None)
-        # Handle old notifications that use 'message' instead of 'body'
-        if "body" not in n and "message" in n:
-            n["body"] = n.pop("message")
-        elif "body" not in n:
-            n["body"] = ""
-        if "type" not in n:
-            n["type"] = "general"
-        result.append(Notification(**n))
-    return result
-
-@router.get("/notifications/unread-count")
