@@ -87,3 +87,7 @@ summary.txt
 
 
 # Environment files are tracked for Emergent deployment
+-e 
+# Environment files
+*.env
+*.env.*
