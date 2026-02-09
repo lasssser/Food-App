@@ -283,12 +283,6 @@ export default function HomeScreen() {
               <Ionicons name="location" size={18} color={COLORS.primary} />
             </View>
           </TouchableOpacity>
-              </Text>
-            </View>
-            <View style={styles.locationIcon}>
-              <Ionicons name="location" size={18} color={COLORS.primary} />
-            </View>
-          </TouchableOpacity>
 
           {/* Greeting */}
           <View style={styles.greetingRow}>
