@@ -5,6 +5,8 @@ from typing import List
 
 router = APIRouter()
 
+# ==================== Notifications Routes ====================
+
 @router.get("/notifications")
 async def get_notifications(current_user: dict = Depends(get_current_user)):
     """Get user notifications"""
@@ -15,6 +17,7 @@ async def get_notifications(current_user: dict = Depends(get_current_user)):
     result = []
     for n in notifications:
         n.pop("_id", None)
+        # Handle old notifications that use 'message' instead of 'body'
         if "body" not in n and "message" in n:
             n["body"] = n.pop("message")
         elif "body" not in n:
@@ -31,16 +34,18 @@ async def get_unread_count(current_user: dict = Depends(get_current_user)):
         "user_id": current_user["id"],
         "is_read": False
     })
-    return {"unread_count": count}
+    return {"count": count}
 
 @router.put("/notifications/{notification_id}/read")
 async def mark_notification_read(notification_id: str, current_user: dict = Depends(get_current_user)):
-    """Mark a notification as read"""
-    await db.notifications.update_one(
+    """Mark notification as read"""
+    result = await db.notifications.update_one(
         {"id": notification_id, "user_id": current_user["id"]},
         {"$set": {"is_read": True}}
     )
-    return {"message": "تم تعليم الإشعار كمقروء"}
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="الإشعار غير موجود")
+    return {"message": "تم"}
 
 @router.put("/notifications/mark-all-read")
 async def mark_all_notifications_read(current_user: dict = Depends(get_current_user)):
@@ -49,53 +54,74 @@ async def mark_all_notifications_read(current_user: dict = Depends(get_current_u
         {"user_id": current_user["id"], "is_read": False},
         {"$set": {"is_read": True}}
     )
-    return {"message": "تم تعليم جميع الإشعارات كمقروءة"}
+    return {"message": "تم تحديث جميع الإشعارات"}
+
+# ==================== Push Token Routes ====================
 
 @router.post("/notifications/register-push-token")
 async def register_push_token(data: PushTokenRegister, current_user: dict = Depends(get_current_user)):
-    """Register a device push token for the current user"""
+    """Register or update Expo push token for the current user"""
+    user_id = current_user["id"]
+    
+    # Check if token already exists for this user
     existing = await db.push_tokens.find_one({
-        "token": data.push_token,
-        "user_id": current_user["id"]
+        "user_id": user_id,
+        "token": data.push_token
     })
     
     if existing:
+        # Update existing token
         await db.push_tokens.update_one(
             {"_id": existing["_id"]},
-            {"$set": {"is_active": True, "last_used": datetime.utcnow()}}
+            {"$set": {
+                "is_active": True,
+                "last_used": datetime.utcnow()
+            }}
         )
-        return {"message": "تم تحديث التوكن"}
+        return {"message": "Token updated successfully"}
     
+    # Deactivate old tokens for this user on same platform
     await db.push_tokens.update_many(
-        {"token": data.push_token, "user_id": {"$ne": current_user["id"]}},
+        {"user_id": user_id, "platform": data.platform},
         {"$set": {"is_active": False}}
     )
     
-    token = PushToken(
-        user_id=current_user["id"],
+    # Create new token record
+    push_token = PushToken(
+        user_id=user_id,
         token=data.push_token,
         platform=data.platform
     )
-    await db.push_tokens.insert_one(token.dict())
-    return {"message": "تم تسجيل التوكن بنجاح"}
+    await db.push_tokens.insert_one(push_token.dict())
+    
+    logger.info(f"Push token registered for user {user_id}: {data.push_token[:20]}...")
+    return {"message": "Token registered successfully"}
 
 @router.delete("/notifications/push-token")
 async def unregister_push_token(current_user: dict = Depends(get_current_user)):
-    """Deactivate all push tokens for the current user"""
-    await db.push_tokens.update_many(
-        {"user_id": current_user["id"]},
+    """Unregister all push tokens for the current user (logout)"""
+    user_id = current_user["id"]
+    
+    # Deactivate all tokens for this user
+    result = await db.push_tokens.update_many(
+        {"user_id": user_id},
         {"$set": {"is_active": False}}
     )
-    return {"message": "تم إلغاء تسجيل التوكنات"}
+    
+    logger.info(f"Deactivated {result.modified_count} push tokens for user {user_id}")
+    return {"message": "Tokens deactivated successfully", "count": result.modified_count}
 
 @router.post("/notifications/test-push")
-async def test_push_notification_route(current_user: dict = Depends(get_current_user)):
-    """Send a test push notification"""
-    await send_push_to_user(
-        current_user["id"],
-        "اختبار الإشعارات",
-        "هذا إشعار تجريبي من أكلة عالسريع",
-        {"type": "test"},
-        "default"
-    )
-    return {"message": "تم إرسال إشعار تجريبي"}
+async def test_push_notification(current_user: dict = Depends(get_current_user)):
+    """Send a test push notification to the current user"""
+    title = "🔔 إشعار تجريبي"
+    body = "هذا إشعار تجريبي من يلا ناكل؟"
+    data = {"type": "test", "timestamp": datetime.utcnow().isoformat()}
+    
+    results = await send_push_to_user(current_user["id"], title, body, data)
+    
+    if not results:
+        raise HTTPException(status_code=404, detail="لا توجد أجهزة مسجلة لهذا المستخدم")
+    
+    return {"message": "تم إرسال الإشعار التجريبي", "results": results}
+

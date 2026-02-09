@@ -9,6 +9,8 @@ from typing import List, Optional
 
 router = APIRouter()
 
+# ==================== Address Routes ====================
+
 @router.get("/addresses", response_model=List[Address])
 async def get_addresses(current_user: dict = Depends(get_current_user)):
     addresses = await db.addresses.find({"user_id": current_user["id"]}).to_list(20)

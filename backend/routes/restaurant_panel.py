@@ -10,6 +10,8 @@ from typing import List, Optional
 
 router = APIRouter()
 
+# ==================== Restaurant Panel Routes ====================
+
 @router.get("/restaurant/orders")
 async def get_restaurant_orders(current_user: dict = Depends(get_current_user)):
     """Get orders for restaurant owner"""
@@ -534,6 +536,8 @@ async def update_restaurant_location(
     
     return {"message": "تم تحديث موقع المطعم", "lat": lat, "lng": lng}
 
+# ==================== Restaurant Payment Methods ====================
+
 @router.get("/restaurant/payment-methods")
 async def get_restaurant_payment_methods(
     current_user: dict = Depends(get_current_user)
@@ -711,6 +715,8 @@ async def reject_order_payment(
     await db.notifications.insert_one(notification)
     
     return {"message": "تم رفض الدفع وإلغاء الطلب"}
+
+# ==================== Restaurant Drivers Management ====================
 
 @router.get("/restaurant/platform-drivers")
 async def get_available_platform_drivers(

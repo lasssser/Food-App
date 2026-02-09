@@ -5,6 +5,39 @@ from typing import List
 
 router = APIRouter()
 
+# ==================== Seed Data ====================
+
+@router.post("/seed")
+async def seed_database():
+    """Seed database with demo data including images and add-ons"""
+    
+    # Check if seeding is disabled (admin cleared data)
+    settings = await db.settings.find_one({"id": "app_settings"})
+    if settings and settings.get("seed_disabled"):
+        return {"message": "Seeding is disabled by admin", "skipped": True}
+    
+    # Check if already seeded
+    existing_restaurants = await db.restaurants.count_documents({"id": {"$regex": "^rest-"}})
+    if existing_restaurants > 0:
+        return {"message": "Database already seeded", "skipped": True}
+    
+    # Demo Restaurants with images
+    restaurants = [
+        {
+            "id": "rest-1",
+            "name": "مطعم الشام",
+            "name_en": "Al Sham Restaurant",
+            "description": "أشهى الأطباق الشامية التقليدية",
+            "image": "https://images.pexels.com/photos/17794709/pexels-photo-17794709.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "address": "شارع الحمرا، دمشق",
+            "area": "دمشق",
+            "cuisine_type": "شامي",
+            "rating": 4.5,
+            "review_count": 120,
+            "is_open": True,
+            "delivery_fee": 5000,
+            "min_order": 5000,
+            "delivery_time": "30-45 دقيقة",
             "city_id": "damascus",
             "created_at": datetime.utcnow()
         },
@@ -415,26 +448,3 @@ router = APIRouter()
     
     return {"message": "تم إضافة البيانات التجريبية بنجاح", "restaurants": len(restaurants), "menu_items": len(menu_items), "addon_groups": len(addon_groups)}
 
-# ==================== Admin APIs ====================
-
-@router.get("/admin/stats")
-async def get_admin_stats(admin: dict = Depends(require_admin_or_moderator)):
-    """Get overall app statistics"""
-    # Users stats
-    total_customers = await db.users.count_documents({"role": "customer"})
-    total_restaurants = await db.restaurants.count_documents({})
-    total_drivers = await db.users.count_documents({"role": "driver"})
-    online_drivers = await db.users.count_documents({"role": "driver", "is_online": True})
-    
-    # Orders stats
-    total_orders = await db.orders.count_documents({})
-    pending_orders = await db.orders.count_documents({"order_status": "pending"})
-    delivered_orders = await db.orders.count_documents({"order_status": "delivered"})
-    cancelled_orders = await db.orders.count_documents({"order_status": "cancelled"})
-    
-    # Revenue
-    orders = await db.orders.find({"order_status": "delivered"}).to_list(10000)
-    total_revenue = sum(o.get("total", 0) for o in orders)
-    
-    # Today's stats
-    today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)

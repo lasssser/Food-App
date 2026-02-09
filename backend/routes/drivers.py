@@ -2,9 +2,10 @@ from fastapi import APIRouter
 from routes.deps import *
 from models.schemas import DriverLocation, DriverStatus, OrderStatusUpdate
 from typing import List, Optional
-from routes.cities import SYRIAN_CITIES
 
 router = APIRouter()
+
+# ==================== Driver Routes ====================
 
 @router.put("/driver/status")
 async def update_driver_status(status: DriverStatus, current_user: dict = Depends(get_current_user)):
