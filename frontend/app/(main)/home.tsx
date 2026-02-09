@@ -10,6 +10,8 @@ import {
   RefreshControl,
   ActivityIndicator,
   Dimensions,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -20,7 +22,14 @@ import { restaurantAPI, locationAPI, advertisementsAPI } from '../../src/service
 import { useAuthStore } from '../../src/store/authStore';
 import { COLORS, RADIUS, SPACING, SHADOWS } from '../../src/constants/theme';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+
+const fp = (n: number | null | undefined): string => {
+  if (n == null || isNaN(Number(n))) return '0';
+  const parts = Math.round(Number(n)).toString().split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return parts.join('.');
+};
 
 interface Restaurant {
   id: string;
@@ -38,6 +47,14 @@ interface Restaurant {
   delivery_fee: number;
   min_order: number;
   delivery_time: string;
+}
+
+interface City {
+  id: string;
+  name: string;
+  name_en: string;
+  lat: number;
+  lng: number;
 }
 
 const CATEGORIES = [
@@ -60,32 +77,53 @@ export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
   const [detectedCity, setDetectedCity] = useState<string | null>(null);
-  const [detectedCityName, setDetectedCityName] = useState<string>('جاري التحديد...');
+  const [detectedCityName, setDetectedCityName] = useState<string>('كل المدن');
   const [locatingGPS, setLocatingGPS] = useState(false);
+  const [showCityModal, setShowCityModal] = useState(false);
+  const [cities, setCities] = useState<City[]>([]);
+  const [gpsError, setGpsError] = useState<string | null>(null);
+
+  // Load cities list
+  useEffect(() => {
+    const loadCities = async () => {
+      try {
+        const data = await locationAPI.getCities();
+        setCities(data || []);
+      } catch {}
+    };
+    loadCities();
+  }, []);
 
   const detectLocation = async () => {
     setLocatingGPS(true);
+    setGpsError(null);
     try {
       const { status } = await Promise.race([
         Location.requestForegroundPermissionsAsync(),
-        new Promise<any>((_, reject) => setTimeout(() => reject('timeout'), 3000)),
+        new Promise<any>((_, reject) => setTimeout(() => reject('timeout'), 5000)),
       ]);
-      if (status === 'granted') {
-        const loc = await Promise.race([
-          Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low }),
-          new Promise<any>((_, reject) => setTimeout(() => reject('timeout'), 4000)),
-        ]);
-        const result = await locationAPI.detectCity(loc.coords.latitude, loc.coords.longitude);
-        setDetectedCity(result.city_id);
-        setDetectedCityName(result.city_name);
+      if (status !== 'granted') {
+        setGpsError('لم يتم منح إذن الموقع');
         setLocatingGPS(false);
-        return result.city_id;
+        return null;
       }
-    } catch {}
-    setDetectedCity(null);
-    setDetectedCityName('كل المدن');
-    setLocatingGPS(false);
-    return null;
+      const loc = await Promise.race([
+        Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low }),
+        new Promise<any>((_, reject) => setTimeout(() => reject('timeout'), 8000)),
+      ]);
+      const result = await locationAPI.detectCity(loc.coords.latitude, loc.coords.longitude);
+      setDetectedCity(result.city_id);
+      setDetectedCityName(result.city_name);
+      setGpsError(null);
+      setLocatingGPS(false);
+      return result.city_id;
+    } catch (e) {
+      setGpsError('تعذر تحديد الموقع');
+      setDetectedCity(null);
+      setDetectedCityName('كل المدن');
+      setLocatingGPS(false);
+      return null;
+    }
   };
 
   useEffect(() => {
@@ -135,15 +173,17 @@ export default function HomeScreen() {
     fetchRestaurants();
   };
 
-  const handleRelocate = async () => {
+  const selectCity = (cityId: string | null, cityName: string) => {
+    setDetectedCity(cityId);
+    setDetectedCityName(cityName);
+    setShowCityModal(false);
+  };
+
+  const handleGPSDetect = async () => {
     const cityId = await detectLocation();
-    try {
-      const filters: any = {};
-      if (selectedCategory !== 'all') filters.cuisine = selectedCategory;
-      if (cityId) filters.city_id = cityId;
-      const data = await restaurantAPI.getAll(filters);
-      setRestaurants(data || []);
-    } catch {}
+    if (cityId) {
+      setShowCityModal(false);
+    }
   };
 
   const filteredRestaurants = restaurants.filter((r) =>
@@ -167,6 +207,100 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={s.container} edges={['top']}>
+      {/* === CITY SELECTION MODAL === */}
+      <Modal
+        visible={showCityModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowCityModal(false)}
+      >
+        <Pressable style={s.modalOverlay} onPress={() => setShowCityModal(false)}>
+          <Pressable style={s.modalSheet} onPress={(e) => e.stopPropagation()}>
+            {/* Handle bar */}
+            <View style={s.modalHandle} />
+
+            {/* Title */}
+            <Text style={s.modalTitle}>اختر منطقة التوصيل</Text>
+
+            {/* GPS Button */}
+            <TouchableOpacity
+              style={s.gpsButton}
+              onPress={handleGPSDetect}
+              activeOpacity={0.7}
+              disabled={locatingGPS}
+              data-testid="gps-detect-btn"
+            >
+              <View style={s.gpsIconWrap}>
+                {locatingGPS ? (
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                ) : (
+                  <Ionicons name="navigate" size={22} color={COLORS.primary} />
+                )}
+              </View>
+              <View style={s.gpsTextWrap}>
+                <Text style={s.gpsTitle}>
+                  {locatingGPS ? 'جاري تحديد موقعك...' : 'استخدم موقعي الحالي'}
+                </Text>
+                <Text style={s.gpsSubtitle}>
+                  {gpsError ? gpsError : 'تحديد تلقائي عبر GPS'}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={COLORS.textLight} />
+            </TouchableOpacity>
+
+            {/* Divider */}
+            <View style={s.modalDivider}>
+              <View style={s.modalDividerLine} />
+              <Text style={s.modalDividerText}>أو اختر مدينة</Text>
+              <View style={s.modalDividerLine} />
+            </View>
+
+            {/* All Cities Option */}
+            <TouchableOpacity
+              style={[s.cityItem, !detectedCity && s.cityItemActive]}
+              onPress={() => selectCity(null, 'كل المدن')}
+              activeOpacity={0.7}
+              data-testid="city-all"
+            >
+              <View style={[s.cityIconWrap, !detectedCity && s.cityIconWrapActive]}>
+                <Ionicons name="globe-outline" size={20} color={!detectedCity ? '#fff' : COLORS.textSecondary} />
+              </View>
+              <Text style={[s.cityName, !detectedCity && s.cityNameActive]}>كل المدن</Text>
+              {!detectedCity && (
+                <Ionicons name="checkmark-circle" size={22} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+
+            {/* City List */}
+            <ScrollView style={s.cityList} showsVerticalScrollIndicator={false}>
+              {cities.map((city) => {
+                const isSelected = detectedCity === city.id;
+                return (
+                  <TouchableOpacity
+                    key={city.id}
+                    style={[s.cityItem, isSelected && s.cityItemActive]}
+                    onPress={() => selectCity(city.id, city.name)}
+                    activeOpacity={0.7}
+                    data-testid={`city-${city.id}`}
+                  >
+                    <View style={[s.cityIconWrap, isSelected && s.cityIconWrapActive]}>
+                      <Ionicons name="location-outline" size={20} color={isSelected ? '#fff' : COLORS.textSecondary} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[s.cityName, isSelected && s.cityNameActive]}>{city.name}</Text>
+                      <Text style={s.cityNameEn}>{city.name_en}</Text>
+                    </View>
+                    {isSelected && (
+                      <Ionicons name="checkmark-circle" size={22} color={COLORS.primary} />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
       <ScrollView
         style={s.scrollView}
         showsVerticalScrollIndicator={false}
@@ -183,19 +317,24 @@ export default function HomeScreen() {
               <Ionicons name="map-outline" size={20} color={COLORS.primary} />
             </TouchableOpacity>
 
-            <TouchableOpacity style={s.locationPill} onPress={handleRelocate} activeOpacity={0.7} data-testid="relocate-btn">
+            <TouchableOpacity
+              style={s.locationPill}
+              onPress={() => setShowCityModal(true)}
+              activeOpacity={0.7}
+              data-testid="location-pill-btn"
+            >
               <View style={s.locationDot}>
                 {locatingGPS ? (
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
-                  <Ionicons name="location" size={14} color="#fff" />
+                  <Ionicons name="location" size={16} color="#fff" />
                 )}
               </View>
               <View style={s.locationTextWrap}>
                 <Text style={s.locationLabel}>التوصيل إلى</Text>
                 <Text style={s.locationCity} numberOfLines={1}>{detectedCityName}</Text>
               </View>
-              <Ionicons name="chevron-down" size={16} color="rgba(255,255,255,0.7)" />
+              <Ionicons name="chevron-down" size={18} color="rgba(255,255,255,0.8)" />
             </TouchableOpacity>
           </View>
 
@@ -380,7 +519,7 @@ export default function HomeScreen() {
                       {/* Delivery fee */}
                       <View style={s.cardStat}>
                         <Ionicons name="bicycle-outline" size={14} color={COLORS.textSecondary} />
-                        <Text style={s.cardStatMed}>{(() => { const n = restaurant.delivery_fee ?? 0; const parts = Math.round(n).toString().split('.'); parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ','); return parts.join('.'); })()} ل.س</Text>
+                        <Text style={s.cardStatMed}>{fp(restaurant.delivery_fee)} ل.س</Text>
                       </View>
                     </View>
                   </View>
@@ -417,11 +556,32 @@ const s = StyleSheet.create({
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 24, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 },
   mapBtn: { width: 42, height: 42, borderRadius: 14, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', ...SHADOWS.small },
-  locationPill: { flex: 1, flexDirection: 'row-reverse', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 30, paddingHorizontal: 14, paddingVertical: 8, marginLeft: 12, gap: 8 },
-  locationDot: { width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.25)', justifyContent: 'center', alignItems: 'center' },
+
+  // Location Pill - Professional design
+  locationPill: {
+    flex: 1,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderRadius: 30,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginLeft: 12,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  locationDot: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   locationTextWrap: { flex: 1, alignItems: 'flex-end' },
-  locationLabel: { fontSize: 10, fontFamily: 'Cairo_400Regular', color: 'rgba(255,255,255,0.65)' },
-  locationCity: { fontSize: 14, fontFamily: 'Cairo_700Bold', color: '#fff' },
+  locationLabel: { fontSize: 10, fontFamily: 'Cairo_400Regular', color: 'rgba(255,255,255,0.7)' },
+  locationCity: { fontSize: 15, fontFamily: 'Cairo_700Bold', color: '#fff' },
 
   greetingWrap: { alignItems: 'flex-end', marginBottom: 18 },
   greetingMain: { fontSize: 26, fontFamily: 'Cairo_700Bold', color: '#fff', lineHeight: 36 },
@@ -429,6 +589,94 @@ const s = StyleSheet.create({
 
   searchWrap: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 16, paddingHorizontal: 14, height: 50, ...SHADOWS.small },
   searchInput: { flex: 1, fontSize: 14, fontFamily: 'Cairo_400Regular', color: COLORS.textPrimary, marginHorizontal: 10, textAlign: 'right' },
+
+  // City Modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingTop: 12,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    maxHeight: height * 0.7,
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#E0E0E0',
+    alignSelf: 'center',
+    marginBottom: 18,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontFamily: 'Cairo_700Bold',
+    color: COLORS.textPrimary,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  gpsButton: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    backgroundColor: '#FFF0F0',
+    borderRadius: 16,
+    padding: 16,
+    gap: 12,
+    borderWidth: 1.5,
+    borderColor: '#FFE0E0',
+  },
+  gpsIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.small,
+  },
+  gpsTextWrap: { flex: 1, alignItems: 'flex-end' },
+  gpsTitle: { fontSize: 15, fontFamily: 'Cairo_600SemiBold', color: COLORS.textPrimary },
+  gpsSubtitle: { fontSize: 12, fontFamily: 'Cairo_400Regular', color: COLORS.textSecondary, marginTop: 2 },
+  modalDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 18,
+    gap: 12,
+  },
+  modalDividerLine: { flex: 1, height: 1, backgroundColor: '#F0F0F0' },
+  modalDividerText: { fontSize: 13, fontFamily: 'Cairo_400Regular', color: COLORS.textLight },
+  cityList: { maxHeight: height * 0.35 },
+  cityItem: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    gap: 12,
+    marginBottom: 4,
+  },
+  cityItemActive: {
+    backgroundColor: '#FFF5F5',
+  },
+  cityIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#F5F5F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cityIconWrapActive: {
+    backgroundColor: COLORS.primary,
+  },
+  cityName: { flex: 1, fontSize: 16, fontFamily: 'Cairo_600SemiBold', color: COLORS.textPrimary, textAlign: 'right' },
+  cityNameActive: { color: COLORS.primary },
+  cityNameEn: { fontSize: 12, fontFamily: 'Cairo_400Regular', color: COLORS.textLight, textAlign: 'right' },
 
   // Categories
   catScroll: { paddingHorizontal: 16, gap: 8 },
