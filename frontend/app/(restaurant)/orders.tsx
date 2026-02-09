@@ -874,6 +874,13 @@ export default function RestaurantOrders() {
           </View>
         </View>
       </Modal>
+
+      {/* Live Tracking Modal */}
+      <LiveTrackingModal
+        orderId={trackingOrderId || ''}
+        visible={!!trackingOrderId}
+        onClose={() => setTrackingOrderId(null)}
+      />
     </SafeAreaView>
   );
 }
