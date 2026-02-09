@@ -4,6 +4,32 @@ from models.schemas import UserCreate, UserLogin, UserResponse, TokenResponse
 
 router = APIRouter()
 
+# Minimum app version - increase this when you release breaking changes
+APP_MIN_VERSION = "1.0.0"
+APP_LATEST_VERSION = "1.0.0"
+
+@router.get("/app/version")
+async def check_app_version(current: str = "0.0.0"):
+    """Check if app version is supported. Returns update info."""
+    def parse_version(v: str):
+        try:
+            parts = v.split(".")
+            return tuple(int(p) for p in parts)
+        except:
+            return (0, 0, 0)
+    
+    current_v = parse_version(current)
+    min_v = parse_version(APP_MIN_VERSION)
+    latest_v = parse_version(APP_LATEST_VERSION)
+    
+    return {
+        "force_update": current_v < min_v,
+        "update_available": current_v < latest_v,
+        "min_version": APP_MIN_VERSION,
+        "latest_version": APP_LATEST_VERSION,
+        "message": "يرجى تحديث التطبيق للاستمرار" if current_v < min_v else None,
+    }
+
 @router.post("/auth/register", response_model=TokenResponse)
 async def register(user_data: UserCreate):
     # Check if phone already exists
