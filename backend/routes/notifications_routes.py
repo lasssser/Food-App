@@ -5,24 +5,42 @@ from typing import List
 
 router = APIRouter()
 
+@router.get("/notifications")
+async def get_notifications(current_user: dict = Depends(get_current_user)):
+    """Get user notifications"""
+    notifications = await db.notifications.find({
+        "user_id": current_user["id"]
+    }).sort("created_at", -1).to_list(50)
+    
+    result = []
+    for n in notifications:
+        n.pop("_id", None)
+        if "body" not in n and "message" in n:
+            n["body"] = n.pop("message")
+        elif "body" not in n:
+            n["body"] = ""
+        if "type" not in n:
+            n["type"] = "general"
+        result.append(Notification(**n))
+    return result
+
+@router.get("/notifications/unread-count")
 async def get_unread_count(current_user: dict = Depends(get_current_user)):
     """Get unread notifications count"""
     count = await db.notifications.count_documents({
         "user_id": current_user["id"],
         "is_read": False
     })
-    return {"count": count}
+    return {"unread_count": count}
 
 @router.put("/notifications/{notification_id}/read")
 async def mark_notification_read(notification_id: str, current_user: dict = Depends(get_current_user)):
-    """Mark notification as read"""
-    result = await db.notifications.update_one(
+    """Mark a notification as read"""
+    await db.notifications.update_one(
         {"id": notification_id, "user_id": current_user["id"]},
         {"$set": {"is_read": True}}
     )
-    if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="الإشعار غير موجود")
-    return {"message": "تم"}
+    return {"message": "تم تعليم الإشعار كمقروء"}
 
 @router.put("/notifications/mark-all-read")
 async def mark_all_notifications_read(current_user: dict = Depends(get_current_user)):
@@ -31,107 +49,53 @@ async def mark_all_notifications_read(current_user: dict = Depends(get_current_u
         {"user_id": current_user["id"], "is_read": False},
         {"$set": {"is_read": True}}
     )
-    return {"message": "تم تحديث جميع الإشعارات"}
-
-# ==================== Push Token Routes ====================
+    return {"message": "تم تعليم جميع الإشعارات كمقروءة"}
 
 @router.post("/notifications/register-push-token")
 async def register_push_token(data: PushTokenRegister, current_user: dict = Depends(get_current_user)):
-    """Register or update Expo push token for the current user"""
-    user_id = current_user["id"]
-    
-    # Check if token already exists for this user
+    """Register a device push token for the current user"""
     existing = await db.push_tokens.find_one({
-        "user_id": user_id,
-        "token": data.push_token
+        "token": data.push_token,
+        "user_id": current_user["id"]
     })
     
     if existing:
-        # Update existing token
         await db.push_tokens.update_one(
             {"_id": existing["_id"]},
-            {"$set": {
-                "is_active": True,
-                "last_used": datetime.utcnow()
-            }}
+            {"$set": {"is_active": True, "last_used": datetime.utcnow()}}
         )
-        return {"message": "Token updated successfully"}
+        return {"message": "تم تحديث التوكن"}
     
-    # Deactivate old tokens for this user on same platform
     await db.push_tokens.update_many(
-        {"user_id": user_id, "platform": data.platform},
+        {"token": data.push_token, "user_id": {"$ne": current_user["id"]}},
         {"$set": {"is_active": False}}
     )
     
-    # Create new token record
-    push_token = PushToken(
-        user_id=user_id,
+    token = PushToken(
+        user_id=current_user["id"],
         token=data.push_token,
         platform=data.platform
     )
-    await db.push_tokens.insert_one(push_token.dict())
-    
-    logger.info(f"Push token registered for user {user_id}: {data.push_token[:20]}...")
-    return {"message": "Token registered successfully"}
+    await db.push_tokens.insert_one(token.dict())
+    return {"message": "تم تسجيل التوكن بنجاح"}
 
 @router.delete("/notifications/push-token")
 async def unregister_push_token(current_user: dict = Depends(get_current_user)):
-    """Unregister all push tokens for the current user (logout)"""
-    user_id = current_user["id"]
-    
-    # Deactivate all tokens for this user
-    result = await db.push_tokens.update_many(
-        {"user_id": user_id},
+    """Deactivate all push tokens for the current user"""
+    await db.push_tokens.update_many(
+        {"user_id": current_user["id"]},
         {"$set": {"is_active": False}}
     )
-    
-    logger.info(f"Deactivated {result.modified_count} push tokens for user {user_id}")
-    return {"message": "Tokens deactivated successfully", "count": result.modified_count}
+    return {"message": "تم إلغاء تسجيل التوكنات"}
 
 @router.post("/notifications/test-push")
-async def test_push_notification(current_user: dict = Depends(get_current_user)):
-    """Send a test push notification to the current user"""
-    title = "🔔 إشعار تجريبي"
-    body = "هذا إشعار تجريبي من يلا ناكل؟"
-    data = {"type": "test", "timestamp": datetime.utcnow().isoformat()}
-    
-    results = await send_push_to_user(current_user["id"], title, body, data)
-    
-    if not results:
-        raise HTTPException(status_code=404, detail="لا توجد أجهزة مسجلة لهذا المستخدم")
-    
-    return {"message": "تم إرسال الإشعار التجريبي", "results": results}
-
-# ==================== Seed Data ====================
-
-@router.post("/seed")
-async def seed_database():
-    """Seed database with demo data including images and add-ons"""
-    
-    # Check if seeding is disabled (admin cleared data)
-    settings = await db.settings.find_one({"id": "app_settings"})
-    if settings and settings.get("seed_disabled"):
-        return {"message": "Seeding is disabled by admin", "skipped": True}
-    
-    # Check if already seeded
-    existing_restaurants = await db.restaurants.count_documents({"id": {"$regex": "^rest-"}})
-    if existing_restaurants > 0:
-        return {"message": "Database already seeded", "skipped": True}
-    
-    # Demo Restaurants with images
-    restaurants = [
-        {
-            "id": "rest-1",
-            "name": "مطعم الشام",
-            "name_en": "Al Sham Restaurant",
-            "description": "أشهى الأطباق الشامية التقليدية",
-            "image": "https://images.pexels.com/photos/17794709/pexels-photo-17794709.jpeg?auto=compress&cs=tinysrgb&w=600",
-            "address": "شارع الحمرا، دمشق",
-            "area": "دمشق",
-            "cuisine_type": "شامي",
-            "rating": 4.5,
-            "review_count": 120,
-            "is_open": True,
-            "delivery_fee": 5000,
-            "min_order": 5000,
-            "delivery_time": "30-45 دقيقة",
+async def test_push_notification_route(current_user: dict = Depends(get_current_user)):
+    """Send a test push notification"""
+    await send_push_to_user(
+        current_user["id"],
+        "اختبار الإشعارات",
+        "هذا إشعار تجريبي من أكلة عالسريع",
+        {"type": "test"},
+        "default"
+    )
+    return {"message": "تم إرسال إشعار تجريبي"}
