@@ -44,23 +44,19 @@ backend/
 3. **Bug Fix: Keyboard covers checkout inputs** - Bottom card hides when keyboard is visible using Keyboard event listeners.
 4. **Map screens unified** - `LocationPicker.tsx` now exports both inline map picker and full-screen `MapLocationPicker`, sharing the same WebView-based Leaflet map code.
 5. **Server.py refactored** - Models extracted to `models/schemas.py`, auth to `utils/auth.py`, helpers to `utils/helpers.py`, notifications to `utils/notifications.py`. Duplicate routes removed.
+6. **Bug Fix: LinkingContext error** - Fixed @react-navigation/native version conflict by deduplication.
+7. **Bug Fix: City filtering** - `fetchRestaurants()` now passes `selectedCity.id` as `city_id` filter. Header shows selected city name. Restaurants re-fetch on city change.
+8. **Bug Fix: toLocaleString crash (P0)** - Added null guards (`?? 0`) for `rating`, `delivery_fee`, `min_order`, `review_count` in renderRestaurantCard.
+9. **Bug Fix: Map loading loop** - Added aggressive timeouts (3s for permissions, 4s for GPS, 6s safety), error state with retry button, cleanup on unmount.
 
 ## Known Issues
 - Old admin account (0900000000) has stale bcrypt hash - login fails (pre-existing)
-- Guest user home screen crash (toLocaleString on undefined) - needs fix in home.tsx
-- Restaurant location filtering by city not working properly
-- Map feature stuck in loading loop on some devices
 
 ## Pending Tasks (Priority Order)
-### P0
-- Fix guest user crash on home screen (toLocaleString error in renderRestaurantCard)
-
 ### P1  
-- Fix restaurant location filtering (restaurants from wrong cities appearing)
 - Continue extracting routes from server.py into separate files
 
 ### P2
-- Fix map loading loop on nearby-map screen
 - Simplify restaurant dashboard UI
 - Dark mode
 
