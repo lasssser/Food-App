@@ -62,7 +62,6 @@ export default function HomeScreen() {
   const [detectedCity, setDetectedCity] = useState<string | null>(null);
   const [detectedCityName, setDetectedCityName] = useState<string>('جاري التحديد...');
   const [locatingGPS, setLocatingGPS] = useState(false);
-  const scrollY = useRef(new Animated.Value(0)).current;
 
   const detectLocation = async () => {
     setLocatingGPS(true);
