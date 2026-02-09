@@ -45,9 +45,12 @@ backend/
 4. **Map screens unified** - `LocationPicker.tsx` now exports both inline map picker and full-screen `MapLocationPicker`, sharing the same WebView-based Leaflet map code.
 5. **Server.py refactored** - Models extracted to `models/schemas.py`, auth to `utils/auth.py`, helpers to `utils/helpers.py`, notifications to `utils/notifications.py`. Duplicate routes removed.
 6. **Bug Fix: LinkingContext error** - Fixed @react-navigation/native version conflict by deduplication.
-7. **Bug Fix: City filtering** - `fetchRestaurants()` now passes `selectedCity.id` as `city_id` filter. Header shows selected city name. Restaurants re-fetch on city change.
-8. **Bug Fix: toLocaleString crash (P0)** - Added null guards (`?? 0`) for `rating`, `delivery_fee`, `min_order`, `review_count` in renderRestaurantCard.
-9. **Bug Fix: Map loading loop** - Added aggressive timeouts (3s for permissions, 4s for GPS, 6s safety), error state with retry button, cleanup on unmount.
+7. **GPS auto-detect city** - Removed manual city picker. App detects city from GPS and auto-filters restaurants.
+8. **Bug Fix: toLocaleString crash (P0)** - Added null guards for rating, delivery_fee, min_order, review_count.
+9. **Bug Fix: Map loading loop** - Aggressive timeouts + error state with retry.
+10. **Bug Fix: Driver city_id missing** - `PUT /driver/location` now auto-detects city from GPS. Drivers always have correct city.
+11. **Bug Fix: Orders not reaching drivers** - `driver_accept_order` now accepts orders in `preparing` status too.
+12. **Restaurant driver tracking** - Added LiveTrackingModal to restaurant orders. Restaurant can track driver on map with ETA.
 
 ## Known Issues
 - Old admin account (0900000000) has stale bcrypt hash - login fails (pre-existing)
