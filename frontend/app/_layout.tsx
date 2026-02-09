@@ -1,142 +1,37 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator, StyleSheet, I18nManager, Text, Image, Animated, Easing, TouchableOpacity, Linking, Platform } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, I18nManager, Text, Image, TouchableOpacity, Linking } from 'react-native';
 import { COLORS } from '../src/constants/theme';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts, Cairo_300Light, Cairo_400Regular, Cairo_500Medium, Cairo_600SemiBold, Cairo_700Bold } from '@expo-google-fonts/cairo';
 import Constants from 'expo-constants';
 
 // Keep splash screen visible while fonts load
-SplashScreen.preventAutoHideAsync();
+try { SplashScreen.preventAutoHideAsync(); } catch (e) { /* ignore */ }
 
 // Force RTL for Arabic
-I18nManager.allowRTL(true);
-I18nManager.forceRTL(true);
+try {
+  I18nManager.allowRTL(true);
+  I18nManager.forceRTL(true);
+} catch (e) { /* ignore */ }
 
-// Animated Splash Screen Component
+// Simple static Splash Screen (no Animated API)
 function SplashView() {
-  const scaleAnim = React.useRef(new Animated.Value(0.3)).current;
-  const opacityAnim = React.useRef(new Animated.Value(0)).current;
-  const textOpacity = React.useRef(new Animated.Value(0)).current;
-  const pulseAnim = React.useRef(new Animated.Value(1)).current;
-  const shakeAnim = React.useRef(new Animated.Value(0)).current;
-
-  React.useEffect(() => {
-    // Logo entrance: scale up + fade in
-    Animated.parallel([
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 4,
-        tension: 60,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      // After logo appears, show text
-      Animated.timing(textOpacity, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }).start();
-
-      // Start continuous pulse + shake
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, {
-            toValue: 1.08,
-            duration: 800,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 800,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
-
-      // Fire/shake effect
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(shakeAnim, {
-            toValue: 3,
-            duration: 80,
-            easing: Easing.linear,
-            useNativeDriver: true,
-          }),
-          Animated.timing(shakeAnim, {
-            toValue: -3,
-            duration: 80,
-            easing: Easing.linear,
-            useNativeDriver: true,
-          }),
-          Animated.timing(shakeAnim, {
-            toValue: 2,
-            duration: 60,
-            easing: Easing.linear,
-            useNativeDriver: true,
-          }),
-          Animated.timing(shakeAnim, {
-            toValue: -2,
-            duration: 60,
-            easing: Easing.linear,
-            useNativeDriver: true,
-          }),
-          Animated.timing(shakeAnim, {
-            toValue: 0,
-            duration: 50,
-            easing: Easing.linear,
-            useNativeDriver: true,
-          }),
-          Animated.delay(2000),
-        ])
-      ).start();
-    });
-  }, []);
-
   return (
     <View style={styles.splashContainer}>
-      {/* Glowing background circle */}
-      <Animated.View style={[styles.splashGlow, { opacity: opacityAnim, transform: [{ scale: pulseAnim }] }]} />
-
-      {/* Logo with animation */}
-      <Animated.View
-        style={[
-          styles.splashLogoBox,
-          {
-            opacity: opacityAnim,
-            transform: [
-              { scale: Animated.multiply(scaleAnim, pulseAnim) },
-              { translateX: shakeAnim },
-            ],
-          },
-        ]}
-      >
+      <View style={styles.splashGlow} />
+      <View style={styles.splashLogoBox}>
         <Image
           source={require('../assets/images/logo.png')}
           style={styles.splashLogo}
           resizeMode="contain"
         />
-      </Animated.View>
-
-      {/* App name */}
-      <Animated.View style={{ opacity: textOpacity }}>
-        <Text style={styles.splashName}>أكلة عالسريع</Text>
-        <Text style={styles.splashSlogan}>اطلب أشهى المأكولات بضغطة زر 🔥</Text>
-      </Animated.View>
-
-      {/* Loading indicator */}
-      <Animated.View style={{ opacity: textOpacity, marginTop: 40 }}>
-        <ActivityIndicator size="small" color="rgba(255,255,255,0.7)" />
-        <Text style={styles.splashLoading}>جاري التحميل...</Text>
-      </Animated.View>
+      </View>
+      <Text style={styles.splashName}>أكلة عالسريع</Text>
+      <Text style={styles.splashSlogan}>اطلب أشهى المأكولات بضغطة زر</Text>
+      <ActivityIndicator size="small" color="rgba(255,255,255,0.7)" style={{ marginTop: 40 }} />
+      <Text style={styles.splashLoading}>جاري التحميل...</Text>
     </View>
   );
 }
