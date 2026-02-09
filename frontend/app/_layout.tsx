@@ -142,7 +142,6 @@ function SplashView() {
 }
 
 export default function RootLayout() {
-  // Load Cairo fonts
   const [fontsLoaded] = useFonts({
     Cairo_300Light,
     Cairo_400Regular,
@@ -150,6 +149,24 @@ export default function RootLayout() {
     Cairo_600SemiBold,
     Cairo_700Bold,
   });
+
+  const [forceUpdate, setForceUpdate] = useState(false);
+
+  // Check app version on mount
+  useEffect(() => {
+    const checkVersion = async () => {
+      try {
+        const appVersion = Constants.expoConfig?.version || '1.0.0';
+        const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://akla-alsaree.cloud';
+        const res = await fetch(`${API_URL}/api/app/version?current=${appVersion}`);
+        const data = await res.json();
+        if (data.force_update) {
+          setForceUpdate(true);
+        }
+      } catch {}
+    };
+    checkVersion();
+  }, []);
 
   // Hide splash screen when fonts are loaded
   useEffect(() => {
@@ -160,6 +177,25 @@ export default function RootLayout() {
 
   if (!fontsLoaded) {
     return <SplashView />;
+  }
+
+  // Force update screen
+  if (forceUpdate) {
+    return (
+      <View style={styles.updateContainer}>
+        <View style={styles.updateCard}>
+          <Image source={require('../assets/images/logo.png')} style={{ width: 80, height: 80 }} resizeMode="contain" />
+          <Text style={styles.updateTitle}>تحديث مطلوب</Text>
+          <Text style={styles.updateMsg}>يوجد إصدار جديد من التطبيق. يرجى التحديث للاستمرار.</Text>
+          <TouchableOpacity style={styles.updateBtn} onPress={() => {
+            // Replace with your Play Store / download link
+            Linking.openURL('https://akla-alsaree.cloud');
+          }}>
+            <Text style={styles.updateBtnText}>تحديث الآن</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
   }
 
   return (
