@@ -1,13 +1,13 @@
-import { Redirect } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useAuthStore } from '../src/store/authStore';
 import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { useEffect, useState } from 'react';
-import { seedAPI } from '../src/services/api';
 import { COLORS } from '../src/constants/theme';
 
 export default function Index() {
   const { isAuthenticated, isLoading, isGuest, user, checkAuth } = useAuthStore();
   const [isReady, setIsReady] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const init = async () => {
@@ -17,32 +17,33 @@ export default function Index() {
     init();
   }, []);
 
-  if (isLoading || !isReady) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-        <Text style={styles.loadingText}>جاري التحميل...</Text>
-      </View>
-    );
-  }
+  useEffect(() => {
+    if (!isReady || isLoading) return;
 
-  if (isAuthenticated) {
-    const role = user?.role || 'customer';
-    if (role === 'admin' || role === 'moderator') {
-      return <Redirect href="/(admin)/dashboard" />;
-    } else if (role === 'restaurant') {
-      return <Redirect href="/(restaurant)/dashboard" />;
-    } else if (role === 'driver') {
-      return <Redirect href="/(driver)/dashboard" />;
+    if (isAuthenticated) {
+      const role = user?.role || 'customer';
+      if (role === 'admin' || role === 'moderator') {
+        router.replace('/(admin)/dashboard');
+      } else if (role === 'restaurant') {
+        router.replace('/(restaurant)/dashboard');
+      } else if (role === 'driver') {
+        router.replace('/(driver)/dashboard');
+      } else {
+        router.replace('/(main)/home');
+      }
+    } else if (isGuest) {
+      router.replace('/(main)/home');
+    } else {
+      router.replace('/(auth)/login');
     }
-    return <Redirect href="/(main)/home" />;
-  }
+  }, [isReady, isLoading, isAuthenticated, isGuest]);
 
-  if (isGuest) {
-    return <Redirect href="/(main)/home" />;
-  }
-
-  return <Redirect href="/(auth)/login" />;
+  return (
+    <View style={styles.container}>
+      <ActivityIndicator size="large" color={COLORS.primary} />
+      <Text style={styles.loadingText}>جاري التحميل...</Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
