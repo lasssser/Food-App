@@ -188,23 +188,23 @@ export default function HomeScreen() {
         <View style={styles.infoRow}>
           <View style={styles.ratingContainer}>
             <Ionicons name="star" size={16} color={COLORS.accent} />
-            <Text style={styles.ratingText}>{restaurant.rating.toFixed(1)}</Text>
-            <Text style={styles.reviewCount}>({restaurant.review_count})</Text>
+            <Text style={styles.ratingText}>{(restaurant.rating ?? 0).toFixed(1)}</Text>
+            <Text style={styles.reviewCount}>({restaurant.review_count ?? 0})</Text>
           </View>
           
           <View style={styles.deliveryInfo}>
             <Ionicons name="time-outline" size={14} color={COLORS.textSecondary} />
-            <Text style={styles.deliveryText}>{restaurant.delivery_time}</Text>
+            <Text style={styles.deliveryText}>{restaurant.delivery_time || '30-45 د'}</Text>
           </View>
         </View>
 
         <View style={styles.infoRow}>
           <View style={styles.feeContainer}>
             <Ionicons name="bicycle-outline" size={14} color={COLORS.textSecondary} />
-            <Text style={styles.feeText}>توصيل: {restaurant.delivery_fee.toLocaleString()} ل.س</Text>
+            <Text style={styles.feeText}>توصيل: {(restaurant.delivery_fee ?? 0).toLocaleString()} ل.س</Text>
           </View>
           
-          <Text style={styles.minOrder}>الحد الأدنى: {(restaurant.min_order || 0).toLocaleString()} ل.س</Text>
+          <Text style={styles.minOrder}>الحد الأدنى: {(restaurant.min_order ?? 0).toLocaleString()} ل.س</Text>
         </View>
       </View>
     </TouchableOpacity>
