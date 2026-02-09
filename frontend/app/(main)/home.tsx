@@ -246,10 +246,12 @@ export default function HomeScreen() {
             <View style={styles.locationInfo}>
               <Text style={styles.locationLabel}>التوصيل إلى</Text>
               <Text style={styles.locationText} numberOfLines={1}>
-                {mapAddress 
-                  ? mapAddress
-                  : 'موقعك الحالي'
-                    }
+                {selectedCity?.name 
+                  ? selectedCity.name
+                  : mapAddress 
+                    ? mapAddress
+                    : 'اختر مدينتك'
+                }
               </Text>
             </View>
             <View style={styles.locationIcon}>
