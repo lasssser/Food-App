@@ -466,6 +466,11 @@ export default function RestaurantOrders() {
                       <Ionicons name="call" size={20} color="#4CAF50" />
                     </TouchableOpacity>
                   ) : null}
+                  {['driver_assigned', 'picked_up', 'out_for_delivery'].includes(order.order_status) && (
+                    <TouchableOpacity onPress={() => setTrackingOrderId(order.id)} data-testid="restaurant-track-driver-btn">
+                      <Ionicons name="navigate" size={20} color="#E53935" />
+                    </TouchableOpacity>
+                  )}
                 </View>
               ) : null}
               {/* Payment verification */}
