@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,8 @@ import {
   RefreshControl,
   ActivityIndicator,
   Dimensions,
-  Alert,
+  Animated,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -19,10 +20,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
 import { restaurantAPI, locationAPI, advertisementsAPI } from '../../src/services/api';
 import { useAuthStore } from '../../src/store/authStore';
-import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
+import { COLORS, RADIUS, SPACING, SHADOWS } from '../../src/constants/theme';
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = width - 32;
 
 interface Restaurant {
   id: string;
@@ -43,12 +43,12 @@ interface Restaurant {
 }
 
 const CATEGORIES = [
-  { id: 'all', name: 'الكل', icon: '🍽️' },
-  { id: 'برجر', name: 'برجر', icon: '🍔' },
-  { id: 'إيطالي', name: 'بيتزا', icon: '🍕' },
-  { id: 'مشاوي', name: 'مشاوي', icon: '🍗' },
-  { id: 'شامي', name: 'سوري', icon: '🥙' },
-  { id: 'فطائر', name: 'فطائر', icon: '🥧' },
+  { id: 'all', name: 'الكل', icon: 'grid-outline' },
+  { id: 'برجر', name: 'برجر', icon: 'fast-food-outline' },
+  { id: 'إيطالي', name: 'بيتزا', icon: 'pizza-outline' },
+  { id: 'مشاوي', name: 'مشاوي', icon: 'flame-outline' },
+  { id: 'شامي', name: 'سوري', icon: 'restaurant-outline' },
+  { id: 'فطائر', name: 'فطائر', icon: 'cafe-outline' },
 ];
 
 export default function HomeScreen() {
@@ -64,8 +64,8 @@ export default function HomeScreen() {
   const [detectedCity, setDetectedCity] = useState<string | null>(null);
   const [detectedCityName, setDetectedCityName] = useState<string>('جاري التحديد...');
   const [locatingGPS, setLocatingGPS] = useState(false);
+  const scrollY = useRef(new Animated.Value(0)).current;
 
-  // Detect location and city on mount
   const detectLocation = async () => {
     setLocatingGPS(true);
     try {
@@ -85,7 +85,6 @@ export default function HomeScreen() {
         return result.city_id;
       }
     } catch {}
-    // Fallback: show all restaurants
     setDetectedCity(null);
     setDetectedCityName('كل المدن');
     setLocatingGPS(false);
@@ -94,18 +93,15 @@ export default function HomeScreen() {
 
   useEffect(() => {
     const init = async () => {
-      // Load advertisements
       try {
         const ads = await advertisementsAPI.getAll();
         setAdvertisements(ads);
       } catch {}
-      // Detect location
       await detectLocation();
     };
     init();
   }, []);
 
-  // Auto-rotate advertisements
   useEffect(() => {
     if (advertisements.length > 1) {
       const interval = setInterval(() => {
@@ -118,13 +114,8 @@ export default function HomeScreen() {
   const fetchRestaurants = async () => {
     try {
       const filters: any = {};
-      if (selectedCategory !== 'all') {
-        filters.cuisine = selectedCategory;
-      }
-      // Filter by detected city
-      if (detectedCity) {
-        filters.city_id = detectedCity;
-      }
+      if (selectedCategory !== 'all') filters.cuisine = selectedCategory;
+      if (detectedCity) filters.city_id = detectedCity;
       const data = await restaurantAPI.getAll(filters);
       setRestaurants(data || []);
     } catch (error) {
@@ -149,7 +140,6 @@ export default function HomeScreen() {
 
   const handleRelocate = async () => {
     const cityId = await detectLocation();
-    // Re-fetch with new city
     try {
       const filters: any = {};
       if (selectedCategory !== 'all') filters.cuisine = selectedCategory;
@@ -163,193 +153,114 @@ export default function HomeScreen() {
     r.name.includes(searchQuery) || r.cuisine_type.includes(searchQuery)
   );
 
-  const renderRestaurantCard = (restaurant: Restaurant, index: number) => {
-    return (
-    <TouchableOpacity
-      key={restaurant.id}
-      style={styles.restaurantCard}
-      onPress={() => router.push(`/restaurant/${restaurant.id}`)}
-      activeOpacity={0.9}
-    >
-      {/* Image Container - 70% */}
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: restaurant.image || 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=600' }}
-          style={styles.restaurantImage}
-        />
-        {/* Overlay Gradient */}
-        <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.7)']}
-          style={styles.imageOverlay}
-        />
-        
-        {/* Badges */}
-        <View style={styles.badgesContainer}>
-          {restaurant.is_open ? (
-            <View style={[styles.badge, styles.badgeOpen]}>
-              <Text style={styles.badgeText}>🟢 مفتوح</Text>
-            </View>
-          ) : (
-            <View style={[styles.badge, styles.badgeClosed]}>
-              <Text style={styles.badgeText}>🔴 مغلق</Text>
-            </View>
-          )}
-          {restaurant.is_featured && (
-            <View style={[styles.badge, styles.badgeFeatured]}>
-              <Text style={styles.badgeText}>⭐ مميز</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Restaurant Name on Image */}
-        <View style={styles.imageTextContainer}>
-          <Text style={styles.restaurantNameOnImage}>{restaurant.name}</Text>
-          <Text style={styles.cuisineTypeOnImage}>{restaurant.cuisine_type}</Text>
-        </View>
-      </View>
-
-      {/* Info Container - 30% */}
-      <View style={styles.infoContainer}>
-        <View style={styles.infoRow}>
-          <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={16} color={COLORS.accent} />
-            <Text style={styles.ratingText}>{(restaurant.rating ?? 0).toFixed(1)}</Text>
-            <Text style={styles.reviewCount}>({restaurant.review_count ?? 0})</Text>
-          </View>
-          
-          <View style={styles.deliveryInfo}>
-            <Ionicons name="time-outline" size={14} color={COLORS.textSecondary} />
-            <Text style={styles.deliveryText}>{restaurant.delivery_time || '30-45 د'}</Text>
-          </View>
-        </View>
-
-        <View style={styles.infoRow}>
-          <View style={styles.feeContainer}>
-            <Ionicons name="bicycle-outline" size={14} color={COLORS.textSecondary} />
-            <Text style={styles.feeText}>توصيل: {(restaurant.delivery_fee ?? 0).toLocaleString()} ل.س</Text>
-          </View>
-          
-          <Text style={styles.minOrder}>الحد الأدنى: {(restaurant.min_order ?? 0).toLocaleString()} ل.س</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-    );
-  };
+  const featuredRestaurants = filteredRestaurants.filter(r => r.is_featured);
+  const regularRestaurants = filteredRestaurants.filter(r => !r.is_featured);
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-        <Text style={styles.loadingText}>جاري تحميل المطاعم...</Text>
+      <View style={s.loadingContainer}>
+        <View style={s.loadingLogo}>
+          <Ionicons name="restaurant" size={40} color={COLORS.primary} />
+        </View>
+        <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 20 }} />
+        <Text style={s.loadingText}>جاري تحميل المطاعم...</Text>
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView
-        style={styles.scrollView}
+    <SafeAreaView style={s.container} edges={['top']}>
+      <Animated.ScrollView
+        style={s.scrollView}
         showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[COLORS.primary]}
-            tintColor={COLORS.primary}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} tintColor={COLORS.primary} />
         }
       >
-        {/* Header */}
-        <View style={styles.header}>
-          {/* Location Bar - tap to re-detect GPS */}
-          <TouchableOpacity 
-            style={styles.locationBar}
-            onPress={handleRelocate}
-            activeOpacity={0.8}
-            data-testid="relocate-btn"
-          >
-            {locatingGPS ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Ionicons name="navigate" size={18} color="#fff" />
-            )}
-            <View style={styles.locationInfo}>
-              <Text style={styles.locationLabel}>التوصيل إلى</Text>
-              <Text style={styles.locationText} numberOfLines={1}>
-                {detectedCityName}
-              </Text>
-            </View>
-            <View style={styles.locationIcon}>
-              <Ionicons name="location" size={18} color={COLORS.primary} />
-            </View>
-          </TouchableOpacity>
+        {/* === HEADER === */}
+        <LinearGradient colors={['#E53935', '#B71C1C']} style={s.header}>
+          {/* Top Row: Location + Map */}
+          <View style={s.topRow}>
+            <TouchableOpacity onPress={() => router.push('/(main)/nearby-map')} style={s.mapBtn} data-testid="map-btn">
+              <Ionicons name="map-outline" size={20} color={COLORS.primary} />
+            </TouchableOpacity>
 
-          {/* Greeting */}
-          <View style={styles.greetingRow}>
-            <View style={styles.greetingTextBox}>
-              <Text style={styles.greetingTitle}>شو ناكل اليوم؟ 😋</Text>
-              <Text style={styles.greetingSubtitle}>
-                {restaurants.length > 0 
-                  ? `${restaurants.length} مطعم متوفر` 
-                  : 'اكتشف المطاعم القريبة منك'}
-              </Text>
-            </View>
+            <TouchableOpacity style={s.locationPill} onPress={handleRelocate} activeOpacity={0.7} data-testid="relocate-btn">
+              <View style={s.locationDot}>
+                {locatingGPS ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Ionicons name="location" size={14} color="#fff" />
+                )}
+              </View>
+              <View style={s.locationTextWrap}>
+                <Text style={s.locationLabel}>التوصيل إلى</Text>
+                <Text style={s.locationCity} numberOfLines={1}>{detectedCityName}</Text>
+              </View>
+              <Ionicons name="chevron-down" size={16} color="rgba(255,255,255,0.7)" />
+            </TouchableOpacity>
           </View>
 
-          {/* Search Bar */}
-          <View style={styles.searchContainer}>
+          {/* Greeting */}
+          <View style={s.greetingWrap}>
+            <Text style={s.greetingMain}>
+              {user?.name ? `أهلاً ${user.name.split(' ')[0]}` : 'شو ناكل اليوم؟'}
+            </Text>
+            <Text style={s.greetingSub}>
+              {filteredRestaurants.length > 0 
+                ? `${filteredRestaurants.filter(r => r.is_open).length} مطعم مفتوح الآن`
+                : 'اكتشف المطاعم القريبة منك'}
+            </Text>
+          </View>
+
+          {/* Search */}
+          <View style={s.searchWrap}>
             <Ionicons name="search" size={20} color="#999" />
             <TextInput
-              style={styles.searchInput}
-              placeholder="دور على مطعم أو أكلة..."
+              style={s.searchInput}
+              placeholder="ابحث عن مطعم أو نوع أكل..."
               placeholderTextColor="#bbb"
               value={searchQuery}
               onChangeText={setSearchQuery}
               textAlign="right"
             />
             {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Ionicons name="close-circle" size={20} color="#bbb" />
+              <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Ionicons name="close-circle" size={20} color="#ccc" />
               </TouchableOpacity>
             )}
           </View>
-        </View>
+        </LinearGradient>
 
-        {/* Categories */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.categoriesContainer}
-          contentContainerStyle={styles.categoriesContent}
-        >
-          {CATEGORIES.map((category) => (
-            <TouchableOpacity
-              key={category.id}
-              style={[
-                styles.categoryChip,
-                selectedCategory === category.id && styles.categoryChipActive,
-              ]}
-              onPress={() => setSelectedCategory(category.id)}
-            >
-              <Text style={styles.categoryIcon}>{category.icon}</Text>
-              <Text
-                style={[
-                  styles.categoryText,
-                  selectedCategory === category.id && styles.categoryTextActive,
-                ]}
+        {/* === CATEGORIES === */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.catScroll} style={{ marginTop: 16, marginBottom: 8 }}>
+          {CATEGORIES.map((cat) => {
+            const active = selectedCategory === cat.id;
+            return (
+              <TouchableOpacity
+                key={cat.id}
+                style={[s.catChip, active && s.catChipActive]}
+                onPress={() => setSelectedCategory(cat.id)}
+                activeOpacity={0.8}
               >
-                {category.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Ionicons name={cat.icon as any} size={18} color={active ? '#fff' : COLORS.textSecondary} />
+                <Text style={[s.catText, active && s.catTextActive]}>{cat.name}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
-        {/* Advertisements Slider */}
+        {/* === ADS BANNER === */}
         {advertisements.length > 0 && (
-          <View style={styles.adsContainer}>
+          <View style={s.adSection}>
             <TouchableOpacity
-              style={styles.adCard}
-              activeOpacity={0.9}
+              style={s.adCard}
+              activeOpacity={0.95}
               onPress={() => {
                 const ad = advertisements[currentAdIndex];
                 if (ad?.link_type === 'restaurant' && ad?.link_value) {
@@ -357,470 +268,238 @@ export default function HomeScreen() {
                 }
               }}
             >
-              <Image
-                source={{ uri: advertisements[currentAdIndex]?.image_url }}
-                style={styles.adImage}
-                resizeMode="cover"
-              />
-              <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.6)']}
-                style={styles.adOverlay}
-              >
-                <Text style={styles.adTitle}>{advertisements[currentAdIndex]?.title}</Text>
+              <Image source={{ uri: advertisements[currentAdIndex]?.image_url }} style={s.adImg} resizeMode="cover" />
+              <LinearGradient colors={['transparent', 'rgba(0,0,0,0.75)']} style={s.adGrad}>
+                <Text style={s.adTitle}>{advertisements[currentAdIndex]?.title}</Text>
               </LinearGradient>
             </TouchableOpacity>
-            {/* Dots Indicator */}
             {advertisements.length > 1 && (
-              <View style={styles.dotsContainer}>
-                {advertisements.map((_, index) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.dot,
-                      currentAdIndex === index && styles.dotActive,
-                    ]}
-                  />
+              <View style={s.adDots}>
+                {advertisements.map((_, i) => (
+                  <View key={i} style={[s.adDot, currentAdIndex === i && s.adDotActive]} />
                 ))}
               </View>
             )}
           </View>
         )}
 
-        {/* Section Title */}
-        <View style={styles.sectionHeader}>
-          <TouchableOpacity onPress={() => router.push('/(main)/nearby-map')} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLORS.primary, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 }}>
-            <Ionicons name="map" size={16} color="#fff" />
-            <Text style={{ fontFamily: 'Cairo_600SemiBold', fontSize: 13, color: '#fff' }}>خريطة</Text>
-          </TouchableOpacity>
-          <Text style={styles.sectionTitle}>المطاعم القريبة 🔥</Text>
-        </View>
+        {/* === FEATURED RESTAURANTS === */}
+        {featuredRestaurants.length > 0 && (
+          <View style={s.section}>
+            <View style={s.sectionHead}>
+              <Text style={s.sectionTitle}>المميزة</Text>
+              <Ionicons name="star" size={18} color="#FF9800" />
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 14 }}>
+              {featuredRestaurants.map((r) => (
+                <TouchableOpacity
+                  key={r.id}
+                  style={s.featuredCard}
+                  onPress={() => router.push(`/restaurant/${r.id}`)}
+                  activeOpacity={0.9}
+                >
+                  <Image source={{ uri: r.image || 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400' }} style={s.featuredImg} />
+                  <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={s.featuredGrad}>
+                    <Text style={s.featuredName} numberOfLines={1}>{r.name}</Text>
+                    <View style={s.featuredMeta}>
+                      <View style={s.featuredRating}>
+                        <Ionicons name="star" size={12} color="#FFD700" />
+                        <Text style={s.featuredRatingTxt}>{(r.rating ?? 0).toFixed(1)}</Text>
+                      </View>
+                      <Text style={s.featuredCuisine}>{r.cuisine_type}</Text>
+                    </View>
+                  </LinearGradient>
+                  {!r.is_open && (
+                    <View style={s.closedOverlay}>
+                      <Text style={s.closedTxt}>مغلق</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
 
-        {/* Restaurant Cards */}
-        <View style={styles.restaurantsContainer}>
-          {filteredRestaurants.length > 0 ? (
-            filteredRestaurants.map((restaurant, index) => renderRestaurantCard(restaurant, index))
+        {/* === ALL RESTAURANTS === */}
+        <View style={s.section}>
+          <View style={s.sectionHead}>
+            <TouchableOpacity onPress={() => router.push('/(main)/nearby-map')} style={s.mapPill}>
+              <Ionicons name="map" size={14} color="#fff" />
+              <Text style={s.mapPillTxt}>الخريطة</Text>
+            </TouchableOpacity>
+            <Text style={s.sectionTitle}>المطاعم القريبة</Text>
+          </View>
+
+          {(regularRestaurants.length > 0 || featuredRestaurants.length > 0) ? (
+            <View style={s.cardsWrap}>
+              {(regularRestaurants.length > 0 ? regularRestaurants : filteredRestaurants).map((restaurant) => (
+                <TouchableOpacity
+                  key={restaurant.id}
+                  style={s.card}
+                  onPress={() => router.push(`/restaurant/${restaurant.id}`)}
+                  activeOpacity={0.92}
+                  data-testid={`restaurant-card-${restaurant.id}`}
+                >
+                  {/* Image */}
+                  <View style={s.cardImgWrap}>
+                    <Image
+                      source={{ uri: restaurant.image || 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=600' }}
+                      style={s.cardImg}
+                    />
+                    <LinearGradient colors={['transparent', 'rgba(0,0,0,0.65)']} style={s.cardImgGrad} />
+                    
+                    {/* Status Badge */}
+                    <View style={[s.statusBadge, { backgroundColor: restaurant.is_open ? '#16a34a' : '#dc2626' }]}>
+                      <View style={[s.statusDot, { backgroundColor: restaurant.is_open ? '#86efac' : '#fca5a5' }]} />
+                      <Text style={s.statusTxt}>{restaurant.is_open ? 'مفتوح' : 'مغلق'}</Text>
+                    </View>
+
+                    {/* Featured Star */}
+                    {restaurant.is_featured && (
+                      <View style={s.featuredStar}>
+                        <Ionicons name="star" size={14} color="#FFD700" />
+                      </View>
+                    )}
+
+                    {/* Name overlay on image */}
+                    <View style={s.cardNameWrap}>
+                      <Text style={s.cardName} numberOfLines={1}>{restaurant.name}</Text>
+                      <Text style={s.cardCuisine}>{restaurant.cuisine_type}</Text>
+                    </View>
+                  </View>
+
+                  {/* Info Row */}
+                  <View style={s.cardInfo}>
+                    <View style={s.cardInfoRow}>
+                      {/* Rating */}
+                      <View style={s.cardStat}>
+                        <Ionicons name="star" size={14} color="#FFD700" />
+                        <Text style={s.cardStatBold}>{(restaurant.rating ?? 0).toFixed(1)}</Text>
+                        <Text style={s.cardStatLight}>({restaurant.review_count ?? 0})</Text>
+                      </View>
+
+                      {/* Delivery time */}
+                      <View style={s.cardStat}>
+                        <Ionicons name="time-outline" size={14} color={COLORS.primary} />
+                        <Text style={s.cardStatMed}>{restaurant.delivery_time || '30-45 د'}</Text>
+                      </View>
+
+                      {/* Delivery fee */}
+                      <View style={s.cardStat}>
+                        <Ionicons name="bicycle-outline" size={14} color={COLORS.textSecondary} />
+                        <Text style={s.cardStatMed}>{(restaurant.delivery_fee ?? 0).toLocaleString()} ل.س</Text>
+                      </View>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
           ) : (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyIcon}>🍽️</Text>
-              <Text style={styles.emptyText}>
-                لا توجد مطاعم متاحة حالياً
-              </Text>
-              <Text style={styles.emptySubtext}>
-                جرب تغيير الفلتر أو البحث
-              </Text>
+            <View style={s.emptyWrap}>
+              <View style={s.emptyCircle}>
+                <Ionicons name="restaurant-outline" size={48} color={COLORS.primary} />
+              </View>
+              <Text style={s.emptyTitle}>لا توجد مطاعم</Text>
+              <Text style={s.emptySub}>جرب تغيير الفلتر أو البحث</Text>
             </View>
           )}
         </View>
 
-        {/* Bottom Spacing */}
         <View style={{ height: 100 }} />
-      </ScrollView>
+      </Animated.ScrollView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    fontFamily: 'Cairo_400Regular',
-    color: COLORS.textSecondary,
-  },
+const s = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#f8f8fa' },
+  scrollView: { flex: 1 },
+  
+  // Loading
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f8fa' },
+  loadingLogo: { width: 80, height: 80, borderRadius: 24, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', ...SHADOWS.medium },
+  loadingText: { marginTop: 16, fontSize: 15, fontFamily: 'Cairo_400Regular', color: COLORS.textSecondary },
 
   // Header
-  header: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-  },
-  locationBar: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    borderRadius: 30,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    marginBottom: 16,
-    gap: 8,
-  },
-  locationIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  locationInfo: {
-    flex: 1,
-    alignItems: 'flex-end',
-  },
-  locationLabel: {
-    fontSize: 10,
-    fontFamily: 'Cairo_400Regular',
-    color: 'rgba(255,255,255,0.75)',
-  },
-  locationText: {
-    fontSize: 14,
-    fontFamily: 'Cairo_700Bold',
-    color: '#fff',
-  },
-  greetingRow: {
-    marginBottom: 16,
-    alignItems: 'flex-end',
-  },
-  greetingTextBox: {
-    alignItems: 'flex-end',
-  },
-  greetingTitle: {
-    fontSize: 24,
-    fontFamily: 'Cairo_700Bold',
-    color: '#fff',
-    marginBottom: 2,
-  },
-  greetingSubtitle: {
-    fontSize: 13,
-    fontFamily: 'Cairo_400Regular',
-    color: 'rgba(255,255,255,0.8)',
-  },
-  headerContent: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: SPACING.xl,
-  },
-  headerTextContainer: {
-    flex: 1,
-    alignItems: 'flex-end',
-  },
-  headerGreeting: {
-    fontSize: 28,
-    fontFamily: 'Cairo_700Bold',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    fontFamily: 'Cairo_400Regular',
-    color: 'rgba(255,255,255,0.8)',
-  },
-  headerIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerEmoji: {
-    fontSize: 30,
-    fontFamily: 'Cairo_400Regular',
-  },
+  header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 24, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 },
+  mapBtn: { width: 42, height: 42, borderRadius: 14, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', ...SHADOWS.small },
+  locationPill: { flex: 1, flexDirection: 'row-reverse', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 30, paddingHorizontal: 14, paddingVertical: 8, marginLeft: 12, gap: 8 },
+  locationDot: { width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.25)', justifyContent: 'center', alignItems: 'center' },
+  locationTextWrap: { flex: 1, alignItems: 'flex-end' },
+  locationLabel: { fontSize: 10, fontFamily: 'Cairo_400Regular', color: 'rgba(255,255,255,0.65)' },
+  locationCity: { fontSize: 14, fontFamily: 'Cairo_700Bold', color: '#fff' },
 
-  // Search
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    height: 48,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    fontFamily: 'Cairo_400Regular',
-    color: COLORS.textPrimary,
-    marginHorizontal: 10,
-  },
+  greetingWrap: { alignItems: 'flex-end', marginBottom: 18 },
+  greetingMain: { fontSize: 26, fontFamily: 'Cairo_700Bold', color: '#fff', lineHeight: 36 },
+  greetingSub: { fontSize: 13, fontFamily: 'Cairo_400Regular', color: 'rgba(255,255,255,0.8)', marginTop: 2 },
+
+  searchWrap: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 16, paddingHorizontal: 14, height: 50, ...SHADOWS.small },
+  searchInput: { flex: 1, fontSize: 14, fontFamily: 'Cairo_400Regular', color: COLORS.textPrimary, marginHorizontal: 10, textAlign: 'right' },
 
   // Categories
-  categoriesContainer: {
-    marginTop: 12,
-    marginBottom: 12,
-  },
-  categoriesContent: {
-    paddingHorizontal: 16,
-    gap: 8,
-  },
-  categoryChip: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 25,
-    marginRight: 4,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
-  },
-  categoryChipActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
-  },
-  categoryIcon: {
-    fontSize: 18,
-    fontFamily: 'Cairo_400Regular',
-    marginLeft: SPACING.sm,
-  },
-  categoryText: {
-    fontSize: 14,
-    fontFamily: 'Cairo_400Regular',
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-  },
-  categoryTextActive: {
-    color: COLORS.textWhite,
-  },
+  catScroll: { paddingHorizontal: 16, gap: 8 },
+  catChip: { flexDirection: 'row-reverse', alignItems: 'center', backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 28, gap: 6, borderWidth: 1.5, borderColor: '#f0f0f0' },
+  catChipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  catText: { fontSize: 13, fontFamily: 'Cairo_600SemiBold', color: COLORS.textSecondary },
+  catTextActive: { color: '#fff' },
 
-  // Advertisements
-  adsContainer: {
-    paddingHorizontal: SPACING.lg,
-    marginBottom: SPACING.lg,
-  },
-  adCard: {
-    width: '100%',
-    height: 150,
-    borderRadius: RADIUS.lg,
-    overflow: 'hidden',
-  },
-  adImage: {
-    width: '100%',
-    height: '100%',
-  },
-  adOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '50%',
-    justifyContent: 'flex-end',
-    padding: SPACING.md,
-  },
-  adTitle: {
-    fontSize: 16,
-    fontFamily: 'Cairo_700Bold',
-    fontWeight: 'bold',
-    color: COLORS.textWhite,
-    textAlign: 'right',
-  },
-  dotsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: SPACING.sm,
-    gap: 6,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.border,
-  },
-  dotActive: {
-    backgroundColor: COLORS.primary,
-    width: 20,
-  },
+  // Ads
+  adSection: { paddingHorizontal: 16, marginTop: 16, marginBottom: 8 },
+  adCard: { width: '100%', height: 160, borderRadius: 20, overflow: 'hidden', ...SHADOWS.medium },
+  adImg: { width: '100%', height: '100%' },
+  adGrad: { position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%', justifyContent: 'flex-end', paddingHorizontal: 16, paddingBottom: 14 },
+  adTitle: { fontSize: 17, fontFamily: 'Cairo_700Bold', color: '#fff', textAlign: 'right' },
+  adDots: { flexDirection: 'row', justifyContent: 'center', marginTop: 10, gap: 6 },
+  adDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#ddd' },
+  adDotActive: { backgroundColor: COLORS.primary, width: 22, borderRadius: 6 },
 
-  // Section Header
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
-    marginBottom: SPACING.lg,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontFamily: 'Cairo_400Regular',
-    fontWeight: 'bold',
-    color: COLORS.textPrimary,
-  },
-  seeAll: {
-    fontSize: 14,
-    fontFamily: 'Cairo_400Regular',
-    color: COLORS.primary,
-    fontWeight: '600',
-  },
+  // Sections
+  section: { marginTop: 20 },
+  sectionHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginBottom: 14 },
+  sectionTitle: { fontSize: 20, fontFamily: 'Cairo_700Bold', color: COLORS.textPrimary },
+  mapPill: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: COLORS.primary, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20 },
+  mapPillTxt: { fontSize: 12, fontFamily: 'Cairo_600SemiBold', color: '#fff' },
+
+  // Featured horizontal
+  featuredCard: { width: 200, height: 150, borderRadius: 18, overflow: 'hidden', ...SHADOWS.small },
+  featuredImg: { width: '100%', height: '100%' },
+  featuredGrad: { position: 'absolute', bottom: 0, left: 0, right: 0, height: '65%', justifyContent: 'flex-end', padding: 12 },
+  featuredName: { fontSize: 16, fontFamily: 'Cairo_700Bold', color: '#fff', textAlign: 'right' },
+  featuredMeta: { flexDirection: 'row-reverse', alignItems: 'center', gap: 8, marginTop: 4 },
+  featuredRating: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  featuredRatingTxt: { fontSize: 12, fontFamily: 'Cairo_700Bold', color: '#fff' },
+  featuredCuisine: { fontSize: 11, fontFamily: 'Cairo_400Regular', color: 'rgba(255,255,255,0.8)' },
+  closedOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', borderRadius: 18 },
+  closedTxt: { fontSize: 16, fontFamily: 'Cairo_700Bold', color: '#fff' },
 
   // Restaurant Cards
-  restaurantsContainer: {
-    paddingHorizontal: SPACING.lg,
-  },
-  restaurantCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.lg,
-    marginBottom: SPACING.lg,
-    overflow: 'hidden',
-  },
-  imageContainer: {
-    height: 200,
-    position: 'relative',
-  },
-  restaurantImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  imageOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 100,
-  },
-  badgesContainer: {
-    position: 'absolute',
-    top: SPACING.md,
-    right: SPACING.md,
-    flexDirection: 'row-reverse',
-    gap: SPACING.sm,
-  },
-  badge: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    borderRadius: RADIUS.full,
-  },
-  badgeOpen: {
-    backgroundColor: COLORS.success,
-  },
-  badgeClosed: {
-    backgroundColor: COLORS.error,
-  },
-  badgeDiscount: {
-    backgroundColor: COLORS.accent,
-  },
-  badgeFeatured: {
-    backgroundColor: '#FF9800',
-  },
-  badgeText: {
-    color: COLORS.textWhite,
-    fontSize: 12,
-    fontFamily: 'Cairo_400Regular',
-    fontWeight: 'bold',
-  },
-  imageTextContainer: {
-    position: 'absolute',
-    bottom: SPACING.md,
-    right: SPACING.md,
-  },
-  restaurantNameOnImage: {
-    fontSize: 22,
-    fontFamily: 'Cairo_400Regular',
-    fontWeight: 'bold',
-    color: COLORS.textWhite,
-    textAlign: 'right',
-  },
-  cuisineTypeOnImage: {
-    fontSize: 14,
-    fontFamily: 'Cairo_400Regular',
-    color: 'rgba(255,255,255,0.9)',
-    textAlign: 'right',
-  },
+  cardsWrap: { paddingHorizontal: 16, gap: 14 },
+  card: { backgroundColor: '#fff', borderRadius: 20, overflow: 'hidden', ...SHADOWS.small },
+  cardImgWrap: { height: 180, position: 'relative' },
+  cardImg: { width: '100%', height: '100%', resizeMode: 'cover' },
+  cardImgGrad: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 100 },
+  
+  statusBadge: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, gap: 5 },
+  statusDot: { width: 7, height: 7, borderRadius: 4 },
+  statusTxt: { fontSize: 11, fontFamily: 'Cairo_600SemiBold', color: '#fff' },
+  
+  featuredStar: { position: 'absolute', top: 12, left: 12, width: 30, height: 30, borderRadius: 15, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
 
-  // Info Container
-  infoContainer: {
-    padding: SPACING.lg,
-  },
-  infoRow: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: SPACING.sm,
-  },
-  ratingContainer: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 4,
-  },
-  ratingText: {
-    fontSize: 16,
-    fontFamily: 'Cairo_400Regular',
-    fontWeight: 'bold',
-    color: COLORS.textPrimary,
-  },
-  reviewCount: {
-    fontSize: 13,
-    fontFamily: 'Cairo_400Regular',
-    color: COLORS.textLight,
-  },
-  deliveryInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  deliveryText: {
-    fontSize: 13,
-    fontFamily: 'Cairo_400Regular',
-    color: COLORS.textSecondary,
-  },
-  feeContainer: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 4,
-  },
-  feeText: {
-    fontSize: 13,
-    fontFamily: 'Cairo_400Regular',
-    color: COLORS.textSecondary,
-  },
-  minOrder: {
-    fontSize: 12,
-    fontFamily: 'Cairo_400Regular',
-    color: COLORS.textLight,
-  },
+  cardNameWrap: { position: 'absolute', bottom: 12, right: 14, left: 14 },
+  cardName: { fontSize: 20, fontFamily: 'Cairo_700Bold', color: '#fff', textAlign: 'right', textShadowColor: 'rgba(0,0,0,0.5)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
+  cardCuisine: { fontSize: 13, fontFamily: 'Cairo_400Regular', color: 'rgba(255,255,255,0.9)', textAlign: 'right' },
 
-  // Empty State
-  emptyContainer: {
-    alignItems: 'center',
-    paddingVertical: 60,
-  },
-  emptyIcon: {
-    fontSize: 60,
-    fontFamily: 'Cairo_400Regular',
-    marginBottom: SPACING.lg,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontFamily: 'Cairo_400Regular',
-    fontWeight: 'bold',
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.sm,
-    textAlign: 'center',
-  },
-  emptySubtext: {
-    fontSize: 14,
-    fontFamily: 'Cairo_400Regular',
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-  },
-  selectLocationButton: {
-    marginTop: SPACING.lg,
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.md,
-    borderRadius: RADIUS.md,
-  },
-  selectLocationButtonText: {
-    color: COLORS.textWhite,
-    fontWeight: '600',
-    fontSize: 16,
-    fontFamily: 'Cairo_400Regular',
-  },
+  cardInfo: { paddingHorizontal: 14, paddingVertical: 12 },
+  cardInfoRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' },
+  cardStat: { flexDirection: 'row-reverse', alignItems: 'center', gap: 4 },
+  cardStatBold: { fontSize: 14, fontFamily: 'Cairo_700Bold', color: COLORS.textPrimary },
+  cardStatLight: { fontSize: 12, fontFamily: 'Cairo_400Regular', color: COLORS.textLight },
+  cardStatMed: { fontSize: 12, fontFamily: 'Cairo_400Regular', color: COLORS.textSecondary },
 
+  // Empty
+  emptyWrap: { alignItems: 'center', paddingVertical: 50 },
+  emptyCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#FFF0F0', justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
+  emptyTitle: { fontSize: 18, fontFamily: 'Cairo_700Bold', color: COLORS.textPrimary },
+  emptySub: { fontSize: 14, fontFamily: 'Cairo_400Regular', color: COLORS.textSecondary, marginTop: 4 },
 });
