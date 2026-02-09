@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from routes.deps import *
 from models.schemas import DriverLocation, DriverStatus, OrderStatusUpdate
 from typing import List, Optional
+from routes.cities import SYRIAN_CITIES
 
 router = APIRouter()
 
