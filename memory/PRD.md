@@ -1,67 +1,63 @@
 # أكلة عالسريع (Aklah 3al Saree3) - PRD
 
-## Original Problem Statement
-Food delivery application for Syria with customer frontend, restaurant dashboard, and driver app.
+## Problem Statement
+تطبيق توصيل طعام سوري يعمل على iOS و Android مع لوحة تحكم للمطاعم والسائقين والمديرين.
 
-## Core Architecture
-- **Backend**: Python FastAPI + MongoDB (motor async)
-- **Frontend**: React Native (Expo) + TypeScript
-- **Navigation**: Expo Router (file-based)
-- **State**: Zustand
-- **Maps**: OpenStreetMap + Leaflet via WebView
-- **Notifications**: Expo Push Notifications
+## Architecture
+- **Frontend**: React Native (Expo SDK 54), Expo Router
+- **Backend**: Python FastAPI, MongoDB (motor async)
+- **Production Server**: Ubuntu VPS at `https://akla-alsaree.cloud`
+- **Database**: MongoDB `yalla_nakol_prod` on production
 
-## Backend Structure (Refactored)
-```
-backend/
-├── server.py           # Main app + all routes (~4200 lines)
-├── database.py         # MongoDB connection
-├── models/
-│   └── schemas.py      # All Pydantic models (~445 lines)
-├── utils/
-│   ├── auth.py         # JWT, password hashing, get_current_user
-│   ├── helpers.py      # calculate_distance, timezone, working hours
-│   └── notifications.py # Push notifications, in-app notifications
-└── routes/             # Ready for future route extraction
-```
+## Core Features (Implemented)
+- [x] تسجيل دخول/إنشاء حساب (عميل/مطعم/سائق/مدير)
+- [x] تصفح المطاعم مع بحث وفلترة (اسم، نوع، مدينة)
+- [x] تحديد موقع GPS تلقائي مع كشف خارج التغطية
+- [x] اختيار المدينة يدوياً (Modal احترافي)
+- [x] نظام الطلبات الكامل
+- [x] تتبع السائق على الخريطة
+- [x] إشعارات push
+- [x] لوحة تحكم المطعم
+- [x] لوحة تحكم المدير
+- [x] لوحة تحكم السائق
+- [x] نظام تحديث إجباري
+- [x] تنظيف push tokens عند تسجيل الخروج
+- [x] إجبار السائقين على اختيار المدينة عند التسجيل
 
-## What's Been Implemented
-- Full user auth (register/login/JWT) for customer, driver, restaurant, admin
-- Restaurant CRUD, menu management, payment methods
-- Order flow: create → accept → prepare → ready → driver_assigned → picked_up → delivered
-- Driver management: platform drivers, restaurant drivers, favorites
-- Live driver tracking with ETA (WebView + Leaflet map)
-- Push notifications via Expo Push Service
-- Admin dashboard with stats, user management, complaints
-- Complaint system, password reset requests
-- Advertisements, restaurant featuring
-- Arabic-only UI with forced RTL layout
-- City-based filtering for drivers and restaurants
+## Bug Fixes (Feb 10, 2026)
+- [x] إصلاح crash أندرويد: إزالة Animated API من _layout.tsx, login.tsx, LiveTrackingModal
+- [x] إصلاح toLocaleString crash على Hermes engine
+- [x] إصلاح <Redirect> → router.replace في index.tsx
+- [x] إصلاح إشعارات مكررة
+- [x] إصلاح بحث المطاعم (backend search بدل frontend filter)
+- [x] إصلاح كشف الموقع خارج سوريا (200km threshold)
+- [x] إضافة city_id لـ RestaurantUpdate schema
+- [x] إصلاح كلمة مرور حساب المدير
 
-## Completed in Current Session (Feb 2026)
-1. **Bug Fix: Driver tracking "not assigned"** - Backend now returns `driver_assigned` + `has_location` fields. Frontend shows driver info even without GPS location.
-2. **Bug Fix: Working hours auto-close** - Uses `Asia/Damascus` timezone via `zoneinfo`. Auto-updates `is_open` when restaurants are fetched. Order creation validates against working hours.
-3. **Bug Fix: Keyboard covers checkout inputs** - Bottom card hides when keyboard is visible using Keyboard event listeners.
-4. **Map screens unified** - `LocationPicker.tsx` now exports both inline map picker and full-screen `MapLocationPicker`, sharing the same WebView-based Leaflet map code.
-5. **Server.py refactored** - Models extracted to `models/schemas.py`, auth to `utils/auth.py`, helpers to `utils/helpers.py`, notifications to `utils/notifications.py`. Duplicate routes removed.
-6. **Bug Fix: LinkingContext error** - Fixed @react-navigation/native version conflict by deduplication.
-7. **GPS auto-detect city** - Removed manual city picker. App detects city from GPS and auto-filters restaurants.
-8. **Bug Fix: toLocaleString crash (P0)** - Added null guards for rating, delivery_fee, min_order, review_count.
-9. **Bug Fix: Map loading loop** - Aggressive timeouts + error state with retry.
-10. **Bug Fix: Driver city_id missing** - `PUT /driver/location` now auto-detects city from GPS. Drivers always have correct city.
-11. **Bug Fix: Orders not reaching drivers** - `driver_accept_order` now accepts orders in `preparing` status too.
-12. **Restaurant driver tracking** - Added LiveTrackingModal to restaurant orders. Restaurant can track driver on map with ETA.
+## App Store
+- **Bundle ID**: `com.wethaq.akla3alsare3`
+- **Apple Team ID**: `BLTB53Q8S4`
+- **Android Package**: `com.wethaq.akleh`
+- **iOS build uploaded to App Store Connect via EAS Submit**
 
-## Known Issues
-- Old admin account (0900000000) has stale bcrypt hash - login fails (pre-existing)
+## Production URLs
+- Backend: `https://akla-alsaree.cloud`
+- Database: MongoDB `yalla_nakol_prod` on `mongodb://localhost:27017`
 
-## Pending Tasks (Priority Order)
-### P1  
-- Continue extracting routes from server.py into separate files
+## Accounts
+- Admin: `0900000000` / `admin123`
 
-### P2
-- Simplify restaurant dashboard UI
-- Dark mode
+## P0 (Next)
+- اختبار APK الجديد (crash fix + all 7 fixes)
+- اختبار TestFlight على iPhone
+- تحديث الباك إند على السيرفر
 
-### P3
-- Further route extraction (auth.py, orders.py, drivers.py, admin.py)
+## P1 (Soon)
+- شاشة إعدادات المطعم مع حقول المدينة والموقع الإلزامية
+- شاشة إعدادات السائق مع اختيار المدينة الإلزامي
+- إضافة screenshots للـ App Store
+
+## P2 (Backlog)
+- نشر على Google Play Store
+- تحسين أداء MongoDB indexes
+- نظام تقييم متقدم
