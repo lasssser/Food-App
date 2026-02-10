@@ -158,12 +158,21 @@ export default function HomeScreen() {
     }
   }, [advertisements.length]);
 
+  // Debounce search
+  const handleSearchChange = (text: string) => {
+    setSearchQuery(text);
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      setDebouncedSearch(text);
+    }, 500);
+  };
+
   const fetchRestaurants = async () => {
     try {
       const filters: any = {};
       if (selectedCategory !== 'all') filters.cuisine = selectedCategory;
       if (detectedCity) filters.city_id = detectedCity;
-      if (searchQuery.trim()) filters.search = searchQuery.trim();
+      if (debouncedSearch.trim()) filters.search = debouncedSearch.trim();
       const data = await restaurantAPI.getAll(filters);
       setRestaurants(data || []);
     } catch (error) {
@@ -177,7 +186,7 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchRestaurants();
-    }, [selectedCategory, detectedCity, searchQuery])
+    }, [selectedCategory, detectedCity, debouncedSearch])
   );
 
   const onRefresh = async () => {
