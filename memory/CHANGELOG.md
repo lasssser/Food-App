@@ -1,5 +1,36 @@
 # أكلة عالسريع - CHANGELOG
 
+## Feb 10, 2026 - Session 4 (Redesign)
+
+### Home Screen Redesign
+- New red gradient header with "التوصيل إلى" location selector
+- Greeting text "شو ناكل اليوم؟"
+- Improved search bar with icon wrapper and clear button
+- Professional ad banner with pagination dots
+- Category filter chips with white cards and shadow
+- Featured restaurants horizontal scroll section
+- Nearby restaurants vertical list with full-width image cards
+- Status badges (مفتوح/مغلق) with colored dots
+- Restaurant meta row: rating, delivery time, delivery fee
+
+### Restaurant Detail Page Redesign
+- Hero image with gradient overlay and status badge
+- Navigation buttons (back, favorite)
+- Restaurant info cards (delivery time, fee, min order)
+- Category tabs for menu filtering
+- Clean menu items with image, description, price, add button
+- Floating cart button with item count and total
+- Add-on selection modal with checkbox/radio options
+
+### toLocaleString Crash Fix (Complete)
+- Replaced ALL toLocaleString() calls with formatPrice() utility
+- Files fixed: cart.tsx, checkout.tsx, orders.tsx, home.tsx, [id].tsx
+- Also fixed: driver dashboard, myorders, restaurant menu, addons, dashboard
+- Components fixed: RestaurantCard, MenuItemCard, CartButton
+
+### Backend Fix
+- Fixed CORS middleware syntax error in server.py (app.mount was inserted mid-block)
+
 ## Feb 10, 2026 - Session 3 (Part 3)
 
 ### Dynamic Categories System

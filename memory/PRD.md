@@ -23,16 +23,26 @@
 - [x] نظام تحديث إجباري
 - [x] تنظيف push tokens عند تسجيل الخروج
 - [x] إجبار السائقين على اختيار المدينة عند التسجيل
+- [x] نظام الفئات الديناميكية (CRUD من لوحة المدير)
+- [x] بحث مباشر مع debounce
+- [x] إعدادات المطعم مع موقع إلزامي على الخريطة
+
+## UI/UX Redesign (Feb 10, 2026)
+- [x] إعادة تصميم الصفحة الرئيسية - هيدر أحمر، بحث، فئات، كروت مطاعم
+- [x] إعادة تصميم صفحة تفاصيل المطعم - hero image، info cards، tabs، menu items
+- [x] إصلاح toLocaleString crash عبر جميع الملفات (formatPrice utility)
+- [x] إصلاح CORS middleware syntax error في server.py
 
 ## Bug Fixes (Feb 10, 2026)
 - [x] إصلاح crash أندرويد: إزالة Animated API من _layout.tsx, login.tsx, LiveTrackingModal
-- [x] إصلاح toLocaleString crash على Hermes engine
+- [x] إصلاح toLocaleString crash على Hermes engine (ALL files fixed)
 - [x] إصلاح <Redirect> → router.replace في index.tsx
 - [x] إصلاح إشعارات مكررة
 - [x] إصلاح بحث المطاعم (backend search بدل frontend filter)
 - [x] إصلاح كشف الموقع خارج سوريا (200km threshold)
 - [x] إضافة city_id لـ RestaurantUpdate schema
 - [x] إصلاح كلمة مرور حساب المدير
+- [x] إصلاح CORS middleware في server.py
 
 ## App Store
 - **Bundle ID**: `com.wethaq.akla3alsare3`
@@ -48,16 +58,14 @@
 - Admin: `0900000000` / `admin123`
 
 ## P0 (Next)
-- اختبار APK الجديد (crash fix + all 7 fixes)
-- اختبار TestFlight على iPhone
-- تحديث الباك إند على السيرفر
+- إصلاح مشكلة الكيبورد الذي يخفي أزرار الإرسال (KeyboardAvoidingView)
 
 ## P1 (Soon)
-- شاشة إعدادات المطعم مع حقول المدينة والموقع الإلزامية
-- شاشة إعدادات السائق مع اختيار المدينة الإلزامي
-- إضافة screenshots للـ App Store
+- تحسين عرض صور المطاعم (URL-based instead of file://)
+- نظام المفضلة مع Backend API
 
 ## P2 (Backlog)
 - نشر على Google Play Store
 - تحسين أداء MongoDB indexes
 - نظام تقييم متقدم
+- إضافة screenshots للـ App Store
