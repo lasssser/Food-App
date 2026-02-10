@@ -296,6 +296,49 @@ export default function DriverProfile() {
 
       {/* Complaint Modal */}
       <Modal visible={showComplaintModal} animationType="slide" transparent>
+
+      {/* City Selection Modal */}
+      </Modal>
+      <Modal visible={showCityModal} animationType="slide" transparent>
+        <View style={styles.helpModalOverlay}>
+          <View style={styles.helpModalContent}>
+            <View style={styles.helpModalHeader}>
+              <TouchableOpacity onPress={() => setShowCityModal(false)} activeOpacity={0.7}>
+                <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+              </TouchableOpacity>
+              <Text style={styles.helpModalTitle}>اختر مدينتك</Text>
+              <View style={{ width: 24 }} />
+            </View>
+            <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 13, color: COLORS.textSecondary, textAlign: 'center', marginBottom: SPACING.lg }}>
+              يجب اختيار المدينة لتتمكن من استقبال الطلبات
+            </Text>
+            <View style={styles.helpContent}>
+              {CITIES.map((city) => (
+                <TouchableOpacity
+                  key={city.id}
+                  style={[styles.helpItem, selectedCity === city.id && { borderColor: COLORS.primary, borderWidth: 2 }]}
+                  onPress={() => handleSelectCity(city.id)}
+                  activeOpacity={0.7}
+                  disabled={savingCity}
+                >
+                  <View style={[styles.helpIcon, { backgroundColor: selectedCity === city.id ? `${COLORS.primary}15` : `${COLORS.textLight}15` }]}>
+                    <Ionicons name="location" size={24} color={selectedCity === city.id ? COLORS.primary : COLORS.textSecondary} />
+                  </View>
+                  <View style={styles.helpInfo}>
+                    <Text style={[styles.helpTitle, selectedCity === city.id && { color: COLORS.primary }]}>{city.name}</Text>
+                  </View>
+                  {selectedCity === city.id && (
+                    <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+            {savingCity && <ActivityIndicator size="small" color={COLORS.primary} style={{ marginTop: SPACING.md }} />}
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={showComplaintModal} animationType="slide" transparent>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.modalOverlay}
