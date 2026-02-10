@@ -45,6 +45,12 @@ async def get_restaurants(
     result = []
     for r in restaurants:
         r["is_featured"] = r.get("is_featured", False)
+        # If no lat/lng but has city_id, use city center coordinates
+        if (not r.get("lat") or not r.get("lng")) and r.get("city_id"):
+            city_lat, city_lng = get_city_coords(r["city_id"])
+            if city_lat and city_lng:
+                r["lat"] = city_lat
+                r["lng"] = city_lng
         # Auto-check working hours and update is_open
         should_be_open = is_restaurant_open_by_hours(r)
         if r.get("is_open", True) != should_be_open and r.get("opening_time") and r.get("closing_time"):
