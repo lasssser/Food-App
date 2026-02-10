@@ -160,8 +160,8 @@ export default function RestaurantInfoEdit() {
         closing_time: closingTime || undefined,
         working_days: workingDays.length > 0 ? workingDays : undefined,
         image: restaurantImage || undefined,
-        lat: parseFloat(lat) || undefined,
-        lng: parseFloat(lng) || undefined,
+        lat: lat ? parseFloat(lat) : undefined,
+        lng: lng ? parseFloat(lng) : undefined,
       });
 
       Alert.alert('نجاح', 'تم تحديث بيانات المطعم بنجاح', [
