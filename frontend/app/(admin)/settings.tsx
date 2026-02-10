@@ -268,6 +268,12 @@ export default function AdminSettings() {
               onPress={() => router.push('/(admin)/advertisements')}
             />
             <MenuItem
+              icon="grid-outline"
+              title="إدارة الأصناف"
+              subtitle="إضافة وتعديل أصناف المطاعم (حلويات، قهوة...)"
+              onPress={() => router.push('/(admin)/categories')}
+            />
+            <MenuItem
               icon="people-outline"
               title="طلبات تغيير الدور"
               subtitle="طلبات التقدم كسائق أو صاحب مطعم"
