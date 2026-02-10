@@ -351,8 +351,8 @@ export default function HomeScreen() {
               {user?.name ? `أهلاً ${user.name.split(' ')[0]}` : 'شو ناكل اليوم؟'}
             </Text>
             <Text style={s.greetingSub}>
-              {filteredRestaurants.length > 0 
-                ? `${filteredRestaurants.filter(r => r.is_open).length} مطعم مفتوح الآن`
+              {restaurants.length > 0 
+                ? `${restaurants.filter(r => r.is_open).length} مطعم مفتوح الآن`
                 : 'اكتشف المطاعم القريبة منك'}
             </Text>
           </View>
