@@ -14,20 +14,23 @@ async def get_restaurants(
     search: Optional[str] = None
 ):
     query = {}
-    if city_id:
-        query["city_id"] = city_id
+    if search:
+        # Search ignores city filter - search across ALL restaurants
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"cuisine_type": {"$regex": search, "$options": "i"}},
+            {"area": {"$regex": search, "$options": "i"}},
+        ]
+    else:
+        # Only apply city filter when NOT searching
+        if city_id:
+            query["city_id"] = city_id
     if area:
         query["area"] = area
     if cuisine:
         query["cuisine_type"] = cuisine
     if is_open is not None:
         query["is_open"] = is_open
-    if search:
-        query["$or"] = [
-            {"name": {"$regex": search, "$options": "i"}},
-            {"cuisine_type": {"$regex": search, "$options": "i"}},
-            {"area": {"$regex": search, "$options": "i"}},
-        ]
     
     # Sort by featured first, then by created_at
     restaurants = await db.restaurants.find(query).sort([("is_featured", -1), ("featured_at", -1), ("created_at", -1)]).to_list(100)
