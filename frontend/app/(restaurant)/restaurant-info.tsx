@@ -352,8 +352,73 @@ export default function RestaurantInfoEdit() {
 
           {/* Location Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>الموقع</Text>
+            <Text style={styles.sectionTitle}>الموقع والمدينة</Text>
+
+            {/* City Selection - Required */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>المدينة * (إلزامي)</Text>
+              <TouchableOpacity 
+                style={[styles.dropdownButton, !cityId && { borderColor: COLORS.error, borderWidth: 1.5 }]}
+                onPress={() => setShowCityDropdown(!showCityDropdown)}
+              >
+                <Ionicons name="chevron-down" size={20} color={COLORS.textSecondary} />
+                <Text style={[styles.dropdownText, !cityId && { color: COLORS.error }]}>
+                  {CITIES.find(c => c.id === cityId)?.name || 'اختر المدينة (إلزامي)'}
+                </Text>
+              </TouchableOpacity>
+              {showCityDropdown && (
+                <View style={styles.dropdown}>
+                  {CITIES.map((city) => (
+                    <TouchableOpacity
+                      key={city.id}
+                      style={[styles.dropdownItem, cityId === city.id && styles.dropdownItemActive]}
+                      onPress={() => {
+                        setCityId(city.id);
+                        setShowCityDropdown(false);
+                        setHasChanges(true);
+                      }}
+                    >
+                      <Text style={[styles.dropdownItemText, cityId === city.id && styles.dropdownItemTextActive]}>
+                        {city.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
             
+            {/* GPS Coordinates - Required */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>إحداثيات الموقع * (إلزامي)</Text>
+              <View style={styles.row}>
+                <View style={[styles.halfInput]}>
+                  <TextInput
+                    style={[styles.input, !lat && { borderColor: COLORS.error, borderWidth: 1.5 }]}
+                    value={lat}
+                    onChangeText={(text) => { setLat(text); setHasChanges(true); }}
+                    placeholder="خط العرض (Lat)"
+                    placeholderTextColor={COLORS.textLight}
+                    textAlign="center"
+                    keyboardType="decimal-pad"
+                  />
+                </View>
+                <View style={[styles.halfInput]}>
+                  <TextInput
+                    style={[styles.input, !lng && { borderColor: COLORS.error, borderWidth: 1.5 }]}
+                    value={lng}
+                    onChangeText={(text) => { setLng(text); setHasChanges(true); }}
+                    placeholder="خط الطول (Lng)"
+                    placeholderTextColor={COLORS.textLight}
+                    textAlign="center"
+                    keyboardType="decimal-pad"
+                  />
+                </View>
+              </View>
+              <Text style={{ fontSize: 11, fontFamily: 'Cairo_400Regular', color: COLORS.textLight, textAlign: 'right', marginTop: 4 }}>
+                يمكنك الحصول على الإحداثيات من خرائط Google
+              </Text>
+            </View>
+
             <View style={styles.inputGroup}>
               <Text style={styles.label}>العنوان</Text>
               <TextInput
