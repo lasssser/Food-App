@@ -388,36 +388,28 @@ export default function RestaurantInfoEdit() {
               )}
             </View>
             
-            {/* GPS Coordinates - Required */}
+            {/* GPS Location - Map Picker - Required */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>إحداثيات الموقع * (إلزامي)</Text>
-              <View style={styles.row}>
-                <View style={[styles.halfInput]}>
-                  <TextInput
-                    style={[styles.input, !lat && { borderColor: COLORS.error, borderWidth: 1.5 }]}
-                    value={lat}
-                    onChangeText={(text) => { setLat(text); setHasChanges(true); }}
-                    placeholder="خط العرض (Lat)"
-                    placeholderTextColor={COLORS.textLight}
-                    textAlign="center"
-                    keyboardType="decimal-pad"
-                  />
-                </View>
-                <View style={[styles.halfInput]}>
-                  <TextInput
-                    style={[styles.input, !lng && { borderColor: COLORS.error, borderWidth: 1.5 }]}
-                    value={lng}
-                    onChangeText={(text) => { setLng(text); setHasChanges(true); }}
-                    placeholder="خط الطول (Lng)"
-                    placeholderTextColor={COLORS.textLight}
-                    textAlign="center"
-                    keyboardType="decimal-pad"
-                  />
-                </View>
-              </View>
-              <Text style={{ fontSize: 11, fontFamily: 'Cairo_400Regular', color: COLORS.textLight, textAlign: 'right', marginTop: 4 }}>
-                يمكنك الحصول على الإحداثيات من خرائط Google
-              </Text>
+              <Text style={styles.label}>موقع المطعم على الخريطة * (إلزامي)</Text>
+              <LocationPicker
+                initialLocation={lat && lng ? { lat: parseFloat(lat), lng: parseFloat(lng) } : null}
+                onLocationSelect={(loc) => {
+                  setLat(String(loc.lat));
+                  setLng(String(loc.lng));
+                  setHasChanges(true);
+                }}
+                height={220}
+              />
+              {(!lat || !lng) && (
+                <Text style={{ fontSize: 12, fontFamily: 'Cairo_400Regular', color: COLORS.error, textAlign: 'right', marginTop: 4 }}>
+                  اضغط "موقعي" أو حرّك الخريطة لتحديد موقع المطعم
+                </Text>
+              )}
+              {lat && lng && (
+                <Text style={{ fontSize: 11, fontFamily: 'Cairo_400Regular', color: COLORS.success, textAlign: 'right', marginTop: 4 }}>
+                  تم تحديد الموقع بنجاح
+                </Text>
+              )}
             </View>
 
             <View style={styles.inputGroup}>
