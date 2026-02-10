@@ -140,10 +140,28 @@ export default function CheckoutScreen() {
         setSelectedAddress(addressData[0].id);
       }
 
-      // Use default payment methods (available for all customers)
-      setPaymentMethods(DEFAULT_PAYMENT_METHODS);
-      // Set COD as default payment method
-      setSelectedPaymentMethod('cod');
+      // Fetch payment methods from restaurant
+      if (restaurant?.id) {
+        try {
+          const pmData = await restaurantAPI.getPaymentMethods(restaurant.id);
+          const enabledMethods = (pmData?.methods || []).filter((m: PaymentMethod) => m.is_enabled);
+          if (enabledMethods.length > 0) {
+            setPaymentMethods(enabledMethods);
+            setSelectedPaymentMethod(enabledMethods[0].method);
+          } else {
+            // No payment methods configured - use COD only as fallback
+            setPaymentMethods([DEFAULT_PAYMENT_METHODS[0]]);
+            setSelectedPaymentMethod('cod');
+          }
+        } catch {
+          // API error - use COD only as fallback
+          setPaymentMethods([DEFAULT_PAYMENT_METHODS[0]]);
+          setSelectedPaymentMethod('cod');
+        }
+      } else {
+        setPaymentMethods([DEFAULT_PAYMENT_METHODS[0]]);
+        setSelectedPaymentMethod('cod');
+      }
 
     } catch (error) {
       console.error('Error fetching data:', error);
