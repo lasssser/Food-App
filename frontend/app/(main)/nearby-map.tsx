@@ -89,7 +89,7 @@ const getMapHTML = (lat: number, lng: number, restaurants: any[]) => {
     
     /* Custom zoom controls */
     .custom-zoom {
-      position: absolute; bottom: 100px; right: 16px; z-index: 1000;
+      position: absolute; bottom: 180px; right: 16px; z-index: 1000;
       display: flex; flex-direction: column; gap: 4px;
     }
     .zoom-btn {
@@ -105,7 +105,7 @@ const getMapHTML = (lat: number, lng: number, restaurants: any[]) => {
     
     /* My location button */
     .my-loc-btn {
-      position: absolute; bottom: 100px; left: 16px; z-index: 1000;
+      position: absolute; bottom: 180px; left: 16px; z-index: 1000;
       width: 44px; height: 44px;
       background: white; border: none; border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
