@@ -174,13 +174,13 @@ export default function HomeScreen() {
     }
   }, [advertisements.length]);
 
-  // Debounce search
+  // Debounce search - auto search as user types
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     searchTimerRef.current = setTimeout(() => {
       setDebouncedSearch(text);
-    }, 500);
+    }, 400);
   };
 
   const fetchRestaurants = async () => {
@@ -203,11 +203,9 @@ export default function HomeScreen() {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchRestaurants();
-    }, [selectedCategory, detectedCity, debouncedSearch])
-  );
+  useEffect(() => {
+    fetchRestaurants();
+  }, [selectedCategory, detectedCity, debouncedSearch]);
 
   const onRefresh = async () => {
     setRefreshing(true);
