@@ -11,6 +11,7 @@ class UserCreate(BaseModel):
     phone: str
     password: str
     role: str = "customer"
+    city_id: Optional[str] = None
 
 class UserLogin(BaseModel):
     phone: str
