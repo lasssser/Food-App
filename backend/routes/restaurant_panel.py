@@ -457,7 +457,7 @@ async def get_restaurant_info(current_user: dict = Depends(get_current_user)):
         "description": restaurant.get("description", ""),
         "address": restaurant.get("address", ""),
         "area": restaurant.get("area", ""),
-        "city_id": restaurant.get("city_id", "damascus"),
+        "city_id": restaurant.get("city_id", ""),
         "cuisine_type": restaurant.get("cuisine_type", ""),
         "is_open": restaurant.get("is_open", True),
         "delivery_fee": restaurant.get("delivery_fee", 5000),
@@ -469,6 +469,8 @@ async def get_restaurant_info(current_user: dict = Depends(get_current_user)):
         "rating": restaurant.get("rating", 0),
         "review_count": restaurant.get("review_count", 0),
         "image": restaurant.get("image", ""),
+        "lat": restaurant.get("lat"),
+        "lng": restaurant.get("lng"),
     }
 
 @router.put("/restaurant/info")
