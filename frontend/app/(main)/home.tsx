@@ -74,6 +74,8 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const searchTimerRef = useRef<any>(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
   const [detectedCity, setDetectedCity] = useState<string | null>(null);
