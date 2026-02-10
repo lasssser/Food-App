@@ -110,6 +110,25 @@ export default function DriverProfile() {
         </View>
 
         <View style={styles.menuSection}>
+          {/* City Selection - Required */}
+          <TouchableOpacity 
+            style={[styles.menuItem, !selectedCity && { backgroundColor: '#FFF5F5' }]}
+            onPress={() => setShowCityModal(true)}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="chevron-back" size={20} color={COLORS.textLight} />
+            <View style={styles.menuItemContent}>
+              <Text style={[styles.menuItemText, !selectedCity && { color: COLORS.error }]}>
+                {selectedCity 
+                  ? `المدينة: ${CITIES.find(c => c.id === selectedCity)?.name || selectedCity}`
+                  : 'اختر مدينتك (إلزامي!)'}
+              </Text>
+              <View style={[styles.menuIcon, { backgroundColor: !selectedCity ? `${COLORS.error}15` : `${COLORS.primary}15` }]}>
+                <Ionicons name="location" size={20} color={!selectedCity ? COLORS.error : COLORS.primary} />
+              </View>
+            </View>
+          </TouchableOpacity>
+
           <TouchableOpacity 
             style={styles.menuItem} 
             onPress={() => router.push('/(driver)/myorders')}
