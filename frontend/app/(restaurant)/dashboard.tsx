@@ -173,7 +173,7 @@ export default function RestaurantDashboard() {
           </View>
           
           <View style={styles.infoRow}>
-            <Text style={styles.infoValue}>{stats?.restaurant?.delivery_fee?.toLocaleString()} ل.س</Text>
+            <Text style={styles.infoValue}>{formatPrice(stats?.restaurant?.delivery_fee)} ل.س</Text>
             <View style={styles.infoLabel}>
               <Text style={styles.infoLabelText}>رسوم التوصيل</Text>
               <Ionicons name="bicycle" size={18} color="#666" />
@@ -181,7 +181,7 @@ export default function RestaurantDashboard() {
           </View>
           
           <View style={styles.infoRow}>
-            <Text style={styles.infoValue}>{stats?.restaurant?.min_order?.toLocaleString()} ل.س</Text>
+            <Text style={styles.infoValue}>{formatPrice(stats?.restaurant?.min_order)} ل.س</Text>
             <View style={styles.infoLabel}>
               <Text style={styles.infoLabelText}>الحد الأدنى</Text>
               <Ionicons name="cart" size={18} color="#666" />

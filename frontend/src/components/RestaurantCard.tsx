@@ -45,10 +45,10 @@ export const RestaurantCard: React.FC<Props> = ({ restaurant, onPress }) => {
         
         <View style={styles.row}>
           <Text style={styles.deliveryFee}>
-            توصيل: {restaurant.delivery_fee.toLocaleString()} ل.س
+            توصيل: {formatPrice(restaurant.delivery_fee)} ل.س
           </Text>
           <Text style={styles.minOrder}>
-            الحد الأدنى: {restaurant.min_order.toLocaleString()} ل.س
+            الحد الأدنى: {formatPrice(restaurant.min_order)} ل.س
           </Text>
         </View>
       </View>
