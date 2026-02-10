@@ -654,9 +654,6 @@ export const adminStatisticsAPI = {
     const response = await api.get('/admin/statistics/overview');
     return response.data;
   },
-
-export default api;
-
   toggleFeatured: async (restaurantId: string, isFeatured: boolean) => {
     const response = await api.put(`/admin/restaurants/${restaurantId}/feature?is_featured=${isFeatured}`);
     return response.data;
@@ -669,3 +666,5 @@ export const categoriesAPI = {
     return response.data;
   },
 };
+
+export default api;
