@@ -17,6 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { driverAPI } from '../../src/services/api';
 import { useAuthStore } from '../../src/store/authStore';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+import { formatPrice } from '../../src/utils/formatPrice';
 
 export default function DriverDashboard() {
   const { user } = useAuthStore();

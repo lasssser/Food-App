@@ -19,6 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { driverAPI } from '../../src/services/api';
 import { Order } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+import { formatPrice } from '../../src/utils/formatPrice';
 
 const STATUS_CONFIG: Record<string, { 
   label: string; 
@@ -295,7 +296,7 @@ export default function MyOrders() {
           </View>
           <View style={styles.totalContainer}>
             <Text style={styles.totalLabel}>المجموع</Text>
-            <Text style={styles.totalValue}>{order.total.toLocaleString()} ل.س</Text>
+            <Text style={styles.totalValue}>{formatPrice(order.total)} ل.س</Text>
           </View>
         </View>
 

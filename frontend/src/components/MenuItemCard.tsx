@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { MenuItem } from '../types';
+import { formatPrice } from '../utils/formatPrice';
 
 interface Props {
   item: MenuItem;
@@ -30,7 +31,7 @@ export const MenuItemCard: React.FC<Props> = ({ item, quantity, onAdd, onRemove 
             {item.description}
           </Text>
         )}
-        <Text style={styles.price}>{item.price.toLocaleString()} ل.س</Text>
+        <Text style={styles.price}>{formatPrice(item.price)} ل.س</Text>
       </View>
       
       <View style={styles.actions}>

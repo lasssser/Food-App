@@ -29,7 +29,7 @@ export const CartButton: React.FC<Props> = ({ onPress }) => {
           <Text style={styles.viewCart}>عرض السلة</Text>
         </View>
         
-        <Text style={styles.total}>{total.toLocaleString()} ل.س</Text>
+        <Text style={styles.total}>{formatPrice(total)} ل.س</Text>
       </View>
     </TouchableOpacity>
   );

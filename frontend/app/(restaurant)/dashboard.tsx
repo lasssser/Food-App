@@ -15,6 +15,7 @@ import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { restaurantPanelAPI } from '../../src/services/api';
 import { useAuthStore } from '../../src/store/authStore';
+import { formatPrice } from '../../src/utils/formatPrice';
 
 export default function RestaurantDashboard() {
   const { user } = useAuthStore();

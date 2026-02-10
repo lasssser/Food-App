@@ -21,6 +21,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { restaurantPanelAPI } from '../../src/services/api';
 import { MenuItem, AddOnGroup } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+import { formatPrice } from '../../src/utils/formatPrice';
 
 interface AddOnOption {
   name: string;
@@ -299,7 +300,7 @@ export default function AddOnsManagement() {
                       {group.options.map((option, index) => (
                         <View key={index} style={styles.optionItem}>
                           <Text style={styles.optionPrice}>
-                            {option.price > 0 ? `+${option.price.toLocaleString()} ل.س` : 'مجاني'}
+                            {option.price > 0 ? `+${formatPrice(option.price)} ل.س` : 'مجاني'}
                           </Text>
                           <Text style={styles.optionName}>{option.name}</Text>
                         </View>

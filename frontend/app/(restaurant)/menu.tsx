@@ -24,6 +24,7 @@ import { restaurantPanelAPI } from '../../src/services/api';
 import { pickMenuItemImage } from '../../src/utils/imageUtils';
 import { MenuItem } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+import { formatPrice } from '../../src/utils/formatPrice';
 
 export default function RestaurantMenu() {
   const router = useRouter();
