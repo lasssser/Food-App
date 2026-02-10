@@ -197,12 +197,8 @@ export default function HomeScreen() {
     }
   };
 
-  const filteredRestaurants = restaurants.filter((r) =>
-    r.name.includes(searchQuery) || r.cuisine_type.includes(searchQuery)
-  );
-
-  const featuredRestaurants = filteredRestaurants.filter(r => r.is_featured);
-  const regularRestaurants = filteredRestaurants.filter(r => !r.is_featured);
+  const featuredRestaurants = restaurants.filter(r => r.is_featured);
+  const regularRestaurants = restaurants.filter(r => !r.is_featured);
 
   if (loading) {
     return (
