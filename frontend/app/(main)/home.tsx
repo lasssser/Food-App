@@ -57,13 +57,19 @@ interface City {
   lng: number;
 }
 
-const CATEGORIES = [
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+}
+
+const FALLBACK_CATEGORIES: Category[] = [
   { id: 'all', name: 'الكل', icon: 'grid-outline' },
-  { id: 'برجر', name: 'برجر', icon: 'fast-food-outline' },
-  { id: 'إيطالي', name: 'بيتزا', icon: 'pizza-outline' },
-  { id: 'مشاوي', name: 'مشاوي', icon: 'flame-outline' },
-  { id: 'شامي', name: 'سوري', icon: 'restaurant-outline' },
-  { id: 'فطائر', name: 'فطائر', icon: 'cafe-outline' },
+  { id: 'burger', name: 'برجر', icon: 'fast-food-outline' },
+  { id: 'pizza', name: 'بيتزا', icon: 'pizza-outline' },
+  { id: 'grills', name: 'مشاوي', icon: 'flame-outline' },
+  { id: 'syrian', name: 'سوري', icon: 'restaurant-outline' },
+  { id: 'pastries', name: 'فطائر', icon: 'cafe-outline' },
 ];
 
 export default function HomeScreen() {
