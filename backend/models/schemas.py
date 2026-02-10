@@ -80,6 +80,7 @@ class RestaurantUpdate(BaseModel):
     image: Optional[str] = None
     address: Optional[str] = None
     area: Optional[str] = None
+    city_id: Optional[str] = None
     cuisine_type: Optional[str] = None
     is_open: Optional[bool] = None
     delivery_fee: Optional[float] = None
