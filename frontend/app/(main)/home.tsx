@@ -89,6 +89,7 @@ export default function HomeScreen() {
   const [locatingGPS, setLocatingGPS] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
   const [cities, setCities] = useState<City[]>([]);
+  const [categories, setCategories] = useState<Category[]>(FALLBACK_CATEGORIES);
   const [gpsError, setGpsError] = useState<string | null>(null);
 
   // Load cities list
