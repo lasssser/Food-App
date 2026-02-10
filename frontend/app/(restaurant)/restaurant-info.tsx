@@ -18,7 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { restaurantPanelAPI } from '../../src/services/api';
 import { pickRestaurantImage } from '../../src/utils/imageUtils';
-import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+import { LocationPicker } from '../../src/components/LocationPicker';
 
 interface RestaurantInfo {
   id: string;
