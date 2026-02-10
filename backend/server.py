@@ -35,6 +35,7 @@ from routes.orders import router as orders_router
 from routes.notifications_routes import router as notifications_router
 from routes.admin import router as admin_router
 from routes.seed import router as seed_router
+from routes.categories import router as categories_router
 
 # Include all routers with /api prefix
 app.include_router(auth_router, prefix="/api")
@@ -46,6 +47,7 @@ app.include_router(orders_router, prefix="/api")
 app.include_router(notifications_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(seed_router, prefix="/api")
+app.include_router(categories_router, prefix="/api")
 
 # Health check routes
 @app.get("/api/")
