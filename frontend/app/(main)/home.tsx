@@ -405,7 +405,7 @@ export default function HomeScreen() {
 
         {/* === CATEGORIES === */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.catScroll} style={{ marginTop: 16, marginBottom: 8 }}>
-          {CATEGORIES.map((cat) => {
+          {categories.map((cat) => {
             const active = selectedCategory === cat.id;
             return (
               <TouchableOpacity
