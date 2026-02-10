@@ -20,6 +20,7 @@ import LiveTrackingModal from '../../src/components/LiveTrackingModal';
 import { orderAPI, ratingAPI } from '../../src/services/api';
 import { Order } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+import { formatPrice } from '../../src/utils/formatPrice';
 import RatingModal from '../../src/components/RatingModal';
 
 // Order statuses with all steps
@@ -275,12 +276,12 @@ export default function OrdersScreen() {
             <Text style={styles.detailsTitle}>تفاصيل الطلب</Text>
             {order.items.map((item, index) => (
               <View key={index} style={styles.itemRow}>
-                <Text style={styles.itemPrice}>{item.subtotal.toLocaleString()} ل.س</Text>
+                <Text style={styles.itemPrice}>{formatPrice(item.subtotal)} ل.س</Text>
                 <Text style={styles.itemName}>{item.quantity}x {item.name}</Text>
               </View>
             ))}
             <View style={styles.totalRow}>
-              <Text style={styles.totalValue}>{order.total.toLocaleString()} ل.س</Text>
+              <Text style={styles.totalValue}>{formatPrice(order.total)} ل.س</Text>
               <Text style={styles.totalLabel}>الإجمالي (شامل التوصيل)</Text>
             </View>
           </View>

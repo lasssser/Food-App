@@ -144,12 +144,12 @@ export default function CartScreen() {
                     {item.selectedAddOns.map((addon, index) => (
                       <Text key={index} style={styles.addOnText}>
                         + {addon.option_name}
-                        {addon.price > 0 && ` (${addon.price.toLocaleString()} ل.س)`}
+                        {addon.price > 0 && ` (${formatPrice(addon.price)} ل.س)`}
                       </Text>
                     ))}
                   </View>
                 )}
-                <Text style={styles.itemPrice}>{itemTotal.toLocaleString()} ل.س</Text>
+                <Text style={styles.itemPrice}>{formatPrice(itemTotal)} ل.س</Text>
               </View>
 
               <View style={styles.quantityContainer}>
@@ -221,19 +221,19 @@ export default function CartScreen() {
       <View style={styles.summaryCard}>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>المجموع الفرعي</Text>
-          <Text style={styles.summaryValue}>{subtotal.toLocaleString()} ل.س</Text>
+          <Text style={styles.summaryValue}>{formatPrice(subtotal)} ل.س</Text>
         </View>
         
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>رسوم التوصيل</Text>
-          <Text style={styles.summaryValue}>{deliveryFee.toLocaleString()} ل.س</Text>
+          <Text style={styles.summaryValue}>{formatPrice(deliveryFee)} ل.س</Text>
         </View>
         
         <View style={styles.divider} />
         
         <View style={styles.summaryRow}>
           <Text style={styles.totalLabel}>الإجمالي</Text>
-          <Text style={styles.totalValue}>{total.toLocaleString()} ل.س</Text>
+          <Text style={styles.totalValue}>{formatPrice(total)} ل.س</Text>
         </View>
 
         {/* Checkout Button - Show login prompt for guests */}

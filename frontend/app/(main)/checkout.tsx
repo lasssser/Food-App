@@ -549,15 +549,15 @@ export default function CheckoutScreen() {
       <View style={styles.bottomCard}>
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>المجموع</Text>
-          <Text style={styles.totalSubValue}>{subtotal.toLocaleString()} ل.س</Text>
+          <Text style={styles.totalSubValue}>{formatPrice(subtotal)} ل.س</Text>
         </View>
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>التوصيل</Text>
-          <Text style={styles.totalSubValue}>{deliveryFee.toLocaleString()} ل.س</Text>
+          <Text style={styles.totalSubValue}>{formatPrice(deliveryFee)} ل.س</Text>
         </View>
         <View style={[styles.totalRow, styles.totalRowFinal]}>
           <Text style={styles.totalFinalLabel}>الإجمالي</Text>
-          <Text style={styles.totalFinalValue}>{total.toLocaleString()} ل.س</Text>
+          <Text style={styles.totalFinalValue}>{formatPrice(total)} ل.س</Text>
         </View>
 
         <TouchableOpacity
