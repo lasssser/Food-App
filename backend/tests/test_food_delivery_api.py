@@ -331,6 +331,77 @@ class TestDriverLocation:
         print(f"✓ Driver location endpoint accessible (status: {response.status_code})")
 
 
+# ======================== Restaurant Detail & Menu Tests ========================
+
+class TestRestaurantDetail:
+    """Restaurant detail and menu endpoint tests"""
+    
+    def test_get_restaurant_by_id(self, api_client):
+        """GET /api/restaurants/{id} returns restaurant details"""
+        response = api_client.get(f"{BASE_URL}/api/restaurants/rest-5272e0a8")
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+        data = response.json()
+        
+        # Verify restaurant detail structure
+        assert "id" in data, "Restaurant must have id"
+        assert data["id"] == "rest-5272e0a8"
+        assert "name" in data, "Restaurant must have name"
+        assert "address" in data, "Restaurant must have address"
+        assert "delivery_fee" in data, "Restaurant must have delivery_fee"
+        assert "min_order" in data, "Restaurant must have min_order"
+        assert "is_open" in data, "Restaurant must have is_open"
+        print(f"✓ Got restaurant details: {data.get('name')}")
+    
+    def test_get_restaurant_menu(self, api_client):
+        """GET /api/restaurants/{id}/menu returns menu items"""
+        response = api_client.get(f"{BASE_URL}/api/restaurants/rest-5272e0a8/menu")
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+        data = response.json()
+        
+        assert isinstance(data, list), "Expected a list of menu items"
+        print(f"✓ Got {len(data)} menu items")
+        
+        # Verify menu item structure if any exist
+        if len(data) > 0:
+            item = data[0]
+            assert "id" in item, "Menu item must have id"
+            assert "name" in item, "Menu item must have name"
+            assert "price" in item, "Menu item must have price"
+            assert "category" in item, "Menu item must have category"
+            assert "is_available" in item, "Menu item must have is_available"
+            print(f"✓ First menu item: {item.get('name')} - {item.get('price')} SYP")
+    
+    def test_get_restaurant_menu_nonexistent(self, api_client):
+        """GET /api/restaurants/{id}/menu returns 404 for nonexistent restaurant"""
+        response = api_client.get(f"{BASE_URL}/api/restaurants/nonexistent-id/menu")
+        # Should return empty array or 404
+        assert response.status_code in [200, 404], f"Expected 200/404, got {response.status_code}"
+        print(f"✓ Menu endpoint handles nonexistent restaurant (status: {response.status_code})")
+
+
+class TestCategories:
+    """Categories endpoint tests"""
+    
+    def test_get_categories_list(self, api_client):
+        """GET /api/categories returns categories list"""
+        response = api_client.get(f"{BASE_URL}/api/categories")
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+        data = response.json()
+        
+        assert isinstance(data, list), "Expected a list of categories"
+        assert len(data) > 0, "Should have at least one category"
+        print(f"✓ Got {len(data)} categories")
+        
+        # Verify category structure
+        category = data[0]
+        assert "id" in category, "Category must have id"
+        assert "name" in category, "Category must have name"
+        assert "name_en" in category, "Category must have English name"
+        assert "icon" in category, "Category must have icon"
+        assert "is_active" in category, "Category must have is_active"
+        print(f"✓ First category: {category.get('name')} ({category.get('name_en')})")
+
+
 # ======================== Module Import Tests ========================
 
 class TestModuleImports:
