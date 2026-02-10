@@ -67,7 +67,7 @@ async def get_nearby_restaurants(
 ):
     """Get restaurants near a location (for map view) - public endpoint"""
     restaurants = await db.restaurants.find({}, {
-        "_id": 0, "id": 1, "name": 1, "lat": 1, "lng": 1,
+        "_id": 0, "id": 1, "name": 1, "lat": 1, "lng": 1, "city_id": 1,
         "cuisine_type": 1, "image": 1, "is_open": 1, "rating": 1,
         "delivery_time": 1, "delivery_fee": 1, "address": 1, "area": 1,
         "review_count": 1, "min_order": 1, "is_featured": 1
