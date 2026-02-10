@@ -18,6 +18,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCartStore } from '../../src/store/cartStore';
 import { useAuthStore } from '../../src/store/authStore';
 import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
+import { formatPrice } from '../../src/utils/formatPrice';
 
 export default function CartScreen() {
   const router = useRouter();
