@@ -186,7 +186,11 @@ export default function HomeScreen() {
   const fetchRestaurants = async () => {
     try {
       const filters: any = {};
-      if (selectedCategory !== 'all') filters.cuisine = selectedCategory;
+      if (selectedCategory !== 'all') {
+        // Send category name for cuisine matching
+        const cat = categories.find(c => c.id === selectedCategory);
+        if (cat) filters.cuisine = cat.name;
+      }
       if (detectedCity) filters.city_id = detectedCity;
       if (debouncedSearch.trim()) filters.search = debouncedSearch.trim();
       const data = await restaurantAPI.getAll(filters);
