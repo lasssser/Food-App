@@ -18,7 +18,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
-import { restaurantAPI, locationAPI, advertisementsAPI } from '../../src/services/api';
+import { restaurantAPI, locationAPI, advertisementsAPI, categoriesAPI } from '../../src/services/api';
 import { useAuthStore } from '../../src/store/authStore';
 import { COLORS, RADIUS, SPACING, SHADOWS } from '../../src/constants/theme';
 
