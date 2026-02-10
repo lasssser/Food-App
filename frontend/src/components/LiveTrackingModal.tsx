@@ -97,18 +97,6 @@ export default function LiveTrackingModal({ orderId, visible, onClose }: Props) 
   const [error, setError] = useState<string | null>(null);
   const webViewRef = useRef<any>(null);
   const intervalRef = useRef<any>(null);
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    if (visible) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, { toValue: 1.05, duration: 1000, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-          Animated.timing(pulseAnim, { toValue: 1, duration: 1000, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-        ])
-      ).start();
-    }
-  }, [visible]);
 
   const fetchData = async () => {
     try {
