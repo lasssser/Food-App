@@ -79,6 +79,10 @@ async def get_nearby_restaurants(
         r_lat = r.get("lat")
         r_lng = r.get("lng")
         
+        # If no coordinates, use city center
+        if (not r_lat or not r_lng) and r.get("city_id"):
+            r_lat, r_lng = get_city_coords(r.get("city_id"))
+        
         if r_lat and r_lng:
             distance = calculate_distance(lat, lng, r_lat, r_lng)
             if distance <= radius:
@@ -88,13 +92,6 @@ async def get_nearby_restaurants(
                     "delivery_time": r.get("delivery_time", "30-45 دقيقة"), "delivery_fee": r.get("delivery_fee", 0),
                     "lat": r_lat, "lng": r_lng, "distance_km": round(distance, 1), "address": r.get("address", ""),
                 })
-        else:
-            result.append({
-                "id": r["id"], "name": r.get("name", ""), "cuisine_type": r.get("cuisine_type", ""),
-                "image": r.get("image", ""), "is_open": r.get("is_open", True), "rating": r.get("rating", 0),
-                "delivery_time": r.get("delivery_time", "30-45 دقيقة"), "delivery_fee": r.get("delivery_fee", 0),
-                "lat": r_lat, "lng": r_lng, "distance_km": None, "address": r.get("address", ""),
-            })
     
     result.sort(key=lambda x: (x["distance_km"] is None, x["distance_km"] or 999))
     return result
