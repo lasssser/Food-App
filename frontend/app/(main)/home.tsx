@@ -112,6 +112,16 @@ export default function HomeScreen() {
         new Promise<any>((_, reject) => setTimeout(() => reject('timeout'), 8000)),
       ]);
       const result = await locationAPI.detectCity(loc.coords.latitude, loc.coords.longitude);
+      
+      // Check if user is outside coverage area
+      if (result.outside_coverage) {
+        setGpsError('أنت خارج نطاق التغطية. اختر مدينتك يدوياً.');
+        setDetectedCity(null);
+        setDetectedCityName('كل المدن');
+        setLocatingGPS(false);
+        return null;
+      }
+      
       setDetectedCity(result.city_id);
       setDetectedCityName(result.city_name);
       setGpsError(null);
