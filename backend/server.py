@@ -94,6 +94,31 @@ async def startup_event():
         )
         logger.info("Admin account password hash updated")
 
+    # Create MongoDB indexes for performance
+    try:
+        await db.users.create_index("id", unique=True)
+        await db.users.create_index("phone", unique=True)
+        await db.users.create_index("role")
+        await db.users.create_index("city_id")
+        await db.restaurants.create_index("id", unique=True)
+        await db.restaurants.create_index("city_id")
+        await db.restaurants.create_index("cuisine_type")
+        await db.restaurants.create_index("is_open")
+        await db.restaurants.create_index("owner_id")
+        await db.restaurants.create_index([("name", 1), ("cuisine_type", 1)])
+        await db.orders.create_index("id", unique=True)
+        await db.orders.create_index("user_id")
+        await db.orders.create_index("restaurant_id")
+        await db.orders.create_index("driver_id")
+        await db.orders.create_index("order_status")
+        await db.orders.create_index("created_at")
+        await db.notifications.create_index("user_id")
+        await db.notifications.create_index("is_read")
+        await db.notifications.create_index([("user_id", 1), ("is_read", 1)])
+        logger.info("MongoDB indexes created successfully")
+    except Exception as e:
+        logger.warning(f"Index creation warning: {e}")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
