@@ -87,7 +87,13 @@ async def login(credentials: UserLogin):
 
 @router.post("/auth/logout")
 async def logout(current_user: dict = Depends(get_current_user)):
-    """Logout and clear push token to stop receiving notifications"""
+    """Logout and clear ALL push tokens to stop receiving notifications"""
+    # Clear from push_tokens collection (main source)
+    await db.push_tokens.update_many(
+        {"user_id": current_user["id"]},
+        {"$set": {"is_active": False}}
+    )
+    # Also clear from users collection
     await db.users.update_one(
         {"id": current_user["id"]},
         {"$unset": {"push_token": "", "expo_push_token": ""}}
