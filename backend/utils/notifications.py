@@ -134,7 +134,6 @@ async def notify_customer_order_status(order: dict, new_status: str):
     }
 
     await create_notification(order["user_id"], title, body, "order_update", data)
-    await send_push_to_user(order["user_id"], title, body, data, channel_id="order-updates")
 
 
 async def notify_drivers_new_order(order: dict, city_id: str = None):
