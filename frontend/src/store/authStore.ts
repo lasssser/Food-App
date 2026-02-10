@@ -16,7 +16,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isGuest: boolean;
   login: (phone: string, password: string) => Promise<User>;
-  register: (name: string, phone: string, password: string, role?: string) => Promise<User>;
+  register: (name: string, phone: string, password: string, role?: string, city_id?: string) => Promise<User>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
   setGuestMode: (value: boolean) => void;
@@ -34,8 +34,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     return response.user;
   },
 
-  register: async (name: string, phone: string, password: string, role: string = 'customer') => {
-    const response = await authAPI.register(name, phone, password, role);
+  register: async (name: string, phone: string, password: string, role: string = 'customer', city_id?: string) => {
+    const response = await authAPI.register(name, phone, password, role, city_id);
     set({ user: response.user, isAuthenticated: true, isGuest: false });
     return response.user;
   },
