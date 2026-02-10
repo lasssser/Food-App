@@ -87,7 +87,12 @@ async def startup_event():
         await db.users.insert_one(admin_user)
         logger.info("Admin account created successfully")
     else:
-        logger.info("Admin account already exists")
+        # Update password hash to fix old bcrypt compatibility issue
+        await db.users.update_one(
+            {"phone": admin_phone},
+            {"$set": {"password_hash": hash_password("admin123")}}
+        )
+        logger.info("Admin account password hash updated")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
