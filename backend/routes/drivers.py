@@ -50,6 +50,21 @@ async def update_driver_location(location: DriverLocation, current_user: dict = 
     
     return {"message": "تم تحديث الموقع", "city_id": closest_city_id}
 
+
+@router.put("/driver/city")
+async def update_driver_city(data: dict, current_user: dict = Depends(get_current_user)):
+    """Update driver's working city"""
+    if current_user.get("role") != "driver":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    city_id = data.get("city_id")
+    if not city_id:
+        raise HTTPException(status_code=400, detail="يرجى اختيار المدينة")
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$set": {"city_id": city_id}}
+    )
+    return {"message": "تم تحديث المدينة بنجاح", "city_id": city_id}
+
 @router.get("/orders/{order_id}/driver-location")
 async def get_driver_location_for_order(order_id: str, current_user: dict = Depends(get_current_user)):
     """Get live driver location for an order with ETA"""
