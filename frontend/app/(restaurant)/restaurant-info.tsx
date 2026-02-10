@@ -133,6 +133,14 @@ export default function RestaurantInfoEdit() {
       Alert.alert('خطأ', 'يرجى إدخال اسم المطعم');
       return;
     }
+    if (!cityId) {
+      Alert.alert('خطأ', 'يرجى اختيار المدينة - هذا الحقل إلزامي');
+      return;
+    }
+    if (!lat || !lng) {
+      Alert.alert('خطأ', 'يرجى تحديد موقع المطعم على الخريطة - هذا الحقل إلزامي');
+      return;
+    }
 
     setSaving(true);
     try {
@@ -142,6 +150,7 @@ export default function RestaurantInfoEdit() {
         description: description.trim() || undefined,
         address: address.trim() || undefined,
         area: area.trim() || undefined,
+        city_id: cityId || undefined,
         cuisine_type: cuisineType || undefined,
         delivery_fee: parseFloat(deliveryFee) || 5000,
         min_order: parseFloat(minOrder) || 10000,
@@ -150,6 +159,8 @@ export default function RestaurantInfoEdit() {
         closing_time: closingTime || undefined,
         working_days: workingDays.length > 0 ? workingDays : undefined,
         image: restaurantImage || undefined,
+        lat: parseFloat(lat) || undefined,
+        lng: parseFloat(lng) || undefined,
       });
 
       Alert.alert('نجاح', 'تم تحديث بيانات المطعم بنجاح', [
