@@ -116,6 +116,9 @@ export default function RestaurantInfoEdit() {
       setOpeningTime(data.opening_time || '09:00');
       setClosingTime(data.closing_time || '23:00');
       setRestaurantImage(data.image || null);
+      setCityId(data.city_id || '');
+      setLat(String(data.lat || ''));
+      setLng(String(data.lng || ''));
       setWorkingDays(data.working_days || DAYS);
     } catch (error) {
       console.error('Error fetching info:', error);
