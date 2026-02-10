@@ -201,10 +201,24 @@ export default function NearbyMapScreen() {
 
       // Fetch restaurants
       try {
-        const data = await restaurantAPI.getNearby(lat, lng, 50);
-        if (!cancelled) setRestaurants(data || []);
+        const data = await restaurantAPI.getNearby(lat, lng, 100);
+        if (!cancelled) {
+          // Also fetch all restaurants as fallback for those without coordinates
+          if (!data || data.length === 0) {
+            const allData = await restaurantAPI.getAll({});
+            if (!cancelled) setRestaurants(allData || []);
+          } else {
+            setRestaurants(data);
+          }
+        }
       } catch (e) {
-        if (!cancelled) setError('فشل تحميل المطاعم');
+        // Fallback: load all restaurants
+        try {
+          const allData = await restaurantAPI.getAll({});
+          if (!cancelled) setRestaurants(allData || []);
+        } catch {
+          if (!cancelled) setError('فشل تحميل المطاعم');
+        }
       }
       if (!cancelled) setLoading(false);
     };
