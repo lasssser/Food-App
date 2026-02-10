@@ -18,8 +18,16 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../src/store/authStore';
-import { complaintsAPI } from '../../src/services/api';
+import { complaintsAPI, driverAPI } from '../../src/services/api';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+
+const CITIES = [
+  { id: 'damascus', name: 'دمشق' },
+  { id: 'aleppo', name: 'حلب' },
+  { id: 'homs', name: 'حمص' },
+  { id: 'latakia', name: 'اللاذقية' },
+  { id: 'tartous', name: 'طرطوس' },
+];
 
 export default function DriverProfile() {
   const router = useRouter();
@@ -27,9 +35,26 @@ export default function DriverProfile() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showComplaintModal, setShowComplaintModal] = useState(false);
+  const [showCityModal, setShowCityModal] = useState(false);
+  const [selectedCity, setSelectedCity] = useState(user?.city_id || '');
+  const [savingCity, setSavingCity] = useState(false);
   const [complaintSubject, setComplaintSubject] = useState('');
   const [complaintMessage, setComplaintMessage] = useState('');
   const [submittingComplaint, setSubmittingComplaint] = useState(false);
+
+  const handleSelectCity = async (cityId: string) => {
+    setSavingCity(true);
+    try {
+      await driverAPI.updateCity(cityId);
+      setSelectedCity(cityId);
+      setShowCityModal(false);
+      Alert.alert('نجاح', 'تم تحديث المدينة بنجاح');
+    } catch (error) {
+      Alert.alert('خطأ', 'فشل في تحديث المدينة');
+    } finally {
+      setSavingCity(false);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
