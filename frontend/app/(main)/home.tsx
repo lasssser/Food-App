@@ -376,7 +376,7 @@ export default function HomeScreen() {
               placeholder="ابحث عن مطعم أو نوع أكل..."
               placeholderTextColor="#bbb"
               value={searchQuery}
-              onChangeText={setSearchQuery}
+              onChangeText={handleSearchChange}
               textAlign="right"
             />
             {searchQuery.length > 0 && (
