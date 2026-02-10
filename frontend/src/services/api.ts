@@ -58,8 +58,8 @@ api.interceptors.request.use(async (config) => {
 
 // API Functions
 export const authAPI = {
-  register: async (name: string, phone: string, password: string, role: string = 'customer') => {
-    const response = await api.post('/auth/register', { name, phone, password, role });
+  register: async (name: string, phone: string, password: string, role: string = 'customer', city_id?: string) => {
+    const response = await api.post('/auth/register', { name, phone, password, role, city_id });
     await setToken(response.data.access_token);
     return response.data;
   },
