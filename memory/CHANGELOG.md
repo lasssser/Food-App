@@ -1,48 +1,54 @@
 # أكلة عالسريع - CHANGELOG
 
-## Feb 10, 2026 - Session 3
+## Feb 10, 2026 - Session 3 (Part 3)
+
+### Dynamic Categories System
+- New API: GET /api/categories (public)
+- Admin APIs: POST/PUT/DELETE /api/admin/categories
+- 10 default categories: الكل, برجر, بيتزا, مشاوي, سوري, فطائر, حلويات, قهوة, مشروبات, كوكتيل
+- Home screen loads categories from API dynamically
+- Admin can add/edit/delete categories
+
+### Driver Earnings Fix
+- Added today_earnings and total_earnings to /driver/stats
+- Uses MongoDB aggregation pipeline for performance
+
+### Search Across All Cities
+- Search now ignores city filter - searches across ALL restaurants
+- City filter only applies when not searching
+
+## Feb 10, 2026 - Session 3 (Part 2)
 
 ### Restaurant Settings (City + Location Required)
 - Added mandatory city dropdown to restaurant info page
-- Added mandatory GPS coordinates fields (lat/lng)
+- Added LocationPicker map for restaurant location
 - Validation prevents saving without city and location
-- Added `city_id` to `RestaurantUpdate` schema
 
 ### Driver Settings (City Required)
-- Added city selection button to driver profile
-- Added city selection modal with 5 Syrian cities
-- New API: `PUT /driver/city` for city update
+- Added city selection to driver profile
+- New API: PUT /driver/city
 - Registration validation: drivers must select city
 
 ### MongoDB Performance Indexes
-- Created 20 indexes across users, restaurants, orders, notifications
-- Unique indexes on `id` and `phone` fields
-- Compound indexes for common query patterns
+- 20 indexes across users, restaurants, orders, notifications
 
-### Bug Fixes (from 7 issues list)
-- Fixed duplicate notifications (removed double push send)
-- Added `POST /auth/logout` to clear push tokens
+### Bug Fixes (7 issues)
+- Fixed duplicate notifications
+- Added POST /auth/logout to clear push tokens
 - Fixed restaurant search (backend search with regex)
-- Fixed city detection for users outside Syria (200km threshold)
-- Removed Animated API from LiveTrackingModal (Android crash fix)
-- Added debounced search on home screen (500ms)
+- Fixed city detection outside Syria (200km threshold)
+- Removed Animated API from LiveTrackingModal
+- Added debounced search on home screen
+- Fixed payment methods showing only restaurant-enabled ones
 
-## Feb 9, 2026 - Session 2
+## Feb 10, 2026 - Session 3 (Part 1)
 
 ### Android Crash Fixes
 - Removed Animated API from _layout.tsx and login.tsx
-- Replaced `<Redirect>` with `router.replace` in index.tsx
-- Fixed `toLocaleString('ar-SY')` crash on Hermes engine
-- Added try/catch around SplashScreen and I18nManager
-
-### Deployment Readiness
-- Fixed .gitignore blocking .env files
-- Removed hardcoded URL fallback in api.ts
-- Optimized admin.py with MongoDB aggregation pipeline
-- Added projection to restaurants nearby query
+- Replaced <Redirect> with router.replace in index.tsx
+- Fixed toLocaleString crash on Hermes engine
 
 ### App Store
-- Registered Bundle ID: com.wethaq.akla3alsare3
-- Created app on App Store Connect
-- Built and submitted iOS build via EAS
-- Set up TestFlight for testing
+- Bundle ID: com.wethaq.akla3alsare3
+- iOS build submitted to App Store Connect
+- TestFlight configured
