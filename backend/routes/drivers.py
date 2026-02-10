@@ -398,11 +398,11 @@ async def update_order_status_driver(
 
 @router.get("/driver/stats")
 async def get_driver_stats(current_user: dict = Depends(get_current_user)):
-    """Get driver statistics"""
+    """Get driver statistics including earnings"""
     if current_user.get("role") != "driver":
         raise HTTPException(status_code=403, detail="غير مصرح")
     
-    # Today's deliveries
+    # Today's deliveries and earnings
     today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     today_deliveries = await db.orders.count_documents({
         "driver_id": current_user["id"],
@@ -410,11 +410,25 @@ async def get_driver_stats(current_user: dict = Depends(get_current_user)):
         "updated_at": {"$gte": today}
     })
     
+    # Today's earnings
+    today_earnings_result = await db.orders.aggregate([
+        {"$match": {"driver_id": current_user["id"], "order_status": "delivered", "updated_at": {"$gte": today}}},
+        {"$group": {"_id": None, "total": {"$sum": "$delivery_fee"}}}
+    ]).to_list(1)
+    today_earnings = today_earnings_result[0]["total"] if today_earnings_result else 0
+    
     # Total deliveries
     total_deliveries = await db.orders.count_documents({
         "driver_id": current_user["id"],
         "order_status": "delivered"
     })
+    
+    # Total earnings
+    total_earnings_result = await db.orders.aggregate([
+        {"$match": {"driver_id": current_user["id"], "order_status": "delivered"}},
+        {"$group": {"_id": None, "total": {"$sum": "$delivery_fee"}}}
+    ]).to_list(1)
+    total_earnings = total_earnings_result[0]["total"] if total_earnings_result else 0
     
     # Average rating
     ratings = await db.ratings.find({"driver_id": current_user["id"]}).to_list(1000)
@@ -423,7 +437,9 @@ async def get_driver_stats(current_user: dict = Depends(get_current_user)):
     return {
         "is_online": current_user.get("is_online", False),
         "today_deliveries": today_deliveries,
+        "today_earnings": today_earnings,
         "total_deliveries": total_deliveries,
+        "total_earnings": total_earnings,
         "average_rating": round(avg_rating, 1)
     }
 
