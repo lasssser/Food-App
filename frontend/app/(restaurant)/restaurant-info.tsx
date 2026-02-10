@@ -87,6 +87,10 @@ export default function RestaurantInfoEdit() {
   const [closingTime, setClosingTime] = useState('');
   const [workingDays, setWorkingDays] = useState<string[]>([]);
   const [showCuisineDropdown, setShowCuisineDropdown] = useState(false);
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
+  const [cityId, setCityId] = useState('');
+  const [lat, setLat] = useState('');
+  const [lng, setLng] = useState('');
   const [restaurantImage, setRestaurantImage] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
