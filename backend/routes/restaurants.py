@@ -2,8 +2,16 @@ from fastapi import APIRouter
 from routes.deps import *
 from models.schemas import Restaurant, MenuItem
 from typing import List, Optional
+from routes.cities import SYRIAN_CITIES
 
 router = APIRouter()
+
+# Helper: get city coordinates
+def get_city_coords(city_id: str):
+    for city in SYRIAN_CITIES:
+        if city["id"] == city_id:
+            return city["lat"], city["lng"]
+    return None, None
 
 @router.get("/restaurants", response_model=List[Restaurant])
 async def get_restaurants(
