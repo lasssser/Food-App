@@ -63,13 +63,13 @@ async def health():
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-
-# Serve static files (promo images etc)
-app.mount("/api/static", StaticFiles(directory=str(ROOT_DIR / "static")), name="static")
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve static files (promo images etc)
+app.mount("/api/static", StaticFiles(directory=str(ROOT_DIR / "static")), name="static")
 
 # Startup & shutdown events
 from utils.auth import hash_password
