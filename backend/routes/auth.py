@@ -85,6 +85,16 @@ async def login(credentials: UserLogin):
         )
     )
 
+@router.post("/auth/logout")
+async def logout(current_user: dict = Depends(get_current_user)):
+    """Logout and clear push token to stop receiving notifications"""
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$unset": {"push_token": "", "expo_push_token": ""}}
+    )
+    return {"message": "تم تسجيل الخروج بنجاح"}
+
+
 @router.get("/auth/me", response_model=UserResponse)
 async def get_me(current_user: dict = Depends(get_current_user)):
     return UserResponse(
