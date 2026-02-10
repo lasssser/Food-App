@@ -27,6 +27,7 @@ interface RestaurantInfo {
   description: string;
   address: string;
   area: string;
+  city_id: string;
   cuisine_type: string;
   is_open: boolean;
   delivery_fee: number;
@@ -38,6 +39,8 @@ interface RestaurantInfo {
   rating: number;
   review_count: number;
   image?: string;
+  lat?: number;
+  lng?: number;
 }
 
 const DAYS = ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
@@ -53,6 +56,14 @@ const CUISINE_TYPES = [
   'بيتزا',
   'حلويات',
   'مشروبات',
+];
+
+const CITIES = [
+  { id: 'damascus', name: 'دمشق' },
+  { id: 'aleppo', name: 'حلب' },
+  { id: 'homs', name: 'حمص' },
+  { id: 'latakia', name: 'اللاذقية' },
+  { id: 'tartous', name: 'طرطوس' },
 ];
 
 export default function RestaurantInfoEdit() {
