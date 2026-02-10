@@ -10,8 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.wethaq.akla3alsare3",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "لتحديد موقع التوصيل بدقة"
+        "NSLocationWhenInUseUsageDescription": "لتحديد موقع التوصيل بدقة",
+        "CFBundleAllowMixedLocalizations": true
       }
     },
     "android": {
