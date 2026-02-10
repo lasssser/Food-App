@@ -417,6 +417,10 @@ export const driverAPI = {
     const response = await api.get('/driver/stats');
     return response.data;
   },
+  updateCity: async (cityId: string) => {
+    const response = await api.put('/driver/city', { city_id: cityId });
+    return response.data;
+  },
 };
 
 // Notifications API
