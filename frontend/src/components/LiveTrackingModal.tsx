@@ -193,10 +193,10 @@ export default function LiveTrackingModal({ orderId, visible, onClose }: Props) 
           <View style={styles.bottomCard}>
             {/* ETA */}
             {eta && hasLocation && (
-              <Animated.View style={[styles.etaContainer, { transform: [{ scale: pulseAnim }] }]}>
+              <View style={styles.etaContainer}>
                 <Text style={styles.etaNumber}>{eta}</Text>
                 <Text style={styles.etaLabel}>دقيقة</Text>
-              </Animated.View>
+              </View>
             )}
 
             {/* Phase Text */}
