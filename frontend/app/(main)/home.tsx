@@ -380,7 +380,7 @@ export default function HomeScreen() {
               textAlign="right"
             />
             {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+              <TouchableOpacity onPress={() => { setSearchQuery(''); setDebouncedSearch(''); }} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                 <Ionicons name="close-circle" size={20} color="#ccc" />
               </TouchableOpacity>
             )}
