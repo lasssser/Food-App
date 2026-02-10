@@ -37,6 +37,10 @@ async def register(user_data: UserCreate):
     if existing:
         raise HTTPException(status_code=400, detail="رقم الهاتف مسجل مسبقاً")
     
+    # Validate: drivers MUST have city_id
+    if user_data.role == "driver" and not getattr(user_data, 'city_id', None):
+        raise HTTPException(status_code=400, detail="يجب على السائق اختيار المدينة التي يعمل بها")
+    
     user_id = str(uuid.uuid4())
     user = {
         "id": user_id,
@@ -44,6 +48,7 @@ async def register(user_data: UserCreate):
         "phone": user_data.phone,
         "password_hash": hash_password(user_data.password),
         "role": user_data.role,
+        "city_id": getattr(user_data, 'city_id', None),
         "is_online": False if user_data.role == "driver" else None,
         "current_location": None,
         "created_at": datetime.utcnow()
