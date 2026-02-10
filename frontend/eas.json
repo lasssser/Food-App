@@ -7,7 +7,7 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_BACKEND_URL": "http://76.13.145.157"
+        "EXPO_PUBLIC_BACKEND_URL": "https://akla-alsaree.cloud"
       }
     },
     "preview": {
@@ -16,7 +16,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_BACKEND_URL": "http://76.13.145.157"
+        "EXPO_PUBLIC_BACKEND_URL": "https://akla-alsaree.cloud"
       }
     },
     "production": {
@@ -24,7 +24,7 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "EXPO_PUBLIC_BACKEND_URL": "http://76.13.145.157"
+        "EXPO_PUBLIC_BACKEND_URL": "https://akla-alsaree.cloud"
       }
     }
   },
