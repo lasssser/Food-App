@@ -291,7 +291,7 @@ export default function RestaurantMenu() {
                       <Text style={{ fontSize: 11, color: '#3F51B5' }}>إضافات</Text>
                     </TouchableOpacity>
                   </View>
-                  <Text style={styles.itemPrice}>{(item.price || 0).toLocaleString()} ل.س</Text>
+                  <Text style={styles.itemPrice}>{formatPrice(item.price || 0)} ل.س</Text>
                 </View>
               </View>
             ))}

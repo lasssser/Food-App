@@ -89,7 +89,7 @@ export default function RestaurantDashboard() {
     );
   }
 
-  return (
+  return formatPrice(
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView
         style={styles.content}
@@ -138,7 +138,7 @@ export default function RestaurantDashboard() {
           {[
             { icon: 'receipt', color: '#FF6B35', value: stats?.today_orders || 0, label: 'طلبات اليوم' },
             { icon: 'time', color: '#FFA726', value: stats?.pending_orders || 0, label: 'طلبات معلقة' },
-            { icon: 'cash', color: '#66BB6A', value: (stats?.today_revenue || 0).toLocaleString(), label: 'إيرادات اليوم' },
+            { icon: 'cash', color: '#66BB6A', value: (stats?.today_revenue || 0), label: 'إيرادات اليوم' },
             { icon: 'star', color: '#FFD700', value: stats?.restaurant?.rating?.toFixed(1) || '0.0', label: 'التقييم' },
           ].map((stat, i) => (
             <View key={i} style={styles.statCard}>

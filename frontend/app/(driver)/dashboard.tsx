@@ -192,7 +192,7 @@ export default function DriverDashboard() {
             <Text style={styles.earningsTitle}>أرباح اليوم</Text>
           </View>
           <Text style={styles.earningsAmount}>
-            {(stats?.today_earnings || 0).toLocaleString()} ل.س
+            {formatPrice(stats?.today_earnings || 0)} ل.س
           </Text>
           <Text style={styles.earningsHint}>تحديث تلقائي عند إكمال كل توصيلة</Text>
         </View>
