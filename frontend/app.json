@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.wethaq.akla3alsare3",
-      "buildNumber": "2",
+      "buildNumber": "3",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "لتحديد موقع التوصيل بدقة",
         "CFBundleAllowMixedLocalizations": true
