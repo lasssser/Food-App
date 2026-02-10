@@ -660,4 +660,9 @@ export const adminStatisticsAPI = {
   },
 };
 
-export default api;
+export const categoriesAPI = {
+  getAll: async () => {
+    const response = await api.get('/categories');
+    return response.data;
+  },
+};
