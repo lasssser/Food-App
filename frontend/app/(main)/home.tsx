@@ -92,7 +92,7 @@ export default function HomeScreen() {
   const [categories, setCategories] = useState<Category[]>(FALLBACK_CATEGORIES);
   const [gpsError, setGpsError] = useState<string | null>(null);
 
-  // Load cities list
+  // Load cities and categories
   useEffect(() => {
     const loadCities = async () => {
       try {
@@ -100,7 +100,16 @@ export default function HomeScreen() {
         setCities(data || []);
       } catch {}
     };
+    const loadCategories = async () => {
+      try {
+        const data = await categoriesAPI.getAll();
+        if (data && data.length > 0) {
+          setCategories(data);
+        }
+      } catch {}
+    };
     loadCities();
+    loadCategories();
   }, []);
 
   const detectLocation = async () => {
