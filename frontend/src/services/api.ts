@@ -108,12 +108,13 @@ export const locationAPI = {
 };
 
 export const restaurantAPI = {
-  getAll: async (filters?: { city_id?: string; area?: string; cuisine?: string; is_open?: boolean }) => {
+  getAll: async (filters?: { city_id?: string; area?: string; cuisine?: string; is_open?: boolean; search?: string }) => {
     const params = new URLSearchParams();
     if (filters?.city_id) params.append('city_id', filters.city_id);
     if (filters?.area) params.append('area', filters.area);
     if (filters?.cuisine) params.append('cuisine', filters.cuisine);
     if (filters?.is_open !== undefined) params.append('is_open', String(filters.is_open));
+    if (filters?.search) params.append('search', filters.search);
     const response = await api.get(`/restaurants?${params.toString()}`);
     return response.data;
   },
