@@ -97,9 +97,25 @@ async def detect_city(lat: float, lng: float):
         if dist < min_distance:
             min_distance = dist
             closest_city = city
+    
+    # If user is more than 200km from nearest Syrian city, they're outside coverage
+    if min_distance > 200:
+        return {
+            "city_id": None,
+            "city_name": None,
+            "distance_km": round(min_distance, 1),
+            "outside_coverage": True,
+            "message": "أنت خارج نطاق التغطية حالياً. اختر مدينتك يدوياً."
+        }
+    
     if closest_city:
-        return {"city_id": closest_city["id"], "city_name": closest_city["name"], "distance_km": round(min_distance, 1)}
-    return {"city_id": "damascus", "city_name": "دمشق", "distance_km": 0}
+        return {
+            "city_id": closest_city["id"],
+            "city_name": closest_city["name"],
+            "distance_km": round(min_distance, 1),
+            "outside_coverage": False
+        }
+    return {"city_id": "damascus", "city_name": "دمشق", "distance_km": 0, "outside_coverage": False}
 
 @router.get("/cities/{city_id}")
 async def get_city(city_id: str):
