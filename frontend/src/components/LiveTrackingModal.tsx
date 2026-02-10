@@ -7,8 +7,6 @@ import {
   ActivityIndicator,
   Linking,
   Modal,
-  Animated,
-  Easing,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
