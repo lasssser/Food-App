@@ -131,26 +131,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Cairo_600SemiBold',
     marginTop: -2,
   },
-  cartIconWrap: {
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cartIconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cartIconCircleActive: {
-    backgroundColor: COLORS.primary,
-  },
   cartBadge: {
     position: 'absolute',
-    top: -2,
-    right: -6,
+    top: -4,
+    right: -8,
     backgroundColor: COLORS.primary,
     borderRadius: 10,
     minWidth: 18,
