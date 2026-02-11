@@ -155,13 +155,13 @@ const st = StyleSheet.create({
     height: 160,
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
+    overflow: 'visible',
     borderRadius: 80,
     backgroundColor: 'rgba(255,255,255,0.95)',
   },
   logoImg: {
-    width: 130,
-    height: 130,
+    width: 200,
+    height: 200,
   },
   shimmer: {
     position: 'absolute',
