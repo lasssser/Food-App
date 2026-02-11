@@ -293,6 +293,7 @@ export default function CartScreen() {
         )}
       </View>
       </Animated.View>
+      )}
     </SafeAreaView>
   );
 }
