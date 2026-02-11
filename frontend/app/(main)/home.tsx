@@ -338,6 +338,10 @@ export default function HomeScreen() {
                           <Ionicons name="star" size={14} color="#FFD700" />
                         </View>
                       )}
+                      {/* Favorite heart */}
+                      <TouchableOpacity style={s.rHeart} onPress={(e) => { e.stopPropagation(); toggleFavorite(r.id); }} data-testid={`fav-btn-${r.id}`}>
+                        <Ionicons name={favoriteIds.includes(r.id) ? "heart" : "heart-outline"} size={16} color={favoriteIds.includes(r.id) ? "#FF1744" : "#fff"} />
+                      </TouchableOpacity>
                       <View style={s.rInfo}>
                         <Text style={s.rName} numberOfLines={1}>{r.name}</Text>
                         <Text style={s.rCuisine} numberOfLines={1}>{r.cuisine_type}</Text>
