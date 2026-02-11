@@ -596,13 +596,13 @@ export default function CheckoutScreen() {
           <Text style={styles.sectionTitle}>🧾 ملخص الطلب</Text>
           
           <View style={styles.summaryCard}>
-            {items.map((item) => formatPrice(
+            {items.map((item) => (
               <View key={item.menuItem.id} style={styles.summaryItem}>
                 <Text style={styles.summaryItemName}>
                   {item.menuItem.name} × {item.quantity}
                 </Text>
                 <Text style={styles.summaryItemPrice}>
-                  {(item.menuItem.price * item.quantity)} ل.س
+                  {formatPrice(item.menuItem.price * item.quantity)} ل.س
                 </Text>
               </View>
             ))}
