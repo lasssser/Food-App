@@ -152,6 +152,8 @@ export default function CouponsScreen() {
 
             <TextInput style={st.input} placeholder="عدد مرات الاستخدام الأقصى" placeholderTextColor="#aaa" value={form.max_uses} onChangeText={t => setForm({...form, max_uses: t})} textAlign="right" keyboardType="numeric" data-testid="max-uses-input" />
 
+            <TextInput style={st.input} placeholder="مدة الصلاحية بالأيام (مثال: 30)" placeholderTextColor="#aaa" value={form.expires_days} onChangeText={t => setForm({...form, expires_days: t})} textAlign="right" keyboardType="numeric" data-testid="expires-days-input" />
+
             <TouchableOpacity style={[st.saveBtn, saving && { opacity: 0.6 }]} onPress={handleCreate} disabled={saving} data-testid="save-coupon-btn">
               <LinearGradient colors={['#6366f1', '#8b5cf6']} style={st.saveBtnGrad}>
                 {saving ? <ActivityIndicator color="#fff" /> : <Text style={st.saveBtnTxt}>إنشاء الكوبون</Text>}
