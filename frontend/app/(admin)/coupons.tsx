@@ -20,6 +20,16 @@ export default function CouponsScreen() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ code: '', discount_type: 'percentage', discount_value: '', min_order: '', max_uses: '100', expires_days: '30' });
 
+  const getRemainingDays = (expiresAt: string | null) => {
+    if (!expiresAt) return null;
+    try {
+      const exp = new Date(expiresAt);
+      const now = new Date();
+      const diff = Math.ceil((exp.getTime() - now.getTime()) / 86400000);
+      return diff;
+    } catch { return null; }
+  };
+
   useEffect(() => { fetchCoupons(); }, []);
 
   const fetchCoupons = async () => {
