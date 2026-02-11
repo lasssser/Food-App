@@ -463,7 +463,7 @@ const s = StyleSheet.create({
   statusBadge: { position: 'absolute', top: 8, left: 8, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
   statusTxt: { fontSize: 10, fontFamily: 'Cairo_700Bold', color: '#fff' },
   rStar: { position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: 13, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
-  rHeart: { position: 'absolute', bottom: 8, left: 8, width: 30, height: 30, borderRadius: 15, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center', zIndex: 10 },
+  rHeart: { position: 'absolute', top: 8, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center', zIndex: 10 },
   rInfo: { padding: 10 },
   rName: { fontSize: 13, fontFamily: 'Cairo_700Bold', color: '#fff', textAlign: 'right' },
   rCuisine: { fontSize: 11, fontFamily: 'Cairo_400Regular', color: 'rgba(255,255,255,0.75)', textAlign: 'right', marginTop: 1 },
