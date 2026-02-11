@@ -215,6 +215,9 @@ export default function HomeScreen() {
               <TouchableOpacity onPress={() => setShowOffersOnly(!showOffersOnly)} style={[s.headerMapBtn, showOffersOnly && s.headerBtnActive]} data-testid="offers-btn">
                 <Ionicons name="pricetag-outline" size={20} color="#fff" />
               </TouchableOpacity>
+              <TouchableOpacity onPress={() => setShowFavoritesOnly(!showFavoritesOnly)} style={[s.headerMapBtn, showFavoritesOnly && s.headerBtnActive]} data-testid="favorites-btn">
+                <Ionicons name={showFavoritesOnly ? "heart" : "heart-outline"} size={20} color="#fff" />
+              </TouchableOpacity>
             </View>
             <Text style={s.greeting}>شو ناكل اليوم؟</Text>
           </View>
