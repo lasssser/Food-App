@@ -18,11 +18,14 @@ try {
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
+// Splash image served from backend or CDN
+const SPLASH_IMAGE_URL = 'https://customer-assets.emergentagent.com/job_fb90186d-6a33-4f2d-99aa-2d21227e53b0/artifacts/sfmctbcd_image.png';
+
 // Custom Splash Screen - full screen background image
 function SplashView() {
   return (
     <ImageBackground
-      source={require('../assets/images/splash-image.png')}
+      source={{ uri: SPLASH_IMAGE_URL }}
       style={styles.splashContainer}
       resizeMode="cover"
     >
