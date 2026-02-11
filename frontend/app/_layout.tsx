@@ -18,10 +18,6 @@ try {
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
-// Splash image - use backend URL for reliability
-const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://akla-alsaree.cloud';
-const SPLASH_IMAGE_URL = `${BACKEND_URL}/api/static/splash.png`;
-
 // Custom Splash Screen
 function SplashView() {
   return (
