@@ -485,6 +485,10 @@ const styles = StyleSheet.create({
 
   // Summary Card
   summaryCard: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: COLORS.surface,
     borderTopLeftRadius: RADIUS.xl,
     borderTopRightRadius: RADIUS.xl,
