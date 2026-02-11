@@ -26,6 +26,7 @@ export default function RootLayout() {
   });
 
   const [forceUpdate, setForceUpdate] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     const checkVersion = async () => {
@@ -45,12 +46,21 @@ export default function RootLayout() {
   useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
+      const timer = setTimeout(() => setShowSplash(false), 2000);
+      return () => clearTimeout(timer);
     }
   }, [fontsLoaded]);
 
-  // While fonts load - just show white screen (no custom splash)
-  if (!fontsLoaded) {
-    return <View style={{ flex: 1, backgroundColor: '#fff' }} />;
+  if (!fontsLoaded || showSplash) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#E53935' }}>
+        <Image
+          source={require('../assets/images/splash-screen.png')}
+          style={{ width: '100%', height: '100%' }}
+          resizeMode="cover"
+        />
+      </View>
+    );
   }
 
   if (forceUpdate) {
