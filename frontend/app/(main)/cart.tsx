@@ -223,72 +223,71 @@ export default function CartScreen() {
             )}
           </View>
         )}
-
-        {/* Order Summary Card - inside scroll */}
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>المجموع الفرعي</Text>
-            <Text style={styles.summaryValue}>{formatPrice(subtotal)} ل.س</Text>
-          </View>
-          
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>رسوم التوصيل</Text>
-            <Text style={styles.summaryValue}>{formatPrice(deliveryFee)} ل.س</Text>
-          </View>
-          
-          <View style={styles.divider} />
-          
-          <View style={styles.summaryRow}>
-            <Text style={styles.totalLabel}>الإجمالي</Text>
-            <Text style={styles.totalValue}>{formatPrice(total)} ل.س</Text>
-          </View>
-
-          {/* Checkout Button - Show login prompt for guests */}
-          {isGuest ? (
-            <TouchableOpacity
-              style={styles.checkoutButton}
-              onPress={() => {
-                Alert.alert(
-                  'تسجيل الدخول مطلوب',
-                  'يرجى تسجيل الدخول أو إنشاء حساب لإتمام الطلب',
-                  [
-                    { text: 'إلغاء', style: 'cancel' },
-                    { text: 'تسجيل الدخول', onPress: () => {
-                      const { setGuestMode } = useAuthStore.getState();
-                      setGuestMode(false);
-                      router.push('/(auth)/login');
-                    }},
-                  ]
-                );
-              }}
-              activeOpacity={0.9}
-            >
-              <LinearGradient
-                colors={[COLORS.primary, COLORS.primaryDark]}
-                style={styles.checkoutButtonGradient}
-              >
-                <Ionicons name="log-in-outline" size={24} color={COLORS.textWhite} />
-                <Text style={styles.checkoutButtonText}>سجل دخولك للطلب</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={styles.checkoutButton}
-              onPress={() => router.push('/(main)/checkout')}
-              activeOpacity={0.9}
-            >
-              <LinearGradient
-                colors={[COLORS.primary, COLORS.primaryDark]}
-                style={styles.checkoutButtonGradient}
-              >
-                <Ionicons name="cart-outline" size={24} color={COLORS.textWhite} />
-                <Text style={styles.checkoutButtonText}>اطلب الآن</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          )}
-        </View>
       </ScrollView>
       </Animated.View>
+
+      {/* Order Summary Card - FIXED at bottom */}
+      <View style={styles.summaryCard}>
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>المجموع الفرعي</Text>
+          <Text style={styles.summaryValue}>{formatPrice(subtotal)} ل.س</Text>
+        </View>
+        
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryLabel}>رسوم التوصيل</Text>
+          <Text style={styles.summaryValue}>{formatPrice(deliveryFee)} ل.س</Text>
+        </View>
+        
+        <View style={styles.divider} />
+        
+        <View style={styles.summaryRow}>
+          <Text style={styles.totalLabel}>الإجمالي</Text>
+          <Text style={styles.totalValue}>{formatPrice(total)} ل.س</Text>
+        </View>
+
+        {isGuest ? (
+          <TouchableOpacity
+            style={styles.checkoutButton}
+            onPress={() => {
+              Alert.alert(
+                'تسجيل الدخول مطلوب',
+                'يرجى تسجيل الدخول أو إنشاء حساب لإتمام الطلب',
+                [
+                  { text: 'إلغاء', style: 'cancel' },
+                  { text: 'تسجيل الدخول', onPress: () => {
+                    const { setGuestMode } = useAuthStore.getState();
+                    setGuestMode(false);
+                    router.push('/(auth)/login');
+                  }},
+                ]
+              );
+            }}
+            activeOpacity={0.9}
+          >
+            <LinearGradient
+              colors={[COLORS.primary, COLORS.primaryDark]}
+              style={styles.checkoutButtonGradient}
+            >
+              <Ionicons name="log-in-outline" size={24} color={COLORS.textWhite} />
+              <Text style={styles.checkoutButtonText}>سجل دخولك للطلب</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.checkoutButton}
+            onPress={() => router.push('/(main)/checkout')}
+            activeOpacity={0.9}
+          >
+            <LinearGradient
+              colors={[COLORS.primary, COLORS.primaryDark]}
+              style={styles.checkoutButtonGradient}
+            >
+              <Ionicons name="cart-outline" size={24} color={COLORS.textWhite} />
+              <Text style={styles.checkoutButtonText}>اطلب الآن</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
