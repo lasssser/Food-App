@@ -116,7 +116,7 @@ export default function SplashView() {
 
       {/* Logo */}
       <Animated.View style={[st.logoWrap, { transform: [{ scale: logoScale }], opacity: logoOpacity }]}>
-        <Image source={require('../../assets/images/splash-screen.png')} style={st.logoImg} resizeMode="contain" />
+        <Image source={require('../../assets/images/logo_food2.png')} style={st.logoImg} resizeMode="contain" />
 
         {/* Shimmer overlay */}
         <Animated.View style={[st.shimmer, { transform: [{ translateX: shimmerTranslate }, { rotate: '25deg' }] }]} />
