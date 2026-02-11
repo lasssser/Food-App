@@ -1,28 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCartStore } from '../../src/store/cartStore';
 import { notificationAPI } from '../../src/services/api';
 import { usePushNotifications } from '../../src/hooks/usePushNotifications';
-import { COLORS, RADIUS, SHADOWS } from '../../src/constants/theme';
+import { COLORS, SHADOWS } from '../../src/constants/theme';
 
 export default function MainLayout() {
   const itemCount = useCartStore((state) => state.getItemCount());
   const [unreadCount, setUnreadCount] = useState(0);
   const insets = useSafeAreaInsets();
   
-  // Register push notifications
   usePushNotifications();
 
   const fetchUnreadCount = async () => {
     try {
       const data = await notificationAPI.getUnreadCount();
       setUnreadCount(data.count);
-    } catch (error) {
-      // Ignore errors silently
-    }
+    } catch {}
   };
 
   useEffect(() => {
@@ -35,9 +32,9 @@ export default function MainLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: [styles.tabBar, { paddingBottom: Math.max(insets.bottom, 10), height: 70 + insets.bottom }],
+        tabBarStyle: [styles.tabBar, { paddingBottom: Math.max(insets.bottom, 8), height: 65 + insets.bottom }],
         tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.textLight,
+        tabBarInactiveTintColor: '#BDBDBD',
         tabBarLabelStyle: styles.tabBarLabel,
       }}
     >
@@ -46,25 +43,7 @@ export default function MainLayout() {
         options={{
           title: 'الرئيسية',
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeIconContainer : undefined}>
-              <Ionicons name={focused ? "home" : "home-outline"} size={24} color={color} />
-            </View>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="cart"
-        options={{
-          title: 'السلة',
-          tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeIconContainer : undefined}>
-              <Ionicons name={focused ? "cart" : "cart-outline"} size={24} color={color} />
-              {itemCount > 0 && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{itemCount > 9 ? '9+' : itemCount}</Text>
-                </View>
-              )}
-            </View>
+            <Ionicons name={focused ? "home" : "home-outline"} size={24} color={color} />
           ),
         }}
       />
@@ -73,8 +52,24 @@ export default function MainLayout() {
         options={{
           title: 'طلباتي',
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeIconContainer : undefined}>
-              <Ionicons name={focused ? "receipt" : "receipt-outline"} size={24} color={color} />
+            <Ionicons name={focused ? "receipt" : "receipt-outline"} size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="cart"
+        options={{
+          title: '',
+          tabBarIcon: ({ focused }) => (
+            <View style={styles.cartBtnOuter}>
+              <View style={styles.cartBtn}>
+                <Ionicons name="cart" size={26} color="#fff" />
+                {itemCount > 0 && (
+                  <View style={styles.cartBadge}>
+                    <Text style={styles.cartBadgeText}>{itemCount > 9 ? '9+' : itemCount}</Text>
+                  </View>
+                )}
+              </View>
             </View>
           ),
         }}
@@ -84,7 +79,7 @@ export default function MainLayout() {
         options={{
           title: 'الإشعارات',
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeIconContainer : undefined}>
+            <View>
               <Ionicons name={focused ? "notifications" : "notifications-outline"} size={24} color={color} />
               {unreadCount > 0 && (
                 <View style={styles.badge}>
@@ -100,76 +95,101 @@ export default function MainLayout() {
         options={{
           title: 'حسابي',
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeIconContainer : undefined}>
-              <Ionicons name={focused ? "person" : "person-outline"} size={24} color={color} />
-            </View>
+            <Ionicons name={focused ? "person" : "person-outline"} size={24} color={color} />
           ),
         }}
       />
-      <Tabs.Screen
-        name="checkout"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="my-complaints"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="nearby-map"
-        options={{
-          href: null,
-        }}
-      />
+      <Tabs.Screen name="checkout" options={{ href: null }} />
+      <Tabs.Screen name="my-complaints" options={{ href: null }} />
+      <Tabs.Screen name="nearby-map" options={{ href: null }} />
     </Tabs>
   );
 }
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: '#fff',
     borderTopWidth: 0,
-    height: 70,
-    paddingBottom: 10,
-    paddingTop: 10,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    height: 65,
+    paddingTop: 6,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    ...SHADOWS.medium,
+    ...Platform.select({
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 16,
+        elevation: 12,
+      },
+    }),
   },
   tabBarLabel: {
-    fontSize: 11,
-    fontFamily: 'Cairo_400Regular',
-    fontWeight: '600',
+    fontSize: 10,
+    fontFamily: 'Cairo_600SemiBold',
+    marginTop: -2,
   },
-  activeIconContainer: {
-    backgroundColor: `${COLORS.primary}15`,
-    borderRadius: RADIUS.md,
-    padding: 8,
+  cartBtnOuter: {
+    position: 'relative',
+    top: -18,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  badge: {
-    position: 'absolute',
-    top: -6,
-    right: -10,
+  cartBtn: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
     backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Platform.select({
+      default: {
+        shadowColor: COLORS.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.35,
+        shadowRadius: 12,
+        elevation: 10,
+      },
+    }),
+  },
+  cartBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#fff',
     borderRadius: 10,
     minWidth: 20,
     height: 20,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: COLORS.surface,
+    borderColor: COLORS.primary,
+  },
+  cartBadgeText: {
+    color: COLORS.primary,
+    fontSize: 10,
+    fontFamily: 'Cairo_700Bold',
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -8,
+    backgroundColor: COLORS.primary,
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
   },
   badgeText: {
-    color: COLORS.textWhite,
-    fontSize: 10,
-    fontFamily: 'Cairo_400Regular',
-    fontWeight: 'bold',
+    color: '#fff',
+    fontSize: 9,
+    fontFamily: 'Cairo_700Bold',
   },
 });
