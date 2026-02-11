@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator, StyleSheet, I18nManager, Text, Image, TouchableOpacity, Linking, ImageBackground, Dimensions } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, I18nManager, Text, Image, TouchableOpacity, Linking } from 'react-native';
 import { COLORS } from '../src/constants/theme';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts, Cairo_300Light, Cairo_400Regular, Cairo_500Medium, Cairo_600SemiBold, Cairo_700Bold } from '@expo-google-fonts/cairo';
@@ -16,26 +16,6 @@ try {
   I18nManager.forceRTL(true);
 } catch (e) { /* ignore */ }
 
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
-
-// Custom Splash Screen
-function SplashView() {
-  const { width, height } = Dimensions.get('screen');
-  return (
-    <View style={styles.splashContainer}>
-      <Image
-        source={require('../assets/images/app-image.png')}
-        style={{ position: 'absolute', top: 0, left: 0, width: width || 500, height: height || 1000 }}
-        resizeMode="cover"
-      />
-      <View style={styles.splashBottom}>
-        <ActivityIndicator size="small" color="rgba(255,255,255,0.8)" />
-        <Text style={styles.splashLoading}>جاري التحميل...</Text>
-      </View>
-    </View>
-  );
-}
-
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Cairo_300Light,
@@ -47,7 +27,6 @@ export default function RootLayout() {
 
   const [forceUpdate, setForceUpdate] = useState(false);
 
-  // Check app version on mount
   useEffect(() => {
     const checkVersion = async () => {
       try {
@@ -63,18 +42,17 @@ export default function RootLayout() {
     checkVersion();
   }, []);
 
-  // Hide splash screen when fonts are loaded
   useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
 
+  // While fonts load - just show white screen (no custom splash)
   if (!fontsLoaded) {
-    return <SplashView />;
+    return <View style={{ flex: 1, backgroundColor: '#fff' }} />;
   }
 
-  // Force update screen
   if (forceUpdate) {
     return (
       <View style={styles.updateContainer}>
@@ -83,7 +61,6 @@ export default function RootLayout() {
           <Text style={styles.updateTitle}>تحديث مطلوب</Text>
           <Text style={styles.updateMsg}>يوجد إصدار جديد من التطبيق. يرجى التحديث للاستمرار.</Text>
           <TouchableOpacity style={styles.updateBtn} onPress={() => {
-            // Replace with your Play Store / download link
             Linking.openURL('https://akla-alsaree.cloud');
           }}>
             <Text style={styles.updateBtnText}>تحديث الآن</Text>
@@ -115,28 +92,6 @@ export default function RootLayout() {
 }
 
 const styles = StyleSheet.create({
-  splashContainer: {
-    flex: 1,
-    backgroundColor: '#C62828',
-  },
-  splashBottom: {
-    position: 'absolute',
-    bottom: 60,
-    alignItems: 'center',
-    gap: 8,
-  },
-  splashLoading: {
-    fontSize: 13,
-    fontFamily: 'Cairo_400Regular',
-    color: 'rgba(255,255,255,0.6)',
-    textAlign: 'center',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-  },
   updateContainer: {
     flex: 1,
     justifyContent: 'center',
