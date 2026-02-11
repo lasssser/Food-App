@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { complaintsAPI } from '../../src/services/api';
+import { formatSyriaDate } from '../../src/utils/syriaTime';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 
 interface Complaint {
@@ -62,10 +63,7 @@ export default function MyComplaintsScreen() {
     fetchComplaints();
   }, []);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ar-SY') + ' ' + date.toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' });
-  };
+  const formatDate = (dateString: string) => formatSyriaDate(dateString);
 
   const getStatusConfig = (status: string) => {
     return STATUS_CONFIG[status] || { label: status, color: '#6b7280', bg: '#f3f4f6' };
