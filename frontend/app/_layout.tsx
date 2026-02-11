@@ -22,19 +22,20 @@ const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://akla-alsaree.cloud';
 const SPLASH_IMAGE_URL = `${BACKEND_URL}/api/static/splash.png`;
 
-// Custom Splash Screen - full screen background image
+// Custom Splash Screen
 function SplashView() {
   return (
-    <ImageBackground
-      source={{ uri: SPLASH_IMAGE_URL }}
-      style={styles.splashContainer}
-      resizeMode="cover"
-    >
+    <View style={styles.splashContainer}>
+      <Image
+        source={require('../assets/images/app-image.png')}
+        style={{ width: SCREEN_W, height: SCREEN_H }}
+        resizeMode="cover"
+      />
       <View style={styles.splashBottom}>
         <ActivityIndicator size="small" color="rgba(255,255,255,0.8)" />
         <Text style={styles.splashLoading}>جاري التحميل...</Text>
       </View>
-    </ImageBackground>
+    </View>
   );
 }
 
