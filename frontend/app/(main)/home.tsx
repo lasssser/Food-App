@@ -102,7 +102,14 @@ export default function HomeScreen() {
       try { const c = await locationAPI.getCities(); setCities(c || []); } catch {}
       try { const cat = await categoriesAPI.getAll(); if (cat?.length) setCategories(cat); } catch {}
       try { const ads = await advertisementsAPI.getAll(); setAdvertisements(ads); } catch {}
-      try { const fIds = await favoritesAPI.getIds(); setFavoriteIds(fIds || []); } catch {}
+      if (isGuest) {
+        try {
+          const stored = Platform.OS === 'web' ? localStorage.getItem('guest_favorites') : await AsyncStorage.getItem('guest_favorites');
+          if (stored) setFavoriteIds(JSON.parse(stored));
+        } catch {}
+      } else {
+        try { const fIds = await favoritesAPI.getIds(); setFavoriteIds(fIds || []); } catch {}
+      }
       await detectLocation();
     };
     init();
