@@ -172,9 +172,14 @@ export default function HomeScreen() {
     : restaurants;
 
   const featuredRestaurants = filteredRestaurants.filter(r => r.is_featured);
+  // Sort: open restaurants first, then closed
+  const sortedRestaurants = [...filteredRestaurants].sort((a, b) => {
+    if (a.is_open === b.is_open) return 0;
+    return a.is_open ? -1 : 1;
+  });
   const restaurantRows: Restaurant[][] = [];
-  for (let i = 0; i < filteredRestaurants.length; i += 2) {
-    restaurantRows.push(filteredRestaurants.slice(i, i + 2));
+  for (let i = 0; i < sortedRestaurants.length; i += 2) {
+    restaurantRows.push(sortedRestaurants.slice(i, i + 2));
   }
 
   // Build category grid rows (COLS per row)
