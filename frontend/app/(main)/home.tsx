@@ -69,6 +69,8 @@ export default function HomeScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [gpsError, setGpsError] = useState<string | null>(null);
   const [showOffersOnly, setShowOffersOnly] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   useEffect(() => {
     const init = async () => {
