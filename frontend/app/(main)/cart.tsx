@@ -47,6 +47,12 @@ export default function CartScreen() {
     ]).start();
   }, []);
 
+  useEffect(() => {
+    const showSub = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', () => setKeyboardVisible(false));
+    return () => { showSub.remove(); hideSub.remove(); };
+  }, []);
+
   const subtotal = getSubtotal();
   const deliveryFee = restaurant?.delivery_fee || 5000;
   const total = subtotal + deliveryFee;
