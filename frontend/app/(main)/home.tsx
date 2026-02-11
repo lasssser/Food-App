@@ -75,13 +75,25 @@ export default function HomeScreen() {
 
   const toggleFavorite = async (restaurantId: string) => {
     const isFav = favoriteIds.includes(restaurantId);
-    // Optimistic update
-    if (isFav) {
-      setFavoriteIds(prev => prev.filter(id => id !== restaurantId));
-      try { await favoritesAPI.remove(restaurantId); } catch { setFavoriteIds(prev => [...prev, restaurantId]); }
+    const newIds = isFav ? favoriteIds.filter(id => id !== restaurantId) : [...favoriteIds, restaurantId];
+    setFavoriteIds(newIds);
+    if (isGuest) {
+      // Save locally for guests
+      try {
+        if (Platform.OS === 'web') {
+          localStorage.setItem('guest_favorites', JSON.stringify(newIds));
+        } else {
+          await AsyncStorage.setItem('guest_favorites', JSON.stringify(newIds));
+        }
+      } catch {}
     } else {
-      setFavoriteIds(prev => [...prev, restaurantId]);
-      try { await favoritesAPI.add(restaurantId); } catch { setFavoriteIds(prev => prev.filter(id => id !== restaurantId)); }
+      try {
+        if (isFav) { await favoritesAPI.remove(restaurantId); }
+        else { await favoritesAPI.add(restaurantId); }
+      } catch {
+        // Revert on error
+        setFavoriteIds(favoriteIds);
+      }
     }
   };
 
