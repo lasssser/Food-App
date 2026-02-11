@@ -280,6 +280,12 @@ export default function AdminSettings() {
               onPress={() => router.push('/(admin)/role-requests')}
             />
             <MenuItem
+              icon="pricetag-outline"
+              title="كوبونات الخصم"
+              subtitle="إنشاء وإدارة أكواد الخصم"
+              onPress={() => router.push('/(admin)/coupons')}
+            />
+            <MenuItem
               icon="settings-outline"
               title="إعدادات الدعم الفني"
               subtitle="تغيير رقم الواتساب والبريد الإلكتروني"
