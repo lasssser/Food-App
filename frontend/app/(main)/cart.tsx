@@ -226,7 +226,8 @@ export default function CartScreen() {
       </ScrollView>
       </Animated.View>
 
-      {/* Order Summary Card */}
+      {/* Order Summary Card - hide when keyboard visible */}
+      {!keyboardVisible && (
       <Animated.View style={{ transform: [{ translateY: bottomAnim }] }}>
       <View style={styles.summaryCard}>
         <View style={styles.summaryRow}>
