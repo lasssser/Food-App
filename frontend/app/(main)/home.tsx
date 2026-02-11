@@ -13,10 +13,7 @@ import { restaurantAPI, locationAPI, advertisementsAPI, categoriesAPI } from '..
 import { useAuthStore } from '../../src/store/authStore';
 import { COLORS, RADIUS, SPACING, SHADOWS } from '../../src/constants/theme';
 
-const { width } = Dimensions.get('window');
 const CARD_GAP = 12;
-const CARD_SIZE = (width - 40 - CARD_GAP) / 2;
-const CAT_SIZE = (width - 40 - CARD_GAP * 3) / 4;
 
 const fp = (n: number | null | undefined): string => {
   if (n == null || isNaN(Number(n))) return '0';
