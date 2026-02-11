@@ -61,10 +61,8 @@ export default function MainLayout() {
         options={{
           title: 'السلة',
           tabBarIcon: ({ color, focused }) => (
-            <View style={styles.cartIconWrap}>
-              <View style={[styles.cartIconCircle, focused && styles.cartIconCircleActive]}>
-                <Ionicons name={focused ? "cart" : "cart-outline"} size={22} color={focused ? '#fff' : color} />
-              </View>
+            <View style={{ position: 'relative' }}>
+              <Ionicons name={focused ? "cart" : "cart-outline"} size={24} color={color} />
               {itemCount > 0 && (
                 <View style={styles.cartBadge}>
                   <Text style={styles.cartBadgeText}>{itemCount > 9 ? '9+' : itemCount}</Text>
