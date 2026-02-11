@@ -72,6 +72,18 @@ export default function HomeScreen() {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
+  const toggleFavorite = async (restaurantId: string) => {
+    const isFav = favoriteIds.includes(restaurantId);
+    // Optimistic update
+    if (isFav) {
+      setFavoriteIds(prev => prev.filter(id => id !== restaurantId));
+      try { await favoritesAPI.remove(restaurantId); } catch { setFavoriteIds(prev => [...prev, restaurantId]); }
+    } else {
+      setFavoriteIds(prev => [...prev, restaurantId]);
+      try { await favoritesAPI.add(restaurantId); } catch { setFavoriteIds(prev => prev.filter(id => id !== restaurantId)); }
+    }
+  };
+
   useEffect(() => {
     const init = async () => {
       try { const c = await locationAPI.getCities(); setCities(c || []); } catch {}
