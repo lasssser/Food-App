@@ -511,6 +511,45 @@ export default function CheckoutScreen() {
           )}
         </View>
 
+        {/* Coupon Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>🏷 كود الخصم</Text>
+          {couponResult ? (
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', backgroundColor: '#E8F5E9', borderRadius: 12, padding: 14, gap: 10 }}>
+              <Ionicons name="checkmark-circle" size={22} color="#4CAF50" />
+              <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                <Text style={{ fontFamily: 'Cairo_700Bold', fontSize: 14, color: '#2E7D32' }}>{couponResult.message}</Text>
+                <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 12, color: '#4CAF50' }}>
+                  {couponResult.discount_type === 'free_delivery' ? 'توصيل مجاني' : `خصم ${formatPrice(couponResult.discount_amount)} ل.س`}
+                </Text>
+              </View>
+              <TouchableOpacity onPress={handleRemoveCoupon} data-testid="remove-coupon-btn">
+                <Ionicons name="close-circle" size={22} color="#999" />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+              <TextInput
+                style={{ flex: 1, backgroundColor: COLORS.background, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, fontFamily: 'Cairo_400Regular', color: COLORS.textPrimary, textAlign: 'right', borderWidth: 1, borderColor: couponError ? COLORS.error : COLORS.border }}
+                value={couponCode}
+                onChangeText={(t) => { setCouponCode(t); setCouponError(''); }}
+                placeholder="أدخل كود الخصم"
+                placeholderTextColor={COLORS.textLight}
+                data-testid="coupon-input"
+              />
+              <TouchableOpacity
+                onPress={handleApplyCoupon}
+                disabled={applyingCoupon}
+                style={{ backgroundColor: COLORS.primary, borderRadius: 12, paddingHorizontal: 20, justifyContent: 'center' }}
+                data-testid="apply-coupon-btn"
+              >
+                {applyingCoupon ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ fontFamily: 'Cairo_700Bold', fontSize: 14, color: '#fff' }}>تطبيق</Text>}
+              </TouchableOpacity>
+            </View>
+          )}
+          {couponError ? <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 12, color: COLORS.error, textAlign: 'right', marginTop: 6 }}>{couponError}</Text> : null}
+        </View>
+
         {/* Order Notes */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>📝 ملاحظات الطلب</Text>
