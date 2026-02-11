@@ -358,8 +358,8 @@ export default function HomeScreen() {
                           <Ionicons name="star" size={14} color="#FFD700" />
                         </View>
                       )}
-                      {/* Favorite heart */}
-                      <TouchableOpacity style={s.rHeart} onPress={(e) => { e.stopPropagation(); toggleFavorite(r.id); }} data-testid={`fav-btn-${r.id}`}>
+                      {/* Favorite heart - next to star, or in star's place if no star */}
+                      <TouchableOpacity style={[s.rHeart, { right: r.is_featured ? 40 : 8 }]} onPress={(e) => { e.stopPropagation(); toggleFavorite(r.id); }} data-testid={`fav-btn-${r.id}`}>
                         <Ionicons name={favoriteIds.includes(r.id) ? "heart" : "heart-outline"} size={16} color={favoriteIds.includes(r.id) ? "#FF1744" : "#fff"} />
                       </TouchableOpacity>
                       <View style={s.rInfo}>
