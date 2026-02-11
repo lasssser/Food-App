@@ -111,6 +111,10 @@ export default function CheckoutScreen() {
   const [newAddress, setNewAddress] = useState({ label: '', address_line: '', area: '', lat: 0, lng: 0 });
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponResult, setCouponResult] = useState<any>(null);
+  const [couponError, setCouponError] = useState('');
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
 
   const subtotal = getSubtotal();
   const deliveryFee = restaurant?.delivery_fee || 5000;
