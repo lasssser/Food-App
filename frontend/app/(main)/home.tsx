@@ -285,7 +285,6 @@ export default function HomeScreen() {
                       </View>
                     </TouchableOpacity>
                   ))}
-                  {/* Placeholder if odd number of restaurants */}
                   {row.length === 1 && <View style={{ width: CARD_SIZE }} />}
                 </View>
               ))}
