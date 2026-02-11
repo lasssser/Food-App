@@ -21,6 +21,7 @@ import { Order } from '../../src/types';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 import LocationViewer from '../../src/components/LocationViewer';
 import LiveTrackingModal from '../../src/components/LiveTrackingModal';
+import { toSyriaDate } from '../../src/utils/syriaTime';
 
 // ErrorBoundary to catch any render crashes in order cards
 class OrderCardErrorBoundary extends Component<{children: ReactNode, orderId: string}, {hasError: boolean}> {
