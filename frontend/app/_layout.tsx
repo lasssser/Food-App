@@ -121,8 +121,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#C62828',
   },
   splashFullImage: {
-    width: '75%',
-    height: '40%',
+    width: 220,
+    height: 220,
+  },
+  splashName: {
+    fontSize: 32,
+    fontFamily: 'Cairo_700Bold',
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: 16,
+  },
+  splashSlogan: {
+    fontSize: 14,
+    fontFamily: 'Cairo_400Regular',
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+    marginTop: 4,
   },
   splashBottom: {
     position: 'absolute',
