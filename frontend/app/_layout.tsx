@@ -25,8 +25,6 @@ function SplashView() {
         style={styles.splashFullImage}
         resizeMode="contain"
       />
-      <Text style={styles.splashName}>أكلة عالسريع</Text>
-      <Text style={styles.splashSlogan}>اطلب أشهى المأكولات بضغطة زر</Text>
       <View style={styles.splashBottom}>
         <ActivityIndicator size="small" color="rgba(255,255,255,0.8)" />
         <Text style={styles.splashLoading}>جاري التحميل...</Text>
