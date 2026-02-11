@@ -215,8 +215,8 @@ export default function HomeScreen() {
                 const active = selectedCategory === cat.id;
                 const imgUrl = CATEGORY_IMAGES[cat.name] || CATEGORY_IMAGES['الكل'];
                 return (
-                  <TouchableOpacity key={cat.id} style={[s.catCard, active && s.catCardActive]} onPress={() => setSelectedCategory(cat.id)} activeOpacity={0.8} data-testid={`category-chip-${cat.id}`}>
-                    <View style={[s.catImgWrap, active && s.catImgWrapActive]}>
+                  <TouchableOpacity key={cat.id} style={[s.catCard, { width: CAT_CARD_SIZE }]} onPress={() => setSelectedCategory(cat.id)} activeOpacity={0.8} data-testid={`category-chip-${cat.id}`}>
+                    <View style={[s.catImgWrap, { width: CAT_CARD_SIZE, height: CAT_CARD_SIZE }, active && s.catImgWrapActive]}>
                       <Image source={{ uri: imgUrl }} style={s.catImg} />
                     </View>
                     <Text style={[s.catName, active && s.catNameActive]} numberOfLines={1}>{cat.name}</Text>
