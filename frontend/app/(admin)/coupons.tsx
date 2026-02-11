@@ -39,9 +39,10 @@ export default function CouponsScreen() {
         discount_value: Number(form.discount_value) || 0,
         min_order: Number(form.min_order) || 0,
         max_uses: Number(form.max_uses) || 100,
+        expires_at: form.expires_days ? new Date(Date.now() + Number(form.expires_days) * 86400000).toISOString() : null,
       });
       setShowModal(false);
-      setForm({ code: '', discount_type: 'percentage', discount_value: '', min_order: '', max_uses: '100' });
+      setForm({ code: '', discount_type: 'percentage', discount_value: '', min_order: '', max_uses: '100', expires_days: '30' });
       fetchCoupons();
     } catch (err: any) {
       Alert.alert('خطأ', err.response?.data?.detail || 'فشل إنشاء الكوبون');
