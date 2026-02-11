@@ -20,11 +20,12 @@ const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
 // Custom Splash Screen
 function SplashView() {
+  const { width, height } = Dimensions.get('screen');
   return (
     <View style={styles.splashContainer}>
       <Image
         source={require('../assets/images/app-image.png')}
-        style={{ width: SCREEN_W, height: SCREEN_H }}
+        style={{ position: 'absolute', top: 0, left: 0, width: width || 500, height: height || 1000 }}
         resizeMode="cover"
       />
       <View style={styles.splashBottom}>
