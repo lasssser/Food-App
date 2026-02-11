@@ -10,6 +10,9 @@ import {
   TextInput,
   Animated,
   Easing,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -26,6 +29,7 @@ export default function CartScreen() {
   const { isGuest, isAuthenticated } = useAuthStore();
   const [showNotes, setShowNotes] = useState(false);
   const [orderNotes, setOrderNotes] = useState('');
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   
   // Animations
   const headerAnim = useRef(new Animated.Value(0)).current;
