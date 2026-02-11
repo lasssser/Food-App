@@ -31,8 +31,8 @@ const CATEGORY_IMAGES: { [key: string]: string } = {
   'فطائر': 'https://images.pexels.com/photos/1117862/pexels-photo-1117862.jpeg?auto=compress&cs=tinysrgb&w=200',
   'حلويات': 'https://images.pexels.com/photos/291528/pexels-photo-291528.jpeg?auto=compress&cs=tinysrgb&w=200',
   'قهوة': 'https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg?auto=compress&cs=tinysrgb&w=200',
-  'مشروبات': 'https://images.pexels.com/photos/1536849/pexels-photo-1536849.jpeg?auto=compress&cs=tinysrgb&w=200',
-  'كوكتيل': 'https://images.pexels.com/photos/1042940/pexels-photo-1042940.jpeg?auto=compress&cs=tinysrgb&w=200',
+  'مشروبات': 'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=200&q=80',
+  'كوكتيل': 'https://images.unsplash.com/photo-1766391237554-6d7042d7fbc8?w=200&q=80',
 };
 
 interface Restaurant {
