@@ -34,7 +34,10 @@ export default function Index() {
     } else if (isGuest) {
       router.replace('/(main)/home');
     } else {
-      router.replace('/(auth)/login');
+      // Go directly to home as guest instead of login
+      const { setGuestMode } = useAuthStore.getState();
+      setGuestMode(true);
+      router.replace('/(main)/home');
     }
   }, [isReady, isLoading, isAuthenticated, isGuest]);
 
