@@ -135,6 +135,8 @@ export default function HomeScreen() {
 
   const filteredRestaurants = showOffersOnly 
     ? restaurants.filter(r => r.delivery_fee === 0 || r.is_featured)
+    : showFavoritesOnly
+    ? restaurants.filter(r => favoriteIds.includes(r.id))
     : restaurants;
 
   const featuredRestaurants = filteredRestaurants.filter(r => r.is_featured);
