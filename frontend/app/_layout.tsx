@@ -114,13 +114,7 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   splashContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#C62828',
-  },
-  splashFullImage: {
-    width: 280,
-    height: 280,
   },
   splashBottom: {
     position: 'absolute',
