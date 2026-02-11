@@ -6,6 +6,7 @@ import { COLORS } from '../src/constants/theme';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts, Cairo_300Light, Cairo_400Regular, Cairo_500Medium, Cairo_600SemiBold, Cairo_700Bold } from '@expo-google-fonts/cairo';
 import Constants from 'expo-constants';
+import SplashView from '../src/components/SplashView';
 
 // Keep splash screen visible while fonts load
 try { SplashScreen.preventAutoHideAsync(); } catch (e) { /* ignore */ }
