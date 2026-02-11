@@ -53,15 +53,7 @@ export default function RootLayout() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded || showSplash) {
-    return (
-      <View style={{ flex: 1, backgroundColor: '#E53935' }}>
-        <Image
-          source={require('../assets/images/splash-screen.png')}
-          style={{ width: '100%', height: '100%' }}
-          resizeMode="cover"
-        />
-      </View>
-    );
+    return <SplashView />;
   }
 
   if (forceUpdate) {
