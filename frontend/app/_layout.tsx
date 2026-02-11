@@ -16,22 +16,19 @@ try {
   I18nManager.forceRTL(true);
 } catch (e) { /* ignore */ }
 
-// Simple static Splash Screen (no Animated API)
+// Custom Splash Screen matching reference design
 function SplashView() {
   return (
     <View style={styles.splashContainer}>
-      <View style={styles.splashGlow} />
-      <View style={styles.splashLogoBox}>
-        <Image
-          source={require('../assets/images/logo.png')}
-          style={styles.splashLogo}
-          resizeMode="contain"
-        />
+      <Image
+        source={require('../assets/images/splash-icon.png')}
+        style={styles.splashFullImage}
+        resizeMode="contain"
+      />
+      <View style={styles.splashBottom}>
+        <ActivityIndicator size="small" color="rgba(255,255,255,0.8)" />
+        <Text style={styles.splashLoading}>جاري التحميل...</Text>
       </View>
-      <Text style={styles.splashName}>أكلة عالسريع</Text>
-      <Text style={styles.splashSlogan}>اطلب أشهى المأكولات بضغطة زر</Text>
-      <ActivityIndicator size="small" color="rgba(255,255,255,0.7)" style={{ marginTop: 40 }} />
-      <Text style={styles.splashLoading}>جاري التحميل...</Text>
     </View>
   );
 }
