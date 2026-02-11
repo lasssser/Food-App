@@ -46,7 +46,7 @@ interface Category { id: string; name: string; icon: string; }
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isGuest } = useAuthStore();
   const { width: screenWidth } = useWindowDimensions();
   const CARD_SIZE = (screenWidth - 40 - CARD_GAP) / 2;
   const COLS = 5;
