@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { adminAPI } from '../../src/services/api';
+import { toSyriaDate } from '../../src/utils/syriaTime';
 
 type OrderStatus = 'all' | 'pending' | 'preparing' | 'delivering' | 'delivered' | 'cancelled';
 
@@ -87,7 +88,7 @@ export default function AdminOrders() {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = toSyriaDate(dateString);
     const d = date.getDate().toString().padStart(2, '0');
     const m = (date.getMonth() + 1).toString().padStart(2, '0');
     const y = date.getFullYear();
