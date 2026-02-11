@@ -2,7 +2,7 @@
   "expo": {
     "name": "أكلة عالسريع",
     "slug": "akla-3alsare3",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "akla3alsare3",
@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.wethaq.akla3alsare3",
-      "buildNumber": "3",
+      "buildNumber": "4",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "لتحديد موقع التوصيل بدقة",
         "CFBundleAllowMixedLocalizations": true
