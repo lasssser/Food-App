@@ -20,7 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import { useCartStore } from '../../src/store/cartStore';
-import { addressAPI, orderAPI, restaurantAPI, customerAPI } from '../../src/services/api';
+import { addressAPI, orderAPI, restaurantAPI, customerAPI, couponsAPI } from '../../src/services/api';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
 import LocationPicker from '../../src/components/LocationPicker';
 import { formatPrice } from '../../src/utils/formatPrice';
