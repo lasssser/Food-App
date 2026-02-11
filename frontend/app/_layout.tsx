@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator, StyleSheet, I18nManager, Text, Image, TouchableOpacity, Linking } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, I18nManager, Text, Image, TouchableOpacity, Linking, ImageBackground, Dimensions } from 'react-native';
 import { COLORS } from '../src/constants/theme';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts, Cairo_300Light, Cairo_400Regular, Cairo_500Medium, Cairo_600SemiBold, Cairo_700Bold } from '@expo-google-fonts/cairo';
