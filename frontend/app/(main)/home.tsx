@@ -199,11 +199,16 @@ export default function HomeScreen() {
             </View>
           </TouchableOpacity>
 
-          {/* Greeting + Map Button */}
+          {/* Greeting + Buttons */}
           <View style={s.greetRow}>
-            <TouchableOpacity onPress={() => router.push('/(main)/nearby-map')} style={s.headerMapBtn} data-testid="map-btn">
-              <Ionicons name="map-outline" size={22} color="#fff" />
-            </TouchableOpacity>
+            <View style={s.headerBtns}>
+              <TouchableOpacity onPress={() => router.push('/(main)/nearby-map')} style={s.headerMapBtn} data-testid="map-btn">
+                <Ionicons name="map-outline" size={22} color="#fff" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setShowOffersOnly(!showOffersOnly)} style={[s.headerMapBtn, showOffersOnly && s.headerBtnActive]} data-testid="offers-btn">
+                <Ionicons name="pricetag-outline" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
             <Text style={s.greeting}>شو ناكل اليوم؟</Text>
           </View>
 
