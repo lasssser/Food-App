@@ -2,13 +2,14 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput,
   Image, RefreshControl, ActivityIndicator, Dimensions, Modal, Pressable,
-  Platform, useWindowDimensions,
+  Platform, useWindowDimensions, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { restaurantAPI, locationAPI, advertisementsAPI, categoriesAPI, favoritesAPI } from '../../src/services/api';
 import { useAuthStore } from '../../src/store/authStore';
 import { COLORS, RADIUS, SPACING, SHADOWS } from '../../src/constants/theme';
