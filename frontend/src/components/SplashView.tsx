@@ -151,15 +151,17 @@ const st = StyleSheet.create({
     backgroundColor: 'rgba(255,200,100,0.15)',
   },
   logoWrap: {
-    width: 240,
-    height: 120,
+    width: 160,
+    height: 160,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
+    borderRadius: 80,
+    backgroundColor: 'rgba(255,255,255,0.95)',
   },
   logoImg: {
-    width: 240,
-    height: 120,
+    width: 130,
+    height: 130,
   },
   shimmer: {
     position: 'absolute',
