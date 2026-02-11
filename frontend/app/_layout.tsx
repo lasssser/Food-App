@@ -16,20 +16,21 @@ try {
   I18nManager.forceRTL(true);
 } catch (e) { /* ignore */ }
 
+const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
+
 // Custom Splash Screen - full screen background image
 function SplashView() {
   return (
-    <View style={styles.splashContainer}>
-      <Image
-        source={require('../assets/images/splash-image.png')}
-        style={StyleSheet.absoluteFillObject}
-        resizeMode="cover"
-      />
+    <ImageBackground
+      source={require('../assets/images/splash-image.png')}
+      style={styles.splashContainer}
+      resizeMode="cover"
+    >
       <View style={styles.splashBottom}>
         <ActivityIndicator size="small" color="rgba(255,255,255,0.8)" />
         <Text style={styles.splashLoading}>جاري التحميل...</Text>
       </View>
-    </View>
+    </ImageBackground>
   );
 }
 
