@@ -620,8 +620,16 @@ export default function CheckoutScreen() {
         </View>
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>التوصيل</Text>
-          <Text style={styles.totalSubValue}>{formatPrice(deliveryFee)} ل.س</Text>
+          <Text style={[styles.totalSubValue, freeDelivery && { textDecorationLine: 'line-through', color: '#999' }]}>{formatPrice(deliveryFee)} ل.س</Text>
         </View>
+        {(couponDiscount > 0 || freeDelivery) && (
+          <View style={styles.totalRow}>
+            <Text style={[styles.totalLabel, { color: '#4CAF50' }]}>الخصم</Text>
+            <Text style={{ fontSize: 14, fontFamily: 'Cairo_700Bold', color: '#4CAF50' }}>
+              -{freeDelivery ? formatPrice(deliveryFee) : formatPrice(couponDiscount)} ل.س
+            </Text>
+          </View>
+        )}
         <View style={[styles.totalRow, styles.totalRowFinal]}>
           <Text style={styles.totalFinalLabel}>الإجمالي</Text>
           <Text style={styles.totalFinalValue}>{formatPrice(total)} ل.س</Text>
