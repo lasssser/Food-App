@@ -260,10 +260,10 @@ export default function HomeScreen() {
               {restaurantRows.map((row, rowIdx) => (
                 <View key={rowIdx} style={s.gridRow}>
                   {row.map(r => (
-                    <TouchableOpacity key={r.id} style={s.rCard} onPress={() => router.push(`/restaurant/${r.id}`)} activeOpacity={0.92} data-testid={`restaurant-card-${r.id}`}>
+                    <TouchableOpacity key={r.id} style={[s.rCard, { width: CARD_SIZE }]} onPress={() => router.push(`/restaurant/${r.id}`)} activeOpacity={0.92} data-testid={`restaurant-card-${r.id}`}>
                       <Image
                         source={{ uri: r.image || 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400' }}
-                        style={s.rImg}
+                        style={[s.rImg, { height: CARD_SIZE * 0.65 }]}
                       />
                       {/* Status badge */}
                       <View style={[s.statusBadge, { backgroundColor: r.is_open ? '#E8F5E9' : '#FFEBEE' }]}>
