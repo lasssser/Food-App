@@ -160,8 +160,8 @@ const st = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.95)',
   },
   logoImg: {
-    width: 200,
-    height: 200,
+    width: 320,
+    height: 320,
   },
   shimmer: {
     position: 'absolute',
