@@ -142,15 +142,7 @@ export default function OrdersScreen() {
     return ORDER_STEPS.findIndex(s => s.status === status);
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ar-SY', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const formatDate = (dateString: string) => formatSyriaDate(dateString);
 
   const renderOrderCard = ({ item: order }: { item: Order }) => {
     const isExpanded = expandedOrder === order.id;
