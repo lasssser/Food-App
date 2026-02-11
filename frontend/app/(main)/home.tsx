@@ -49,6 +49,9 @@ interface Category { id: string; name: string; icon: string; }
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
+  const { width: screenWidth } = useWindowDimensions();
+  const CARD_SIZE = (screenWidth - 40 - CARD_GAP) / 2;
+  const CAT_CARD_SIZE = 80;
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [advertisements, setAdvertisements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
