@@ -1,85 +1,58 @@
 # أكلة عالسريع - CHANGELOG
 
-## Feb 10, 2026 - Session 4 (Redesign)
+## Feb 11, 2026 - Session 4 (UI V2 - Per User Reference)
+
+### Categories Redesign
+- Changed from horizontal chips to square cards with food images
+- Each category shows a Pexels food image matching the category type
+- Horizontal scroll, 4 visible at a time
+- Active category has red border highlight
+
+### Restaurant Grid Layout
+- Changed from full-width vertical list to 2-column grid
+- Each card: food image, status badge (مفتوح/مغلق), name, cuisine, rating, delivery fee
+- Uses useWindowDimensions for responsive sizing
+
+### Tab Bar Redesign
+- Added floating red circular cart button in center
+- Cart badge shows item count
+- Icons: home, orders, (cart), notifications, profile
+- Red highlight for active tab
+
+## Feb 10, 2026 - Session 4 (Redesign V1)
 
 ### Home Screen Redesign
-- New red gradient header with "التوصيل إلى" location selector
+- Red gradient header with "التوصيل إلى" location selector
 - Greeting text "شو ناكل اليوم؟"
-- Improved search bar with icon wrapper and clear button
+- Improved search bar with icon wrapper
 - Professional ad banner with pagination dots
-- Category filter chips with white cards and shadow
-- Featured restaurants horizontal scroll section
-- Nearby restaurants vertical list with full-width image cards
-- Status badges (مفتوح/مغلق) with colored dots
-- Restaurant meta row: rating, delivery time, delivery fee
+- Restaurant cards with status badges
 
 ### Restaurant Detail Page Redesign
 - Hero image with gradient overlay and status badge
-- Navigation buttons (back, favorite)
-- Restaurant info cards (delivery time, fee, min order)
+- Info cards (delivery time, fee, min order)
 - Category tabs for menu filtering
-- Clean menu items with image, description, price, add button
-- Floating cart button with item count and total
-- Add-on selection modal with checkbox/radio options
+- Menu items with add-to-cart buttons
+- Floating cart button, add-on modal
 
 ### toLocaleString Crash Fix (Complete)
-- Replaced ALL toLocaleString() calls with formatPrice() utility
-- Files fixed: cart.tsx, checkout.tsx, orders.tsx, home.tsx, [id].tsx
-- Also fixed: driver dashboard, myorders, restaurant menu, addons, dashboard
-- Components fixed: RestaurantCard, MenuItemCard, CartButton
+- Replaced ALL toLocaleString() with formatPrice()
+- 12+ files fixed: cart, checkout, orders, home, restaurant, driver, admin
 
 ### Backend Fix
-- Fixed CORS middleware syntax error in server.py (app.mount was inserted mid-block)
+- Fixed CORS middleware syntax error in server.py
 
 ## Feb 10, 2026 - Session 3 (Part 3)
 
-### Dynamic Categories System
-- New API: GET /api/categories (public)
-- Admin APIs: POST/PUT/DELETE /api/admin/categories
-- 10 default categories: الكل, برجر, بيتزا, مشاوي, سوري, فطائر, حلويات, قهوة, مشروبات, كوكتيل
-- Home screen loads categories from API dynamically
-- Admin can add/edit/delete categories
-
-### Driver Earnings Fix
-- Added today_earnings and total_earnings to /driver/stats
-- Uses MongoDB aggregation pipeline for performance
-
-### Search Across All Cities
-- Search now ignores city filter - searches across ALL restaurants
-- City filter only applies when not searching
+### Dynamic Categories, Driver Earnings, Search
+- Category CRUD API, 10 default categories
+- Driver earnings aggregation
+- Cross-city search
 
 ## Feb 10, 2026 - Session 3 (Part 2)
 
-### Restaurant Settings (City + Location Required)
-- Added mandatory city dropdown to restaurant info page
-- Added LocationPicker map for restaurant location
-- Validation prevents saving without city and location
-
-### Driver Settings (City Required)
-- Added city selection to driver profile
-- New API: PUT /driver/city
-- Registration validation: drivers must select city
-
-### MongoDB Performance Indexes
-- 20 indexes across users, restaurants, orders, notifications
-
-### Bug Fixes (7 issues)
-- Fixed duplicate notifications
-- Added POST /auth/logout to clear push tokens
-- Fixed restaurant search (backend search with regex)
-- Fixed city detection outside Syria (200km threshold)
-- Removed Animated API from LiveTrackingModal
-- Added debounced search on home screen
-- Fixed payment methods showing only restaurant-enabled ones
+### Restaurant/Driver Settings, MongoDB Indexes, Bug Fixes (7)
 
 ## Feb 10, 2026 - Session 3 (Part 1)
 
-### Android Crash Fixes
-- Removed Animated API from _layout.tsx and login.tsx
-- Replaced <Redirect> with router.replace in index.tsx
-- Fixed toLocaleString crash on Hermes engine
-
-### App Store
-- Bundle ID: com.wethaq.akla3alsare3
-- iOS build submitted to App Store Connect
-- TestFlight configured
+### Android Crash Fixes, App Store Setup
