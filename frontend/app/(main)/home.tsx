@@ -324,11 +324,9 @@ const s = StyleSheet.create({
   // Categories - Square cards
   catSection: { marginTop: 18 },
   catScroll: { paddingHorizontal: 16, gap: 12 },
-  catCard: { alignItems: 'center', width: CAT_SIZE },
+  catCard: { alignItems: 'center' },
   catCardActive: {},
   catImgWrap: {
-    width: CAT_SIZE,
-    height: CAT_SIZE,
     borderRadius: 18,
     backgroundColor: '#fff',
     overflow: 'hidden',
