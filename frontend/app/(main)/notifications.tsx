@@ -19,6 +19,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { notificationAPI } from '../../src/services/api';
 import { COLORS, RADIUS, SHADOWS, SPACING } from '../../src/constants/theme';
+import { formatSyriaRelative } from '../../src/utils/syriaTime';
 import { scheduleLocalNotification } from '../../src/services/notifications';
 
 interface NotificationItem {
