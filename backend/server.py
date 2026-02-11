@@ -37,6 +37,8 @@ from routes.notifications_routes import router as notifications_router
 from routes.admin import router as admin_router
 from routes.seed import router as seed_router
 from routes.categories import router as categories_router
+from routes.favorites import router as favorites_router
+from routes.coupons import router as coupons_router
 
 # Include all routers with /api prefix
 app.include_router(auth_router, prefix="/api")
@@ -49,6 +51,8 @@ app.include_router(notifications_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(seed_router, prefix="/api")
 app.include_router(categories_router, prefix="/api")
+app.include_router(favorites_router, prefix="/api")
+app.include_router(coupons_router, prefix="/api")
 
 # Health check routes
 @app.get("/api/")
