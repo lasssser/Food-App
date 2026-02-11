@@ -667,4 +667,51 @@ export const categoriesAPI = {
   },
 };
 
+export const favoritesAPI = {
+  getAll: async () => {
+    const response = await api.get('/favorites');
+    return response.data;
+  },
+  getIds: async () => {
+    const response = await api.get('/favorites/ids');
+    return response.data;
+  },
+  add: async (restaurantId: string) => {
+    const response = await api.post(`/favorites/${restaurantId}`);
+    return response.data;
+  },
+  remove: async (restaurantId: string) => {
+    const response = await api.delete(`/favorites/${restaurantId}`);
+    return response.data;
+  },
+};
+
+export const couponsAPI = {
+  validate: async (code: string, subtotal: number) => {
+    const response = await api.post('/coupons/validate', { code, subtotal });
+    return response.data;
+  },
+  use: async (couponId: string) => {
+    const response = await api.post('/coupons/use', { coupon_id: couponId });
+    return response.data;
+  },
+  // Admin
+  getAll: async () => {
+    const response = await api.get('/admin/coupons');
+    return response.data;
+  },
+  create: async (data: any) => {
+    const response = await api.post('/admin/coupons', data);
+    return response.data;
+  },
+  update: async (id: string, data: any) => {
+    const response = await api.put(`/admin/coupons/${id}`, data);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/admin/coupons/${id}`);
+    return response.data;
+  },
+};
+
 export default api;
