@@ -16,14 +16,14 @@ try {
   I18nManager.forceRTL(true);
 } catch (e) { /* ignore */ }
 
-// Custom Splash Screen matching reference design
+// Custom Splash Screen - full screen background image
 function SplashView() {
   return (
     <View style={styles.splashContainer}>
       <Image
-        source={require('../assets/images/logo.png')}
-        style={styles.splashFullImage}
-        resizeMode="contain"
+        source={require('../assets/images/splash-bg.png')}
+        style={StyleSheet.absoluteFillObject}
+        resizeMode="cover"
       />
       <View style={styles.splashBottom}>
         <ActivityIndicator size="small" color="rgba(255,255,255,0.8)" />
