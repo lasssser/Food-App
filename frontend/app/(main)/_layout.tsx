@@ -59,17 +59,17 @@ export default function MainLayout() {
       <Tabs.Screen
         name="cart"
         options={{
-          title: '',
-          tabBarIcon: ({ focused }) => (
-            <View style={styles.cartBtnOuter}>
-              <View style={styles.cartBtn}>
-                <Ionicons name="cart" size={26} color="#fff" />
-                {itemCount > 0 && (
-                  <View style={styles.cartBadge}>
-                    <Text style={styles.cartBadgeText}>{itemCount > 9 ? '9+' : itemCount}</Text>
-                  </View>
-                )}
+          title: 'السلة',
+          tabBarIcon: ({ color, focused }) => (
+            <View style={styles.cartIconWrap}>
+              <View style={[styles.cartIconCircle, focused && styles.cartIconCircleActive]}>
+                <Ionicons name={focused ? "cart" : "cart-outline"} size={22} color={focused ? '#fff' : color} />
               </View>
+              {itemCount > 0 && (
+                <View style={styles.cartBadge}>
+                  <Text style={styles.cartBadgeText}>{itemCount > 9 ? '9+' : itemCount}</Text>
+                </View>
+              )}
             </View>
           ),
         }}
