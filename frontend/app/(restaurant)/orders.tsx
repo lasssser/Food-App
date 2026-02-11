@@ -68,11 +68,8 @@ function safeFormatNumber(num: any): string {
 function safeFormatTime(dateStr: any): string {
   if (!dateStr) return '';
   try {
-    // Parse ISO string manually for Android compatibility
     const str = String(dateStr);
-    const match = str.match(/(\d{2}):(\d{2})/);
-    if (match) return `${match[1]}:${match[2]}`;
-    const d = new Date(str);
+    const d = toSyriaDate(str);
     if (isNaN(d.getTime())) return '';
     const h = d.getHours().toString().padStart(2, '0');
     const m = d.getMinutes().toString().padStart(2, '0');
