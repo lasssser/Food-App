@@ -118,7 +118,31 @@ export default function CheckoutScreen() {
 
   const subtotal = getSubtotal();
   const deliveryFee = restaurant?.delivery_fee || 5000;
-  const total = subtotal + deliveryFee;
+  const couponDiscount = couponResult?.discount_amount || 0;
+  const freeDelivery = couponResult?.discount_type === 'free_delivery';
+  const finalDelivery = freeDelivery ? 0 : deliveryFee;
+  const total = subtotal - couponDiscount + finalDelivery;
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setApplyingCoupon(true);
+    setCouponError('');
+    try {
+      const result = await couponsAPI.validate(couponCode.trim(), subtotal);
+      setCouponResult(result);
+    } catch (err: any) {
+      setCouponError(err.response?.data?.detail || 'كود غير صالح');
+      setCouponResult(null);
+    } finally {
+      setApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponResult(null);
+    setCouponCode('');
+    setCouponError('');
+  };
 
   useEffect(() => {
     const showSub = Keyboard.addListener(
