@@ -71,10 +71,13 @@ export default function AvailableOrders() {
   const formatTime = (dateString: string) => {
     try {
       const str = String(dateString || '');
-      const date = new Date(str);
+      const date = toSyriaDate(str);
       const now = new Date();
+      const syriaOffset = 3 * 60 * 60 * 1000;
+      const nowUtc = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
+      const syriaNow = new Date(nowUtc + syriaOffset);
       if (isNaN(date.getTime())) return '';
-      const diffMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
+      const diffMinutes = Math.floor((syriaNow.getTime() - date.getTime()) / 60000);
       
       if (diffMinutes < 1) return 'الآن';
       if (diffMinutes < 60) return `منذ ${diffMinutes} دقيقة`;
