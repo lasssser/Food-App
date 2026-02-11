@@ -21,7 +21,7 @@ function SplashView() {
   return (
     <View style={styles.splashContainer}>
       <Image
-        source={require('../assets/images/splash-bg.png')}
+        source={require('../assets/images/splash-image.png')}
         style={StyleSheet.absoluteFillObject}
         resizeMode="cover"
       />
