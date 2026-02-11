@@ -129,6 +129,19 @@ export default function CouponsScreen() {
               <Text style={st.infoTxt}>الحد الأدنى: {c.min_order || 0} ل.س</Text>
               <Text style={st.infoTxt}>الاستخدام: {c.used_count}/{c.max_uses}</Text>
             </View>
+            {c.expires_at && (() => {
+              const days = getRemainingDays(c.expires_at);
+              if (days === null) return null;
+              const expired = days <= 0;
+              return (
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 4, marginTop: 6 }}>
+                  <Ionicons name="time-outline" size={14} color={expired ? '#ef4444' : days <= 3 ? '#f59e0b' : '#22c55e'} />
+                  <Text style={{ fontSize: 11, fontFamily: 'Cairo_600SemiBold', color: expired ? '#ef4444' : days <= 3 ? '#f59e0b' : '#22c55e' }}>
+                    {expired ? 'منتهي الصلاحية' : `متبقي ${days} يوم`}
+                  </Text>
+                </View>
+              );
+            })()}
           </View>
         ))}
       </ScrollView>
