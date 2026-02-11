@@ -130,10 +130,14 @@ export default function HomeScreen() {
   const onRefresh = async () => { setRefreshing(true); await detectLocation(); fetchRestaurants(); };
   const selectCity = (id: string | null, name: string) => { setDetectedCity(id); setDetectedCityName(name); setShowCityModal(false); };
 
-  const featuredRestaurants = restaurants.filter(r => r.is_featured);
+  const filteredRestaurants = showOffersOnly 
+    ? restaurants.filter(r => r.delivery_fee === 0 || r.is_featured)
+    : restaurants;
+
+  const featuredRestaurants = filteredRestaurants.filter(r => r.is_featured);
   const restaurantRows: Restaurant[][] = [];
-  for (let i = 0; i < restaurants.length; i += 2) {
-    restaurantRows.push(restaurants.slice(i, i + 2));
+  for (let i = 0; i < filteredRestaurants.length; i += 2) {
+    restaurantRows.push(filteredRestaurants.slice(i, i + 2));
   }
 
   // Build category grid rows (COLS per row)
