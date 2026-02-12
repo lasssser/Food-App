@@ -109,11 +109,11 @@ export default function MyOrders() {
       await driverAPI.updateOrderStatus(orderId, newStatus);
       
       if (newStatus === 'delivered') {
-        setSuccessMessage('تم تسليم الطلب بنجاح! 🎉\nشكراً لك على عملك الرائع');
+        setSuccessMessage('تم تسليم الطلب بنجاح! \nشكراً لك على عملك الرائع');
       } else if (newStatus === 'picked_up') {
-        setSuccessMessage('تم استلام الطلب من المطعم ✅\nتوجه الآن لموقع العميل');
+        setSuccessMessage('تم استلام الطلب من المطعم\nتوجه الآن لموقع العميل');
       } else if (newStatus === 'out_for_delivery') {
-        setSuccessMessage('بالتوفيق في التوصيل! 🚀\nالعميل بانتظارك');
+        setSuccessMessage('بالتوفيق في التوصيل!\nالعميل بانتظارك');
       }
       setShowSuccessModal(true);
       fetchOrders();
@@ -123,6 +123,24 @@ export default function MyOrders() {
     } finally {
       setUpdating(null);
     }
+  };
+
+  const handleRejectOrder = async (orderId: string) => {
+    Alert.alert('رفض الطلب', 'هل أنت متأكد من رفض هذا الطلب؟', [
+      { text: 'إلغاء', style: 'cancel' },
+      { text: 'رفض', style: 'destructive', onPress: async () => {
+        setUpdating(orderId);
+        try {
+          await driverAPI.rejectOrder(orderId);
+          Alert.alert('تم', 'تم رفض الطلب');
+          fetchOrders();
+        } catch (error: any) {
+          Alert.alert('خطأ', error.response?.data?.detail || 'فشل رفض الطلب');
+        } finally {
+          setUpdating(null);
+        }
+      }},
+    ]);
   };
 
   const getActiveOrdersCount = () => {
