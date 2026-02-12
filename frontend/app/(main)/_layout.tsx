@@ -8,14 +8,18 @@ import { notificationAPI } from '../../src/services/api';
 import { usePushNotifications } from '../../src/hooks/usePushNotifications';
 import { COLORS, SHADOWS } from '../../src/constants/theme';
 
+import { useAuthStore } from '../../src/store/authStore';
+
 export default function MainLayout() {
   const itemCount = useCartStore((state) => state.getItemCount());
   const [unreadCount, setUnreadCount] = useState(0);
   const insets = useSafeAreaInsets();
+  const { isGuest, isAuthenticated } = useAuthStore();
   
   usePushNotifications();
 
   const fetchUnreadCount = async () => {
+    if (!isAuthenticated) return;
     try {
       const data = await notificationAPI.getUnreadCount();
       setUnreadCount(data.count);
@@ -23,10 +27,11 @@ export default function MainLayout() {
   };
 
   useEffect(() => {
+    if (!isAuthenticated) return;
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 15000);
+    const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <Tabs
