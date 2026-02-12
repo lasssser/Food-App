@@ -115,7 +115,7 @@ async def unregister_push_token(current_user: dict = Depends(get_current_user)):
 async def test_push_notification(current_user: dict = Depends(get_current_user)):
     """Send a test push notification to the current user"""
     title = "🔔 إشعار تجريبي"
-    body = "هذا إشعار تجريبي من يلا ناكل؟"
+    body = "هذا إشعار تجريبي من أكلة عالسريع"
     data = {"type": "test", "timestamp": datetime.utcnow().isoformat()}
     
     results = await send_push_to_user(current_user["id"], title, body, data)

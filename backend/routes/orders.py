@@ -248,7 +248,7 @@ async def verify_payment(payment_data: PaymentVerification, current_user: dict =
 @router.get("/payments/shamcash-info")
 async def get_shamcash_info():
     return {
-        "merchant_name": "يلا ناكل؟",
+        "merchant_name": "أكلة عالسريع",
         "merchant_phone": "+963 XXX XXX XXX",
         "instructions": [
             "1. افتح تطبيق ShamCash",
