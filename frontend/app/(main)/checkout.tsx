@@ -596,8 +596,8 @@ export default function CheckoutScreen() {
           <Text style={styles.sectionTitle}>🧾 ملخص الطلب</Text>
           
           <View style={styles.summaryCard}>
-            {items.map((item) => (
-              <View key={item.menuItem.id} style={styles.summaryItem}>
+            {items.map((item, index) => (
+              <View key={`summary-${index}`} style={styles.summaryItem}>
                 <Text style={styles.summaryItemName}>
                   {item.menuItem.name} × {item.quantity}
                 </Text>
