@@ -292,8 +292,15 @@ async def get_restaurant_stats(current_user: dict = Depends(get_current_user)):
     revenue_result = await db.orders.aggregate(pipeline).to_list(1)
     today_revenue = revenue_result[0]["total"] if revenue_result else 0
     
+    rest_data = {k: v for k, v in restaurant.items() if k != '_id'}
+    for key in ["created_at", "featured_at"]:
+        val = rest_data.get(key)
+        if val and not isinstance(val, str):
+            try: rest_data[key] = val.isoformat()
+            except: rest_data[key] = str(val)
+    
     return {
-        "restaurant": Restaurant(**restaurant),
+        "restaurant": rest_data,
         "today_orders": today_orders,
         "pending_orders": pending_orders,
         "today_revenue": today_revenue
