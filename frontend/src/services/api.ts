@@ -409,6 +409,10 @@ export const driverAPI = {
     const response = await api.post(`/driver/accept-order/${orderId}`);
     return response.data;
   },
+  rejectOrder: async (orderId: string) => {
+    const response = await api.post(`/driver/reject-order/${orderId}`);
+    return response.data;
+  },
   updateOrderStatus: async (orderId: string, status: string) => {
     const response = await api.put(`/driver/orders/${orderId}/status`, { status });
     return response.data;
