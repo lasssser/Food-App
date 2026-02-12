@@ -89,7 +89,7 @@ export default function RestaurantDashboard() {
     );
   }
 
-  return formatPrice(
+  return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView
         style={styles.content}
