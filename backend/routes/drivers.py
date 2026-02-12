@@ -286,6 +286,51 @@ async def driver_accept_order(order_id: str, current_user: dict = Depends(get_cu
     
     return {"message": "تم قبول الطلب بنجاح", "order_id": order_id}
 
+@router.post("/driver/reject-order/{order_id}")
+async def driver_reject_order(order_id: str, current_user: dict = Depends(get_current_user)):
+    """Driver rejects/declines an assigned order"""
+    if current_user.get("role") != "driver":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    order = await db.orders.find_one({"id": order_id, "driver_id": current_user["id"]})
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود أو ليس مسنداً لك")
+    
+    if order.get("order_status") not in ["driver_assigned"]:
+        raise HTTPException(status_code=400, detail="لا يمكن رفض هذا الطلب بعد الاستلام")
+    
+    # Remove driver and reset status
+    await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {
+            "driver_id": None,
+            "driver_name": None,
+            "driver_phone": None,
+            "driver_type": None,
+            "order_status": "ready",
+            "updated_at": datetime.utcnow()
+        }}
+    )
+    
+    # Notify restaurant
+    restaurant = await db.restaurants.find_one({"id": order.get("restaurant_id")})
+    if restaurant and restaurant.get("owner_id"):
+        await create_notification(
+            restaurant["owner_id"],
+            "السائق رفض الطلب",
+            f"السائق {current_user['name']} رفض الطلب #{order_id[:8]}. يرجى تعيين سائق آخر.",
+            "driver_rejected",
+            {"order_id": order_id}
+        )
+    
+    # Notify other drivers
+    city_id = order.get("city_id") or (restaurant.get("city_id") if restaurant else None)
+    if city_id:
+        await notify_drivers_new_order(order_id, city_id)
+    
+    return {"message": "تم رفض الطلب", "order_id": order_id}
+
+
 @router.get("/driver/my-orders")
 async def get_driver_orders(current_user: dict = Depends(get_current_user)):
     """Get driver's current and recent orders"""
