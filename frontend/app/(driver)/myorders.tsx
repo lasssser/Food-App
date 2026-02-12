@@ -320,26 +320,38 @@ export default function MyOrders() {
 
         {/* Action Button */}
         {action && (
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => handleUpdateStatus(order.id, action.next)}
-            disabled={isUpdating}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={action.next === 'delivered' ? [COLORS.success, '#43A047'] : [COLORS.primary, COLORS.primaryDark]}
-              style={styles.actionButtonGradient}
+          <View style={{ gap: 8 }}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => handleUpdateStatus(order.id, action.next)}
+              disabled={isUpdating}
+              activeOpacity={0.8}
             >
-              {isUpdating ? (
-                <ActivityIndicator color={COLORS.textWhite} />
-              ) : (
-                <>
-                  <Ionicons name={action.icon} size={22} color={COLORS.textWhite} />
-                  <Text style={styles.actionButtonText}>{action.label}</Text>
-                </>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
+              <LinearGradient
+                colors={action.next === 'delivered' ? [COLORS.success, '#43A047'] : [COLORS.primary, COLORS.primaryDark]}
+                style={styles.actionButtonGradient}
+              >
+                {isUpdating ? (
+                  <ActivityIndicator color={COLORS.textWhite} />
+                ) : (
+                  <>
+                    <Ionicons name={action.icon} size={22} color={COLORS.textWhite} />
+                    <Text style={styles.actionButtonText}>{action.label}</Text>
+                  </>
+                )}
+              </LinearGradient>
+            </TouchableOpacity>
+            {order.order_status === 'driver_assigned' && (
+              <TouchableOpacity
+                style={{ backgroundColor: '#FFF3F3', borderRadius: 14, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: '#FFCDD2' }}
+                onPress={() => handleRejectOrder(order.id)}
+                disabled={isUpdating}
+                activeOpacity={0.8}
+              >
+                <Text style={{ fontFamily: 'Cairo_700Bold', fontSize: 15, color: COLORS.error }}>رفض الطلب</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         )}
       </View>
     );
