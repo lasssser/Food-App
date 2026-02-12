@@ -596,10 +596,12 @@ export default function CheckoutScreen() {
           <Text style={styles.sectionTitle}>🧾 ملخص الطلب</Text>
           
           <View style={styles.summaryCard}>
-            {items.map((item, index) => (
+            {items.length === 0 ? (
+              <Text style={{ fontFamily: 'Cairo_400Regular', fontSize: 14, color: COLORS.textLight, textAlign: 'center', padding: 10 }}>لا توجد عناصر</Text>
+            ) : items.map((item, index) => (
               <View key={`summary-${index}`} style={styles.summaryItem}>
                 <Text style={styles.summaryItemName}>
-                  {item.menuItem.name} × {item.quantity}
+                  {item.menuItem.name} x {item.quantity}
                 </Text>
                 <Text style={styles.summaryItemPrice}>
                   {formatPrice(item.menuItem.price * item.quantity)} ل.س
