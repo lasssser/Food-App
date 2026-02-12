@@ -29,20 +29,33 @@ export const useAuthStore = create<AuthState>((set) => ({
   isGuest: false,
 
   login: async (phone: string, password: string) => {
-    const response = await authAPI.login(phone, password);
-    set({ user: response.user, isAuthenticated: true, isGuest: false });
-    return response.user;
+    set({ isLoading: true });
+    try {
+      const response = await authAPI.login(phone, password);
+      set({ user: response.user, isAuthenticated: true, isGuest: false, isLoading: false });
+      return response.user;
+    } catch (e) {
+      set({ isLoading: false });
+      throw e;
+    }
   },
 
   register: async (name: string, phone: string, password: string, role: string = 'customer', city_id?: string) => {
-    const response = await authAPI.register(name, phone, password, role, city_id);
-    set({ user: response.user, isAuthenticated: true, isGuest: false });
-    return response.user;
+    set({ isLoading: true });
+    try {
+      const response = await authAPI.register(name, phone, password, role, city_id);
+      set({ user: response.user, isAuthenticated: true, isGuest: false, isLoading: false });
+      return response.user;
+    } catch (e) {
+      set({ isLoading: false });
+      throw e;
+    }
   },
 
   logout: async () => {
-    await authAPI.logout();
+    // Optimistic: clear state FIRST, then call API
     set({ user: null, isAuthenticated: false, isGuest: false });
+    try { await authAPI.logout(); } catch {}
   },
 
   checkAuth: async () => {
