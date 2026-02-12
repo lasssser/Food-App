@@ -107,7 +107,7 @@ export default function HomeScreen() {
           const stored = Platform.OS === 'web' ? localStorage.getItem('guest_favorites') : await AsyncStorage.getItem('guest_favorites');
           if (stored) setFavoriteIds(JSON.parse(stored));
         } catch {}
-      } else {
+      } else if (!isGuest) {
         try { const fIds = await favoritesAPI.getIds(); setFavoriteIds(fIds || []); } catch {}
       }
       await detectLocation();
