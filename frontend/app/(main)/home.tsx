@@ -120,12 +120,12 @@ export default function HomeScreen() {
     try {
       const { status } = await Promise.race([
         Location.requestForegroundPermissionsAsync(),
-        new Promise<any>((_, rej) => setTimeout(() => rej('timeout'), 5000)),
+        new Promise<any>((_, rej) => setTimeout(() => rej('timeout'), 3000)),
       ]);
       if (status !== 'granted') { setGpsError('لم يتم منح إذن الموقع'); setLocatingGPS(false); return null; }
       const loc = await Promise.race([
         Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low }),
-        new Promise<any>((_, rej) => setTimeout(() => rej('timeout'), 8000)),
+        new Promise<any>((_, rej) => setTimeout(() => rej('timeout'), 5000)),
       ]);
       const result = await locationAPI.detectCity(loc.coords.latitude, loc.coords.longitude);
       if (result.outside_coverage) {
